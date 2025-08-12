@@ -8,5 +8,6 @@ export type ControllerRequest = {
 };
 
 export interface Controller {
+  path: string;
   handle(request: ControllerRequest): Promise<Response>;
 }
