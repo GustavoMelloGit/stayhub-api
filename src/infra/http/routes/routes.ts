@@ -3,9 +3,9 @@ import { TenantDi } from "../../di/tenant_di";
 import { BunHttpControllerAdapter } from "../adapters/http_controller_adapter";
 
 const tenantDi = new TenantDi();
-const listTenantsController = tenantDi.makeListTenantsController();
-
 const stayDi = new StayDi();
+
+const listTenantsController = tenantDi.makeListTenantsController();
 const getStayController = stayDi.makeGetStayController();
 
 const controllers = [listTenantsController, getStayController];

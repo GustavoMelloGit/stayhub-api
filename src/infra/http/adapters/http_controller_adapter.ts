@@ -1,3 +1,5 @@
+import { ResourceNotFoundError } from "../../../application/error/resource_not_found_error";
+import { ValidationError } from "../../../application/error/validation_error";
 import type {
   Controller,
   ControllerRequest,
@@ -80,11 +82,39 @@ class ControllerRequestParser {
 
 export function BunHttpControllerAdapter(controller: Controller) {
   return async function (request: Request) {
-    const controllerRequestParser = new ControllerRequestParser(
-      request,
-      controller,
-    );
-    const controllerRequest = await controllerRequestParser.parse();
-    return controller.handle(controllerRequest);
+    try {
+      const controllerRequestParser = new ControllerRequestParser(
+        request,
+        controller,
+      );
+      const controllerRequest = await controllerRequestParser.parse();
+      const response = await controller.handle(controllerRequest);
+      return response;
+    } catch (e) {
+      if (e instanceof ValidationError) {
+        return Response.json(
+          {
+            message: e.message,
+          },
+          { status: 422 },
+        );
+      }
+      if (e instanceof ResourceNotFoundError) {
+        return Response.json(
+          {
+            message: e.message,
+          },
+          { status: 404 },
+        );
+      }
+      return Response.json(
+        {
+          message: "Internal server error",
+        },
+        {
+          status: 500,
+        },
+      );
+    }
   };
 }
