@@ -2,7 +2,7 @@ import type {
   Controller,
   ControllerRequest,
   HttpControllerMethod,
-} from "../../presentation/controller/controller";
+} from "../../../presentation/controller/controller";
 
 class ControllerRequestParser {
   constructor(
@@ -78,7 +78,7 @@ class ControllerRequestParser {
   }
 }
 
-export function BunControllerAdapter(controller: Controller) {
+export function BunHttpControllerAdapter(controller: Controller) {
   return async function (request: Request) {
     const controllerRequestParser = new ControllerRequestParser(
       request,
