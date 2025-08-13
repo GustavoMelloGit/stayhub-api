@@ -31,13 +31,13 @@ export class GetStayController implements Controller {
     return parsedInput.data;
   }
 
-  async handle(request: ControllerRequest): Promise<Response> {
+  async handle(request: ControllerRequest) {
     const validationResponse = this.validate(request);
 
     const output = await this.useCase.execute({
       stay_id: validationResponse.stay_id,
     });
 
-    return Response.json(output);
+    return output;
   }
 }

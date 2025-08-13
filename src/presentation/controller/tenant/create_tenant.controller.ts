@@ -35,14 +35,14 @@ export class CreateTenantController implements Controller {
     return parsedInput.data;
   }
 
-  async handle(request: ControllerRequest): Promise<Response> {
+  async handle(request: ControllerRequest) {
     const validationResponse = this.validate(request);
 
     const output = await this.useCase.execute(validationResponse);
 
-    return Response.json({
+    return {
       message: "Tenant created successfully",
       data: output,
-    });
+    };
   }
 }

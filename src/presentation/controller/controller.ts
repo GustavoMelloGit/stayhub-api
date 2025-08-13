@@ -17,5 +17,5 @@ export type ControllerRequest = {
 export interface Controller {
   path: string;
   method: HttpControllerMethod;
-  handle(request: ControllerRequest): Promise<Response>;
+  handle(request: ControllerRequest): Promise<unknown>;
 }

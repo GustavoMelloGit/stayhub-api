@@ -81,7 +81,7 @@ class ControllerRequestParser {
 }
 
 export function BunHttpControllerAdapter(controller: Controller) {
-  return async function (request: Request) {
+  return async function (request: Request): Promise<Response> {
     try {
       const controllerRequestParser = new ControllerRequestParser(
         request,
@@ -89,7 +89,8 @@ export function BunHttpControllerAdapter(controller: Controller) {
       );
       const controllerRequest = await controllerRequestParser.parse();
       const response = await controller.handle(controllerRequest);
-      return response;
+
+      return Response.json(response);
     } catch (e) {
       if (e instanceof ValidationError) {
         return Response.json(

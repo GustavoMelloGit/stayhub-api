@@ -7,8 +7,8 @@ export class ListTenantsController implements Controller {
 
   constructor(private readonly useCase: ListTenantsUseCase) {}
 
-  async handle(): Promise<Response> {
+  async handle() {
     const tenants = await this.useCase.execute();
-    return Response.json(tenants);
+    return tenants;
   }
 }
