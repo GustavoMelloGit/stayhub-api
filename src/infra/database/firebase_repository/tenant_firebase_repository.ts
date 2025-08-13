@@ -7,14 +7,14 @@ import {
   getDocs,
   query,
   where,
-} from 'firebase/firestore';
-import type { Tenant } from '../../../domain/entity/tenant';
-import type { TenantRepository } from '../../../domain/repository/tenant_repository';
-import { db } from '../firebase';
+} from "firebase/firestore";
+import type { Tenant } from "../../../domain/entity/tenant";
+import type { TenantRepository } from "../../../domain/repository/tenant_repository";
+import { db } from "../firebase";
 
 export class TenantFirebaseRepository implements TenantRepository {
   async findById(id: string): Promise<Tenant | null> {
-    const docRef = doc(db, 'guests', id);
+    const docRef = doc(db, "guests", id);
     const docSnap = await getDoc(docRef);
 
     if (!docSnap.exists()) {
@@ -35,7 +35,7 @@ export class TenantFirebaseRepository implements TenantRepository {
       name: input.name,
       phone: input.phone,
     };
-    const docRef = await addDoc(collection(db, 'guests'), tenant);
+    const docRef = await addDoc(collection(db, "guests"), tenant);
     return {
       ...tenant,
       id: docRef.id,
@@ -44,15 +44,15 @@ export class TenantFirebaseRepository implements TenantRepository {
 
   async isDuplicate(tenant: Tenant): Promise<boolean> {
     const q = query(
-      collection(db, 'guests'),
-      and(where('name', '==', tenant.name), where('phone', '==', tenant.phone))
+      collection(db, "guests"),
+      and(where("name", "==", tenant.name), where("phone", "==", tenant.phone)),
     );
     const querySnapshot = await getDocs(q);
     return !querySnapshot.empty;
   }
 
   async findAll(): Promise<Tenant[]> {
-    const q = query(collection(db, 'guests'));
+    const q = query(collection(db, "guests"));
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map((doc) => {
       const data = doc.data();

@@ -1,11 +1,11 @@
-import { z } from 'zod';
-import { ValidationError } from '../../../application/error/validation_error';
-import { GetStayUseCase } from '../../../application/use_case/stay/get_stay';
+import { z } from "zod";
+import { ValidationError } from "../../../application/error/validation_error";
+import { GetStayUseCase } from "../../../application/use_case/stay/get_stay";
 import {
   HttpControllerMethod,
   type Controller,
   type ControllerRequest,
-} from '../controller';
+} from "../controller";
 
 const inputSchema = z.object({
   stay_id: z.string(),
@@ -14,7 +14,7 @@ const inputSchema = z.object({
 type Input = z.infer<typeof inputSchema>;
 
 export class GetStayController implements Controller {
-  path = '/stays/:stay_id';
+  path = "/stays/:stay_id";
   method = HttpControllerMethod.GET;
 
   constructor(private readonly useCase: GetStayUseCase) {}
@@ -24,7 +24,7 @@ export class GetStayController implements Controller {
 
     if (!parsedInput.success) {
       throw new ValidationError(
-        `Validation errors: ${JSON.stringify(parsedInput.error.flatten())}`
+        `Validation errors: ${JSON.stringify(parsedInput.error.flatten())}`,
       );
     }
 

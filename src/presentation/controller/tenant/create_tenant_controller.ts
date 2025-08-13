@@ -1,21 +1,21 @@
-import { z } from 'zod';
-import { ValidationError } from '../../../application/error/validation_error';
-import { CreateTenantUseCase } from '../../../application/use_case/tenant/create_tenant';
+import { z } from "zod";
+import { ValidationError } from "../../../application/error/validation_error";
+import { CreateTenantUseCase } from "../../../application/use_case/tenant/create_tenant";
 import {
   HttpControllerMethod,
   type Controller,
   type ControllerRequest,
-} from '../controller';
+} from "../controller";
 
 const schema = z.object({
-  name: z.string().min(2, 'Name is required'),
+  name: z.string().min(2, "Name is required"),
   phone: z.string().length(13),
 });
 
 type Input = z.infer<typeof schema>;
 
 export class CreateTenantController implements Controller {
-  path = '/tenants';
+  path = "/tenants";
   method = HttpControllerMethod.POST;
 
   constructor(private readonly useCase: CreateTenantUseCase) {}
@@ -28,7 +28,7 @@ export class CreateTenantController implements Controller {
     if (!parsedInput.success) {
       const errors = z.treeifyError(parsedInput.error);
       throw new ValidationError(
-        `Validation errors: ${JSON.stringify(errors.errors)}`
+        `Validation errors: ${JSON.stringify(errors.errors)}`,
       );
     }
 
@@ -41,7 +41,7 @@ export class CreateTenantController implements Controller {
     const output = await this.useCase.execute(validationResponse);
 
     return Response.json({
-      message: 'Tenant created successfully',
+      message: "Tenant created successfully",
       data: output,
     });
   }

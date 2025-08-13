@@ -1,4 +1,4 @@
-import { formatISO } from 'date-fns';
+import { formatISO } from "date-fns";
 import {
   addDoc,
   collection,
@@ -7,18 +7,18 @@ import {
   getDocs,
   query,
   where,
-} from 'firebase/firestore';
-import type { Stay } from '../../../domain/entity/stay';
-import type { Tenant } from '../../../domain/entity/tenant';
+} from "firebase/firestore";
+import type { Stay } from "../../../domain/entity/stay";
+import type { Tenant } from "../../../domain/entity/tenant";
 import type {
   SaveStayDto,
   StayRepository,
-} from '../../../domain/repository/stay_repository';
-import { db } from '../../database/firebase';
+} from "../../../domain/repository/stay_repository";
+import { db } from "../../database/firebase";
 
 export class StayFirebaseRepository implements StayRepository {
   async findById(id: string): Promise<Stay | null> {
-    const stayRef = doc(db, 'stays', id);
+    const stayRef = doc(db, "stays", id);
     const staySnap = await getDoc(stayRef);
 
     if (!staySnap.exists()) {
@@ -30,7 +30,7 @@ export class StayFirebaseRepository implements StayRepository {
     const tenantSnap = await getDoc(tenantRef);
     const tenant = {
       id: tenantRef.id,
-      ...(tenantSnap.data() as Omit<Tenant, 'id'>),
+      ...(tenantSnap.data() as Omit<Tenant, "id">),
     } satisfies Tenant;
 
     return {
@@ -44,7 +44,7 @@ export class StayFirebaseRepository implements StayRepository {
   }
 
   async findByPassword(password: string): Promise<Stay | null> {
-    const q = query(collection(db, 'stays'), where('password', '==', password));
+    const q = query(collection(db, "stays"), where("password", "==", password));
     const querySnapshot = await getDocs(q);
     if (querySnapshot.empty || !querySnapshot.docs[0]) {
       return null;
@@ -54,7 +54,7 @@ export class StayFirebaseRepository implements StayRepository {
   }
 
   async save(input: SaveStayDto): Promise<SaveStayDto> {
-    const tenantRef = doc(db, 'guests', input.tenant_id);
+    const tenantRef = doc(db, "guests", input.tenant_id);
 
     const stay = {
       check_in: formatISO(input.check_in),
@@ -64,7 +64,7 @@ export class StayFirebaseRepository implements StayRepository {
       password: input.password,
     };
 
-    const docRef = await addDoc(collection(db, 'stays'), stay);
+    const docRef = await addDoc(collection(db, "stays"), stay);
 
     return {
       ...stay,

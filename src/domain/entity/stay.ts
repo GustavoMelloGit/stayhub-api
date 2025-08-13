@@ -1,4 +1,4 @@
-import type { Tenant } from './tenant';
+import type { Tenant } from "./tenant";
 
 export type Stay = {
   check_in: Date;

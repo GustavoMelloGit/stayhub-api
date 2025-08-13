@@ -1,12 +1,12 @@
 import type {
   Controller,
   ControllerRequest,
-} from '../../presentation/controller/controller';
+} from "../../presentation/controller/controller";
 
 class ControllerRequestParser {
   constructor(
     private readonly request: Request,
-    private readonly controller: Controller
+    private readonly controller: Controller,
   ) {}
 
   async parse(): Promise<ControllerRequest> {
@@ -22,23 +22,26 @@ class ControllerRequestParser {
 
   #parseParams(): Record<string, string> {
     const path = this.controller.path;
-    const pathParts = path.split('/');
+    const pathParts = path.split("/");
     const params = pathParts.map((part) =>
-      part.startsWith(':') ? part.slice(1) : null
+      part.startsWith(":") ? part.slice(1) : null,
     );
 
-    const paramsObject = params.reduce((acc, param, index) => {
-      if (!param) {
+    const paramsObject = params.reduce(
+      (acc, param, index) => {
+        if (!param) {
+          return acc;
+        }
+        const url = new URL(this.request.url);
+        const pathname = url.pathname.split("/");
+        if (!pathname[index]) {
+          return acc;
+        }
+        acc[param] = pathname[index];
         return acc;
-      }
-      const url = new URL(this.request.url);
-      const pathname = url.pathname.split('/');
-      if (!pathname[index]) {
-        return acc;
-      }
-      acc[param] = pathname[index];
-      return acc;
-    }, {} as Record<string, string>);
+      },
+      {} as Record<string, string>,
+    );
 
     return paramsObject;
   }
@@ -54,7 +57,7 @@ class ControllerRequestParser {
       return {};
     }
 
-    if (typeof body !== 'object') {
+    if (typeof body !== "object") {
       return {};
     }
 
@@ -78,7 +81,7 @@ export function BunControllerAdapter(controller: Controller) {
   return async function (request: Request) {
     const controllerRequestParser = new ControllerRequestParser(
       request,
-      controller
+      controller,
     );
     const controllerRequest = await controllerRequestParser.parse();
     return controller.handle(controllerRequest);
