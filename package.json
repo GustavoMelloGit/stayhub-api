@@ -6,13 +6,15 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "bun --hot run src/index.ts",
-    "start": "bun run src/index.ts"
+    "start": "bun run src/index.ts",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
     "@types/bun": "latest",
     "eslint": "^9.33.0",
     "globals": "^16.3.0",
+    "husky": "^9.1.7",
     "prettier": "3.6.2",
     "typescript-eslint": "^8.39.1"
   },
