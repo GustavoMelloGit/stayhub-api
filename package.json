@@ -5,14 +5,17 @@
   "private": true,
   "main": "src/index.ts",
   "scripts": {
+    "build": "tsc && bun build ./src/index.ts --compile --outfile project",
     "dev": "bun --hot run src/index.ts",
     "start": "bun run src/index.ts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint": "eslint . --fix"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
     "@types/bun": "latest",
     "eslint": "^9.33.0",
+    "eslint-config-prettier": "^10.1.8",
     "globals": "^16.3.0",
     "husky": "^9.1.7",
     "prettier": "3.6.2",
