@@ -26,13 +26,20 @@ class ControllerRequestParser {
     const params = pathParts.map((part) =>
       part.startsWith(':') ? part.slice(1) : null
     );
+
     const paramsObject = params.reduce((acc, param, index) => {
       if (!param) {
         return acc;
       }
-      acc[`param${index}`] = param;
+      const url = new URL(this.request.url);
+      const pathname = url.pathname.split('/');
+      if (!pathname[index]) {
+        return acc;
+      }
+      acc[param] = pathname[index];
       return acc;
     }, {} as Record<string, string>);
+
     return paramsObject;
   }
 
