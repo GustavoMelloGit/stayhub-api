@@ -2,8 +2,8 @@ import { CreateStayUseCase } from "../../application/use_case/stay/create_stay";
 import { GetStayUseCase } from "../../application/use_case/stay/get_stay";
 import type { StayRepository } from "../../domain/repository/stay_repository";
 import type { TenantRepository } from "../../domain/repository/tenant_repository";
-import { CreateStayController } from "../../presentation/controller/stay/create_stay_controller";
-import { GetStayController } from "../../presentation/controller/stay/get_stay_controller";
+import { CreateStayController } from "../../presentation/controller/stay/create_stay.controller";
+import { GetStayController } from "../../presentation/controller/stay/get_stay.controller";
 import { StayFirebaseRepository } from "../database/firebase_repository/stay_firebase_repository";
 import { TenantFirebaseRepository } from "../database/firebase_repository/tenant_firebase_repository";
 
