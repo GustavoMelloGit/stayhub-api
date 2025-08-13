@@ -1,3 +1,4 @@
+import { HealthController } from "../../../presentation/controller/health/health.controller";
 import { StayDi } from "../../di/stay_di";
 import { TenantDi } from "../../di/tenant_di";
 import { BunHttpControllerAdapter } from "../adapters/http_controller_adapter";
@@ -9,12 +10,14 @@ const listTenantsController = tenantDi.makeListTenantsController();
 const createTenantController = tenantDi.makeCreateTenantController();
 const getStayController = stayDi.makeGetStayController();
 const createStayController = stayDi.makeCreateStayController();
+const healthController = new HealthController();
 
 const controllers = [
   listTenantsController,
   createTenantController,
   getStayController,
   createStayController,
+  healthController,
 ];
 
 const routeMap = new Map();
