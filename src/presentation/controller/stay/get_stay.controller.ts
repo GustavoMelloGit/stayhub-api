@@ -23,9 +23,8 @@ export class GetStayController implements Controller {
     const parsedInput = inputSchema.safeParse(request.params);
 
     if (!parsedInput.success) {
-      throw new ValidationError(
-        `Validation errors: ${JSON.stringify(parsedInput.error.flatten())}`,
-      );
+      const errors = z.prettifyError(parsedInput.error);
+      throw new ValidationError(`Validation errors: ${JSON.stringify(errors)}`);
     }
 
     return parsedInput.data;

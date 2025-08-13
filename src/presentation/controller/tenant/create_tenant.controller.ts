@@ -26,10 +26,8 @@ export class CreateTenantController implements Controller {
     const parsedInput = schema.safeParse(data);
 
     if (!parsedInput.success) {
-      const errors = z.treeifyError(parsedInput.error);
-      throw new ValidationError(
-        `Validation errors: ${JSON.stringify(errors.errors)}`,
-      );
+      const errors = z.prettifyError(parsedInput.error);
+      throw new ValidationError(`Validation errors: ${JSON.stringify(errors)}`);
     }
 
     return parsedInput.data;
