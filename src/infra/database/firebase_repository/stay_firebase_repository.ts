@@ -8,13 +8,13 @@ import {
   query,
   where,
 } from 'firebase/firestore';
-import type { Stay } from '../../domain/entity/stay';
-import type { Tenant } from '../../domain/entity/tenant';
+import type { Stay } from '../../../domain/entity/stay';
+import type { Tenant } from '../../../domain/entity/tenant';
 import type {
   SaveStayDto,
   StayRepository,
-} from '../../domain/repository/stay_repository';
-import { db } from '../database/firebase';
+} from '../../../domain/repository/stay_repository';
+import { db } from '../../database/firebase';
 
 export class StayFirebaseRepository implements StayRepository {
   async findById(id: string): Promise<Stay | null> {
