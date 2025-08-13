@@ -1,7 +1,11 @@
 import { z } from 'zod';
 import { ValidationError } from '../../../application/error/validation_error';
 import { CreateTenantUseCase } from '../../../application/use_case/tenant/create_tenant';
-import type { Controller, ControllerRequest } from '../controller';
+import {
+  HttpControllerMethod,
+  type Controller,
+  type ControllerRequest,
+} from '../controller';
 
 const schema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -11,9 +15,12 @@ const schema = z.object({
 type Input = z.infer<typeof schema>;
 
 export class CreateTenantController implements Controller {
+  path = '/tenants';
+  method = HttpControllerMethod.POST;
+
   constructor(private readonly useCase: CreateTenantUseCase) {}
 
-  async validate(request: ControllerRequest): Promise<Input | Response> {
+  validate(request: ControllerRequest): Input {
     const data = request.body;
 
     const parsedInput = schema.safeParse(data);
@@ -28,17 +35,14 @@ export class CreateTenantController implements Controller {
     return parsedInput.data;
   }
 
-  async handle(request: Request): Promise<Response> {
-    const validationResponse = await this.validate(request);
-    if (validationResponse instanceof Response) {
-      return validationResponse;
-    }
+  async handle(request: ControllerRequest): Promise<Response> {
+    const validationResponse = this.validate(request);
 
     const output = await this.useCase.execute(validationResponse);
 
-    return {
+    return Response.json({
       message: 'Tenant created successfully',
       data: output,
-    };
+    });
   }
 }

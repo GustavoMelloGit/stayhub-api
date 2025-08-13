@@ -1,7 +1,11 @@
-import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { ValidationError } from '../../../application/error/validation_error';
 import { GetStayUseCase } from '../../../application/use_case/stay/get_stay';
-import type { Controller, ControllerRequest } from '../controller';
+import {
+  HttpControllerMethod,
+  type Controller,
+  type ControllerRequest,
+} from '../controller';
 
 const inputSchema = z.object({
   stay_id: z.string(),
@@ -10,29 +14,30 @@ const inputSchema = z.object({
 type Input = z.infer<typeof inputSchema>;
 
 export class GetStayController implements Controller {
+  path = '/stays/:stay_id';
+  method = HttpControllerMethod.GET;
+
   constructor(private readonly useCase: GetStayUseCase) {}
 
-  async validate(request: ControllerRequest): Promise<Response | Input> {
+  validate(request: ControllerRequest): Input {
     const parsedInput = inputSchema.safeParse(request.params);
 
     if (!parsedInput.success) {
-      const errors = parsedInput.error.flatten();
-      return NextResponse.json({ error: errors.fieldErrors }, { status: 422 });
+      throw new ValidationError(
+        `Validation errors: ${JSON.stringify(parsedInput.error.flatten())}`
+      );
     }
 
     return parsedInput.data;
   }
 
   async handle(request: ControllerRequest): Promise<Response> {
-    const validationResponse = await this.validate(request);
-    if (validationResponse instanceof Response) {
-      return validationResponse;
-    }
+    const validationResponse = this.validate(request);
 
     const output = await this.useCase.execute({
       stay_id: validationResponse.stay_id,
     });
 
-    return NextResponse.json(output, { status: 200 });
+    return Response.json(output);
   }
 }

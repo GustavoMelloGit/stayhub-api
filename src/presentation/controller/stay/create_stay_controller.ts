@@ -1,7 +1,11 @@
-import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { ValidationError } from '../../../application/error/validation_error';
 import { CreateStayUseCase } from '../../../application/use_case/stay/create_stay';
-import type { Controller } from '../controller';
+import {
+  HttpControllerMethod,
+  type Controller,
+  type ControllerRequest,
+} from '../controller';
 
 const inputSchema = z.object({
   guests: z.number().gt(0),
@@ -14,34 +18,27 @@ const inputSchema = z.object({
 type CreateStayInput = z.infer<typeof inputSchema>;
 
 export class CreateStayController implements Controller {
+  path = '/stays';
+  method = HttpControllerMethod.POST;
+
   constructor(private readonly useCase: CreateStayUseCase) {}
 
-  async validate(request: Request): Promise<Response | CreateStayInput> {
-    const requestJson = await request.json();
-
-    const parsedInput = inputSchema.safeParse(requestJson);
+  validate(request: ControllerRequest): CreateStayInput {
+    const parsedInput = inputSchema.safeParse(request.body);
 
     if (!parsedInput.success) {
-      const errors = parsedInput.error.flatten();
-      return NextResponse.json({ error: errors.fieldErrors }, { status: 422 });
+      throw new ValidationError(
+        `Validation errors: ${JSON.stringify(parsedInput.error.flatten())}`
+      );
     }
 
     return parsedInput.data;
   }
 
-  async handle(request: Request): Promise<Response> {
-    const validationResponse = await this.validate(request);
-    if (validationResponse instanceof Response) {
-      return validationResponse;
-    }
+  async handle(request: ControllerRequest): Promise<Response> {
+    const validationResponse = this.validate(request);
 
     const output = await this.useCase.execute(validationResponse);
-    return NextResponse.json(
-      {
-        message: 'Stay created successfully',
-        data: output,
-      },
-      { status: 200 }
-    );
+    return Response.json(output);
   }
 }
