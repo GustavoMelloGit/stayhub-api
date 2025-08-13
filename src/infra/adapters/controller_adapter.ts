@@ -1,6 +1,7 @@
 import type {
   Controller,
   ControllerRequest,
+  HttpControllerMethod,
 } from "../../presentation/controller/controller";
 
 class ControllerRequestParser {
@@ -15,7 +16,7 @@ class ControllerRequestParser {
       body: await this.#parseBody(),
       query: this.#parseQuery(),
       headers: this.#parseHeaders(),
-      method: this.request.method,
+      method: this.request.method as HttpControllerMethod,
       url: this.request.url,
     };
   }
