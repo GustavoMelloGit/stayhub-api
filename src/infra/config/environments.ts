@@ -7,6 +7,7 @@ const envSchema = z.object({
   STORAGE_BUCKET: z.string(),
   MESSAGING_SENDER_ID: z.string(),
   APP_ID: z.string(),
+  PORT: z.coerce.number().default(3030),
 });
 
 export const env = envSchema.parse(process.env);
