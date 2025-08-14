@@ -92,6 +92,7 @@ export function BunHttpControllerAdapter(controller: Controller) {
 
       return Response.json(response);
     } catch (e) {
+      console.error(e);
       if (e instanceof ValidationError) {
         return Response.json(
           {
