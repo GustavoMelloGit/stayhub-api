@@ -7,13 +7,11 @@
         "date-fns": "^4.1.0",
         "dotenv": "^17.2.1",
         "drizzle-orm": "^0.44.4",
-        "pg": "^8.16.3",
         "zod": "^4.0.10",
       },
       "devDependencies": {
         "@eslint/js": "^9.33.0",
         "@types/bun": "latest",
-        "@types/pg": "^8.15.5",
         "drizzle-kit": "^0.31.4",
         "eslint": "^9.33.0",
         "eslint-config-prettier": "^10.1.8",
