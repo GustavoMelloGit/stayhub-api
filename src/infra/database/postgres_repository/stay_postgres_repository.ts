@@ -10,7 +10,18 @@ import { staysTable } from "../drizzle/schema";
 
 export class StayPostgresRepository implements StayRepository {
   async save(input: Omit<SaveStayDto, "id">): Promise<SaveStayDto> {
-    const stay = await db.insert(staysTable).values(input).returning();
+    const entity = Stay.create(input);
+
+    const stay = await db
+      .insert(staysTable)
+      .values({
+        check_in: entity.check_in,
+        check_out: entity.check_out,
+        guests: entity.guests,
+        password: entity.password,
+        tenant_id: entity.tenant_id,
+      })
+      .returning();
 
     if (!stay[0]) {
       throw new Error("Failed to save stay");
@@ -33,9 +44,10 @@ export class StayPostgresRepository implements StayRepository {
 
     const tenant = new Tenant(stay.tenant);
 
-    return new Stay({
+    return Stay.reconstitute({
       ...stay,
       tenant,
+      id: stay.id,
     });
   }
 }

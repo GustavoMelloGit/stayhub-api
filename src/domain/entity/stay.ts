@@ -1,52 +1,68 @@
+import { randomUUID } from "node:crypto";
+import { ValidationError } from "../../application/error/validation_error"; // Supondo que você tem um erro customizado
 import type { Tenant } from "./tenant";
 
-type Input = {
+type StayCreateProps = {
   check_in: Date;
   check_out: Date;
-  tenant: Tenant;
+  tenant_id: string;
   guests: number;
-  id: string;
   password: string;
 };
 
+type StayProps = StayCreateProps & {
+  id: string;
+  tenant?: Tenant;
+};
+
 export class Stay {
-  #check_in: Date;
-  #check_out: Date;
-  #tenant: Tenant;
-  #guests: number;
-  #id: string;
-  #password: string;
+  readonly id: string;
+  readonly check_in: Date;
+  readonly check_out: Date;
+  readonly tenant_id: string;
+  readonly guests: number;
+  readonly password: string;
+  tenant?: Tenant;
 
-  constructor(input: Input) {
-    this.#check_in = input.check_in;
-    this.#check_out = input.check_out;
-    this.#tenant = input.tenant;
-    this.#guests = input.guests;
-    this.#id = input.id;
-    this.#password = input.password;
+  private constructor(props: StayProps) {
+    this.id = props.id;
+    this.check_in = props.check_in;
+    this.check_out = props.check_out;
+    this.tenant_id = props.tenant_id;
+    this.guests = props.guests;
+    this.password = props.password;
+    this.tenant = props.tenant;
   }
 
-  get check_in() {
-    return this.#check_in;
+  private static nextId(): string {
+    return randomUUID();
   }
 
-  get check_out() {
-    return this.#check_out;
+  public static create(props: StayCreateProps): Stay {
+    if (props.check_in >= props.check_out) {
+      throw new ValidationError("Check-in date must be before check-out date");
+    }
+
+    if (props.guests < 1 || !Number.isInteger(props.guests)) {
+      throw new ValidationError("Guests must be an integer greater than zero");
+    }
+
+    return new Stay({ ...props, id: this.nextId() });
   }
 
-  get tenant() {
-    return this.#tenant;
+  public static reconstitute(props: StayProps): Stay {
+    return new Stay(props);
   }
 
-  get guests() {
-    return this.#guests;
-  }
-
-  get id() {
-    return this.#id;
-  }
-
-  get password() {
-    return this.#password;
+  public get data() {
+    return {
+      id: this.id,
+      checkIn: this.check_in,
+      checkOut: this.check_out,
+      tenantId: this.tenant_id,
+      guests: this.guests,
+      password: this.password,
+      tenant: this.tenant,
+    };
   }
 }
