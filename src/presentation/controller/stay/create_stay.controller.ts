@@ -23,7 +23,7 @@ export class CreateStayController implements Controller {
 
   constructor(private readonly useCase: CreateStayUseCase) {}
 
-  validate(request: ControllerRequest): CreateStayInput {
+  #validate(request: ControllerRequest): CreateStayInput {
     const parsedInput = inputSchema.safeParse(request.body);
 
     if (!parsedInput.success) {
@@ -35,7 +35,7 @@ export class CreateStayController implements Controller {
   }
 
   async handle(request: ControllerRequest) {
-    const validationResponse = this.validate(request);
+    const validationResponse = this.#validate(request);
 
     const output = await this.useCase.execute(validationResponse);
     return output;

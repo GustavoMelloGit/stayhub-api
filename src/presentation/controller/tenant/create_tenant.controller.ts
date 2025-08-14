@@ -20,7 +20,7 @@ export class CreateTenantController implements Controller {
 
   constructor(private readonly useCase: CreateTenantUseCase) {}
 
-  validate(request: ControllerRequest): Input {
+  #validate(request: ControllerRequest): Input {
     const data = request.body;
 
     const parsedInput = schema.safeParse(data);
@@ -34,7 +34,7 @@ export class CreateTenantController implements Controller {
   }
 
   async handle(request: ControllerRequest) {
-    const validationResponse = this.validate(request);
+    const validationResponse = this.#validate(request);
 
     const output = await this.useCase.execute(validationResponse);
 
