@@ -10,6 +10,10 @@ type TenantProps = TenantCreateProps & {
   id: string;
 };
 
+export type WithTenant<T> = T & {
+  tenant: Tenant;
+};
+
 export class Tenant {
   readonly id: string;
   readonly name: string;

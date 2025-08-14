@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { Stay } from "../../../domain/entity/stay";
-import { Tenant } from "../../../domain/entity/tenant";
+import { Tenant, type WithTenant } from "../../../domain/entity/tenant";
 import type {
   SaveStayDto,
   StayRepository,
@@ -9,6 +9,24 @@ import { db } from "../drizzle/database";
 import { staysTable } from "../drizzle/schema";
 
 export class StayPostgresRepository implements StayRepository {
+  async findWithTenantById(id: string): Promise<WithTenant<Stay> | null> {
+    const stay = await db.query.staysTable.findFirst({
+      where: eq(staysTable.id, id),
+      with: {
+        tenant: true,
+      },
+    });
+
+    if (!stay) {
+      return null;
+    }
+
+    const tenantEntity = Tenant.reconstitute(stay.tenant);
+    const stayEntity = Stay.reconstitute({ ...stay, tenant: tenantEntity });
+
+    return stayEntity as WithTenant<Stay>;
+  }
+
   async save(input: Omit<SaveStayDto, "id">): Promise<SaveStayDto> {
     const entity = Stay.create(input);
 
@@ -23,9 +41,7 @@ export class StayPostgresRepository implements StayRepository {
       })
       .returning();
 
-    if (!stay[0]) {
-      throw new Error("Failed to save stay");
-    }
+    if (!stay[0]) throw new Error("Failed to save stay");
 
     return stay[0];
   }
@@ -33,21 +49,10 @@ export class StayPostgresRepository implements StayRepository {
   async findById(id: string): Promise<Stay | null> {
     const stay = await db.query.staysTable.findFirst({
       where: eq(staysTable.id, id),
-      with: {
-        tenant: true,
-      },
     });
 
-    if (!stay) {
-      return null;
-    }
+    if (!stay) return null;
 
-    const tenant = Tenant.reconstitute(stay.tenant);
-
-    return Stay.reconstitute({
-      ...stay,
-      tenant,
-      id: stay.id,
-    });
+    return Stay.reconstitute(stay);
   }
 }
