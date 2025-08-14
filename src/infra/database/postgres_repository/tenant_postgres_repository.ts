@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import type { Tenant } from "../../../domain/entity/tenant";
+import { Tenant } from "../../../domain/entity/tenant";
 import type { TenantRepository } from "../../../domain/repository/tenant_repository";
 import { db } from "../drizzle/database";
 import { tenantsTable } from "../drizzle/schema";
@@ -12,11 +12,13 @@ export class TenantPostgresRepository implements TenantRepository {
       throw new Error("Failed to save tenant");
     }
 
-    return tenant[0];
+    return new Tenant(tenant[0]);
   }
 
   async findAll(): Promise<Tenant[]> {
-    return db.select().from(tenantsTable);
+    const tenants = await db.select().from(tenantsTable);
+
+    return tenants.map((tenant) => new Tenant(tenant));
   }
 
   async findById(id: string): Promise<Tenant | null> {
@@ -24,6 +26,6 @@ export class TenantPostgresRepository implements TenantRepository {
       where: eq(tenantsTable.id, id),
     });
 
-    return tenant ?? null;
+    return tenant ? new Tenant(tenant) : null;
   }
 }

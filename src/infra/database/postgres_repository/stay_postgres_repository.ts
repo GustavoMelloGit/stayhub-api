@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
-import type { Stay } from "../../../domain/entity/stay";
+import { Stay } from "../../../domain/entity/stay";
+import { Tenant } from "../../../domain/entity/tenant";
 import type {
   SaveStayDto,
   StayRepository,
@@ -26,6 +27,15 @@ export class StayPostgresRepository implements StayRepository {
       },
     });
 
-    return stay ?? null;
+    if (!stay) {
+      return null;
+    }
+
+    const tenant = new Tenant(stay.tenant);
+
+    return new Stay({
+      ...stay,
+      tenant,
+    });
   }
 }
