@@ -1,12 +1,10 @@
 import {
   addDoc,
-  and,
   collection,
   doc,
   getDoc,
   getDocs,
   query,
-  where,
 } from "firebase/firestore";
 import type { Tenant } from "../../../domain/entity/tenant";
 import type { TenantRepository } from "../../../domain/repository/tenant_repository";
@@ -40,15 +38,6 @@ export class TenantFirebaseRepository implements TenantRepository {
       ...tenant,
       id: docRef.id,
     };
-  }
-
-  async isDuplicate(tenant: Tenant): Promise<boolean> {
-    const q = query(
-      collection(db, "guests"),
-      and(where("name", "==", tenant.name), where("phone", "==", tenant.phone)),
-    );
-    const querySnapshot = await getDocs(q);
-    return !querySnapshot.empty;
   }
 
   async findAll(): Promise<Tenant[]> {

@@ -1,7 +1,6 @@
 import type { StayRepository } from "../../../domain/repository/stay_repository";
 import type { TenantRepository } from "../../../domain/repository/tenant_repository";
 import { ResourceNotFoundError } from "../../error/resource_not_found_error";
-import { ValidationError } from "../../error/validation_error";
 import type { UseCase } from "../use_case";
 
 type Input = {
@@ -24,20 +23,14 @@ type Output = {
 export class CreateStayUseCase implements UseCase<Input, Output> {
   constructor(
     private readonly stayRepository: StayRepository,
-    private readonly guestRepository: TenantRepository,
+    private readonly tenantRepository: TenantRepository,
   ) {}
 
   async execute(input: Input): Promise<Output> {
-    const [tenant, hasUsedPassword] = await Promise.all([
-      this.guestRepository.findById(input.tenant_id),
-      this.stayRepository.findByPassword(input.password),
-    ]);
+    const tenant = await this.tenantRepository.findById(input.tenant_id);
 
     if (!tenant) {
       throw new ResourceNotFoundError("Tenant");
-    }
-    if (hasUsedPassword) {
-      throw new ValidationError("Invalid password");
     }
 
     const stay = await this.stayRepository.save(input);

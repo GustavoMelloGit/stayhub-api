@@ -4,21 +4,21 @@ import type { StayRepository } from "../../domain/repository/stay_repository";
 import type { TenantRepository } from "../../domain/repository/tenant_repository";
 import { CreateStayController } from "../../presentation/controller/stay/create_stay.controller";
 import { GetStayController } from "../../presentation/controller/stay/get_stay.controller";
-import { StayFirebaseRepository } from "../database/firebase_repository/stay_firebase_repository";
-import { TenantFirebaseRepository } from "../database/firebase_repository/tenant_firebase_repository";
+import { StayPostgresRepository } from "../database/postgres_repository/stay_postgres_repository";
+import { TenantPostgresRepository } from "../database/postgres_repository/tenant_postgres_repository";
 
 export class StayDi {
   #stayRepository: StayRepository;
   #tenantRepository: TenantRepository;
 
   constructor() {
-    this.#stayRepository = new StayFirebaseRepository();
-    this.#tenantRepository = new TenantFirebaseRepository();
+    this.#stayRepository = new StayPostgresRepository();
+    this.#tenantRepository = new TenantPostgresRepository();
   }
 
   // Use Cases
   makeGetStayUseCase() {
-    return new GetStayUseCase(this.#stayRepository, this.#tenantRepository);
+    return new GetStayUseCase(this.#stayRepository);
   }
   makeCreateStayUseCase() {
     return new CreateStayUseCase(this.#stayRepository, this.#tenantRepository);
