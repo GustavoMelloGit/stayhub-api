@@ -42,7 +42,7 @@ export class StayPostgresRepository implements StayRepository {
       return null;
     }
 
-    const tenant = new Tenant(stay.tenant);
+    const tenant = Tenant.reconstitute(stay.tenant);
 
     return Stay.reconstitute({
       ...stay,

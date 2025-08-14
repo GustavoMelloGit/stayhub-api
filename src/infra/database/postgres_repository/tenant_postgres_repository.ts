@@ -6,19 +6,24 @@ import { tenantsTable } from "../drizzle/schema";
 
 export class TenantPostgresRepository implements TenantRepository {
   async save(input: { name: string; phone: string }): Promise<Tenant> {
-    const tenant = await db.insert(tenantsTable).values(input).returning();
+    const entity = Tenant.create(input);
+
+    const tenant = await db
+      .insert(tenantsTable)
+      .values(entity.data)
+      .returning();
 
     if (!tenant[0]) {
       throw new Error("Failed to save tenant");
     }
 
-    return new Tenant(tenant[0]);
+    return Tenant.reconstitute(tenant[0]);
   }
 
   async findAll(): Promise<Tenant[]> {
     const tenants = await db.select().from(tenantsTable);
 
-    return tenants.map((tenant) => new Tenant(tenant));
+    return tenants.map((tenant) => Tenant.reconstitute(tenant));
   }
 
   async findById(id: string): Promise<Tenant | null> {
@@ -26,6 +31,6 @@ export class TenantPostgresRepository implements TenantRepository {
       where: eq(tenantsTable.id, id),
     });
 
-    return tenant ? new Tenant(tenant) : null;
+    return tenant ? Tenant.reconstitute(tenant) : null;
   }
 }

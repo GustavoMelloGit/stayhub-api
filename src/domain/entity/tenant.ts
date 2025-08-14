@@ -1,29 +1,69 @@
-type Input = {
-  id: string;
+import { randomUUID } from "node:crypto";
+import { ValidationError } from "../../application/error/validation_error"; // Reutilize seu erro customizado
+
+type TenantCreateProps = {
   name: string;
   phone: string;
 };
 
+type TenantProps = TenantCreateProps & {
+  id: string;
+};
+
 export class Tenant {
-  #id: string;
-  #name: string;
-  #phone: string;
+  readonly id: string;
+  readonly name: string;
+  readonly phone: string;
 
-  constructor(input: Input) {
-    this.#id = input.id;
-    this.#name = input.name;
-    this.#phone = input.phone;
+  private constructor(props: TenantProps) {
+    this.id = props.id;
+    this.name = props.name;
+    this.phone = props.phone;
   }
 
-  get id() {
-    return this.#id;
+  private static nextId(): string {
+    return randomUUID();
   }
 
-  get name() {
-    return this.#name;
+  public static create(props: TenantCreateProps): Tenant {
+    const validationErrors = [];
+
+    if (props.name.trim().length < 3) {
+      validationErrors.push({
+        field: "name",
+        message: "O nome deve ter pelo menos 3 caracteres.",
+      });
+    }
+
+    const phoneRegex = /^[0-9]+$/;
+    if (
+      !phoneRegex.test(props.phone) ||
+      props.phone.length < 10 ||
+      props.phone.length > 15
+    ) {
+      validationErrors.push({
+        field: "phone",
+        message:
+          "O telefone deve conter apenas números e ter entre 10 e 15 dígitos.",
+      });
+    }
+
+    if (validationErrors.length > 0) {
+      throw new ValidationError(JSON.stringify(validationErrors));
+    }
+
+    return new Tenant({ ...props, id: this.nextId() });
   }
 
-  get phone() {
-    return this.#phone;
+  public static reconstitute(props: TenantProps): Tenant {
+    return new Tenant(props);
+  }
+
+  public get data() {
+    return {
+      id: this.id,
+      name: this.name,
+      phone: this.phone,
+    };
   }
 }
