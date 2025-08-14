@@ -22,7 +22,7 @@ export class Stay {
   readonly tenant_id: string;
   readonly guests: number;
   readonly password: string;
-  tenant?: Tenant;
+  readonly tenant?: Tenant;
 
   private constructor(props: StayProps) {
     this.id = props.id;
