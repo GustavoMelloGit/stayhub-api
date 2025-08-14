@@ -9,6 +9,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 - [Bun](https://bun.sh/)
+- [Docker](https://www.docker.com/)
 
 ### Installing
 
@@ -20,12 +21,26 @@ These instructions will get you a copy of the project up and running on your loc
    ```bash
    bun install
    ```
+3. Create a `.env` file in the root of the project and add the following environment variables:
+   ```
+   DATABASE_URL="postgresql://user:password@localhost:5432/stayhub"
+   ```
+   Replace `user` and `password` with your PostgreSQL credentials.
 
 ### Running the application
 
-```bash
-bun run dev
-```
+1. Start the PostgreSQL database using Docker Compose:
+   ```bash
+   docker-compose up -d
+   ```
+2. Run the database migrations:
+   ```bash
+   bun run migrate
+   ```
+3. Start the development server:
+   ```bash
+   bun run dev
+   ```
 
 This will start the development server with hot-reloading enabled. The API will be available at `http://localhost:3030`.
 
@@ -38,20 +53,12 @@ The project follows a clean architecture pattern, separating concerns into the f
 - **`src/infra`**: Contains the implementation details of the application, such as database repositories, web frameworks, and dependency injection.
 - **`src/presentation`**: Contains the API controllers, which handle incoming HTTP requests and call the appropriate use cases.
 
-## API Endpoints
-
-The following endpoints are currently available:
-
-- `GET /tenants`: Lists all tenants.
-- `GET /stays`: Lists all stays.
-
-More endpoints will be added as the project progresses.
-
 ## Technologies Used
 
 - [Bun](https://bun.sh/) - JavaScript runtime and toolkit
 - [TypeScript](https://www.typescriptlang.org/) - Typed superset of JavaScript
-- [Firebase](https://firebase.google.com/) - Backend-as-a-Service platform
+- [PostgreSQL](https://www.postgresql.org/) - The World's Most Advanced Open Source Relational Database
+- [Drizzle](https://orm.drizzle.team/) - TypeScript ORM that feels like writing SQL
 - [Zod](https://zod.dev/) - TypeScript-first schema validation
 - [ESLint](https://eslint.org/) - Pluggable linting utility for JavaScript and JSX
 - [Prettier](https://prettier.io/) - Opinionated code formatter
