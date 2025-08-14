@@ -8,7 +8,7 @@ import {
 } from "../controller";
 
 const inputSchema = z.object({
-  stay_id: z.string(),
+  stay_id: z.uuid(),
 });
 
 type Input = z.infer<typeof inputSchema>;
