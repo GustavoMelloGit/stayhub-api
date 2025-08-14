@@ -8,8 +8,8 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-- [Bun](https://bun.sh/)
 - [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
 
 ### Installing
 
@@ -17,32 +17,23 @@ These instructions will get you a copy of the project up and running on your loc
    ```bash
    git clone https://github.com/GustavoMelloGit/stayhub-api
    ```
-2. Install the dependencies:
+2. Navigate to the project directory:
    ```bash
-   bun install
+   cd stayhub-api
    ```
-3. Create a `.env` file in the root of the project and add the following environment variables:
-   ```
-   DATABASE_URL="postgresql://user:password@localhost:5432/stayhub"
-   ```
-   Replace `user` and `password` with your PostgreSQL credentials.
 
 ### Running the application
 
-1. Start the PostgreSQL database using Docker Compose:
+1. Start the application using Docker Compose:
    ```bash
-   docker-compose up -d
+   docker compose up
    ```
 2. Run the database migrations:
    ```bash
-   bun run migrate
-   ```
-3. Start the development server:
-   ```bash
-   bun run dev
+   docker-compose exec api bun run db:migrate
    ```
 
-This will start the development server with hot-reloading enabled. The API will be available at `http://localhost:3030`.
+This will start the development server. The API will be available at `http://localhost:3000`.
 
 ## Project Structure
 
