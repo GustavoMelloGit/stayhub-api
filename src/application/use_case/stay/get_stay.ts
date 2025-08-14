@@ -24,7 +24,7 @@ export class GetStayUseCase implements UseCase<Input, Output> {
   constructor(private readonly stayRepository: StayRepository) {}
 
   async execute(input: Input): Promise<Output> {
-    const stay = await this.stayRepository.findById(input.stay_id);
+    const stay = await this.stayRepository.findWithTenantById(input.stay_id);
 
     if (!stay) {
       throw new ResourceNotFoundError("Stay");
@@ -36,7 +36,7 @@ export class GetStayUseCase implements UseCase<Input, Output> {
       check_out: formatISO(stay.check_out),
       guests: stay.guests,
       password: stay.password,
-      tenant: stay.tenant,
+      tenant: stay.tenant.data,
     };
   }
 }
