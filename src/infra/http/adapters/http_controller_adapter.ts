@@ -81,6 +81,12 @@ class ControllerRequestParser {
   }
 }
 
+const errorCodeMap: Record<string, number> = {
+  [ConflictError.name]: 409,
+  [ValidationError.name]: 422,
+  [ResourceNotFoundError.name]: 404,
+};
+
 export function BunHttpControllerAdapter(controller: Controller) {
   return async function (request: Request): Promise<Response> {
     try {
@@ -94,29 +100,11 @@ export function BunHttpControllerAdapter(controller: Controller) {
       return Response.json(response);
     } catch (e) {
       console.error(e);
-      if (e instanceof ValidationError) {
-        return Response.json(
-          {
-            message: e.message,
-          },
-          { status: 422 },
-        );
-      }
-      if (e instanceof ResourceNotFoundError) {
-        return Response.json(
-          {
-            message: e.message,
-          },
-          { status: 404 },
-        );
-      }
-      if (e instanceof ConflictError) {
-        return Response.json(
-          {
-            message: e.message,
-          },
-          { status: 409 },
-        );
+      if (Error.isError(e)) {
+        const errorCode = errorCodeMap[e.name];
+        if (errorCode) {
+          return Response.json({ message: e.message }, { status: errorCode });
+        }
       }
       return Response.json(
         {
