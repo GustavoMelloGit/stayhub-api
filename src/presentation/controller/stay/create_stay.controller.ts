@@ -38,6 +38,10 @@ export class CreateStayController implements Controller {
     const validationResponse = this.#validate(request);
 
     const output = await this.useCase.execute(validationResponse);
-    return output;
+
+    return {
+      message: "Stay created successfully",
+      data: output,
+    };
   }
 }
