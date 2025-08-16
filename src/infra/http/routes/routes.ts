@@ -11,7 +11,7 @@ const authDi = new AuthDi();
 const listTenantsController = tenantDi.makeListTenantsController();
 const createTenantController = tenantDi.makeCreateTenantController();
 const getStayController = stayDi.makeGetStayController();
-const createStayController = stayDi.makeCreateStayController();
+const createStayController = stayDi.makeBookStayController();
 const addUserController = authDi.makeRegisterUserController();
 const healthController = new HealthController();
 

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ValidationError } from "../../../application/error/validation_error";
-import { CreateStayUseCase } from "../../../application/use_case/stay/create_stay";
+import { BookStayUseCase } from "../../../application/use_case/stay/book_stay";
 import {
   HttpControllerMethod,
   type Controller,
@@ -16,15 +16,15 @@ const inputSchema = z.object({
   check_out: z.coerce.date(),
 });
 
-type CreateStayInput = z.infer<typeof inputSchema>;
+type Input = z.infer<typeof inputSchema>;
 
-export class CreateStayController implements Controller {
+export class BookStayController implements Controller {
   path = "/stays";
   method = HttpControllerMethod.POST;
 
-  constructor(private readonly useCase: CreateStayUseCase) {}
+  constructor(private readonly useCase: BookStayUseCase) {}
 
-  #validate(request: ControllerRequest): CreateStayInput {
+  #validate(request: ControllerRequest): Input {
     const parsedInput = inputSchema.safeParse(request.body);
 
     if (!parsedInput.success) {

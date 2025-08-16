@@ -23,7 +23,7 @@ type Output = {
   check_out: string;
 };
 
-export class CreateStayUseCase implements UseCase<Input, Output> {
+export class BookStayUseCase implements UseCase<Input, Output> {
   constructor(
     private readonly stayRepository: StayRepository,
     private readonly tenantRepository: TenantRepository,
