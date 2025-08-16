@@ -35,8 +35,8 @@ export const staysTable = pgTable("stays", {
       onDelete: "cascade",
     })
     .notNull(),
-  calendar_id: uuid()
-    .references(() => calendarsTable.id, {
+  property_id: uuid()
+    .references(() => propertiesTable.id, {
       onDelete: "cascade",
     })
     .notNull(),
@@ -51,9 +51,9 @@ export const staysRelations = relations(staysTable, ({ one }) => ({
     fields: [staysTable.tenant_id],
     references: [tenantsTable.id],
   }),
-  calendar: one(calendarsTable, {
-    fields: [staysTable.calendar_id],
-    references: [calendarsTable.id],
+  property: one(propertiesTable, {
+    fields: [staysTable.property_id],
+    references: [propertiesTable.id],
   }),
 }));
 
@@ -65,10 +65,10 @@ export const usersTable = pgTable("users", {
 });
 
 export const usersRelations = relations(usersTable, ({ many }) => ({
-  calendars: many(calendarsTable),
+  properties: many(propertiesTable),
 }));
 
-export const calendarsTable = pgTable("calendars", {
+export const propertiesTable = pgTable("properties", {
   ...baseSchema,
   name: varchar({ length: 255 }).notNull(),
   user_id: uuid()
@@ -78,11 +78,11 @@ export const calendarsTable = pgTable("calendars", {
     .notNull(),
 });
 
-export const calendarsRelations = relations(
-  calendarsTable,
+export const propertiesRelations = relations(
+  propertiesTable,
   ({ one, many }) => ({
     user: one(usersTable, {
-      fields: [calendarsTable.user_id],
+      fields: [propertiesTable.user_id],
       references: [usersTable.id],
     }),
     stays: many(staysTable),

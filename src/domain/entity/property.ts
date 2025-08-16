@@ -4,18 +4,18 @@ import type { BaseEntity } from "./base_entity";
 import type { Stay } from "./stay";
 import type { User } from "./user";
 
-type CreateCalendarProps = {
+type CreatePropertyProps = {
   name: string;
   user_id: string;
 };
 
-type CalendarProps = CreateCalendarProps &
+type PropertyProps = CreatePropertyProps &
   BaseEntity & {
     user?: User;
     stays?: Stay[];
   };
 
-export class Calendar implements BaseEntity {
+export class Property implements BaseEntity {
   readonly id: string;
   readonly name: string;
   readonly user_id: string;
@@ -25,7 +25,7 @@ export class Calendar implements BaseEntity {
   readonly user?: User;
   readonly stays?: Stay[];
 
-  private constructor(props: CalendarProps) {
+  private constructor(props: PropertyProps) {
     this.id = props.id;
     this.name = props.name;
     this.user_id = props.user_id;
@@ -38,8 +38,8 @@ export class Calendar implements BaseEntity {
     return randomUUID();
   }
 
-  public static create(props: CreateCalendarProps): Calendar {
-    return new Calendar({
+  public static create(props: CreatePropertyProps): Property {
+    return new Property({
       ...props,
       id: this.nextId(),
       created_at: new Date(),
@@ -47,8 +47,8 @@ export class Calendar implements BaseEntity {
     });
   }
 
-  public static reconstitute(props: CalendarProps): Calendar {
-    return new Calendar(props);
+  public static reconstitute(props: PropertyProps): Property {
+    return new Property(props);
   }
 
   public bookStay(stay: Stay) {

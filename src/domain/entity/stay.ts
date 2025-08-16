@@ -7,7 +7,7 @@ type StayCreateProps = {
   check_in: Date;
   check_out: Date;
   tenant_id: string;
-  calendar_id: string;
+  property_id: string;
   guests: number;
   password: string;
 };
@@ -22,7 +22,7 @@ export class Stay {
   readonly check_in: Date;
   readonly check_out: Date;
   readonly tenant_id: string;
-  readonly calendar_id: string;
+  readonly property_id: string;
   readonly guests: number;
   readonly password: string;
   readonly tenant?: Tenant;
@@ -35,7 +35,7 @@ export class Stay {
     this.check_in = props.check_in;
     this.check_out = props.check_out;
     this.tenant_id = props.tenant_id;
-    this.calendar_id = props.calendar_id;
+    this.property_id = props.property_id;
     this.guests = props.guests;
     this.password = props.password;
     this.tenant = props.tenant;
@@ -75,7 +75,7 @@ export class Stay {
       check_in: this.check_in,
       check_out: this.check_out,
       tenant_id: this.tenant_id,
-      calendar_id: this.calendar_id,
+      property_id: this.property_id,
       guests: this.guests,
       password: this.password,
       tenant: this.tenant,

@@ -1,5 +1,5 @@
 import { Stay } from "../../../domain/entity/stay";
-import type { CalendarRepository } from "../../../domain/repository/calendar_repository";
+import type { PropertyRepository } from "../../../domain/repository/property_repository";
 import type { StayRepository } from "../../../domain/repository/stay_repository";
 import type { TenantRepository } from "../../../domain/repository/tenant_repository";
 import { ResourceNotFoundError } from "../../error/resource_not_found_error";
@@ -8,7 +8,7 @@ import type { UseCase } from "../use_case";
 type Input = {
   guests: number;
   tenant_id: string;
-  calendar_id: string;
+  property_id: string;
   password: string;
   check_in: Date;
   check_out: Date;
@@ -27,7 +27,7 @@ export class BookStayUseCase implements UseCase<Input, Output> {
   constructor(
     private readonly stayRepository: StayRepository,
     private readonly tenantRepository: TenantRepository,
-    private readonly calendarRepository: CalendarRepository,
+    private readonly propertyRepository: PropertyRepository,
   ) {}
 
   async execute(input: Input): Promise<Output> {
@@ -37,10 +37,10 @@ export class BookStayUseCase implements UseCase<Input, Output> {
       throw new ResourceNotFoundError("Tenant");
     }
 
-    const calendar = await this.calendarRepository.findById(input.calendar_id);
+    const property = await this.propertyRepository.findById(input.property_id);
 
-    if (!calendar) {
-      throw new ResourceNotFoundError("Calendar");
+    if (!property) {
+      throw new ResourceNotFoundError("Property");
     }
 
     const stayToCreate = Stay.create(input);
