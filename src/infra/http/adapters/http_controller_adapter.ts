@@ -1,3 +1,4 @@
+import { ConflictError } from "../../../application/error/conflict_error";
 import { ResourceNotFoundError } from "../../../application/error/resource_not_found_error";
 import { ValidationError } from "../../../application/error/validation_error";
 import type {
@@ -107,6 +108,14 @@ export function BunHttpControllerAdapter(controller: Controller) {
             message: e.message,
           },
           { status: 404 },
+        );
+      }
+      if (e instanceof ConflictError) {
+        return Response.json(
+          {
+            message: e.message,
+          },
+          { status: 409 },
         );
       }
       return Response.json(

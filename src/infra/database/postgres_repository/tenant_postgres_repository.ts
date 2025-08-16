@@ -1,11 +1,26 @@
 import { eq } from "drizzle-orm";
+import { ConflictError } from "../../../application/error/conflict_error";
 import { Tenant } from "../../../domain/entity/tenant";
 import type { TenantRepository } from "../../../domain/repository/tenant_repository";
 import { db } from "../drizzle/database";
 import { tenantsTable } from "../drizzle/schema";
 
 export class TenantPostgresRepository implements TenantRepository {
+  async findByPhone(phone: string): Promise<Tenant | null> {
+    const tenant = await db.query.tenantsTable.findFirst({
+      where: eq(tenantsTable.phone, phone),
+    });
+
+    return tenant ? Tenant.reconstitute(tenant) : null;
+  }
+
   async save(input: { name: string; phone: string }): Promise<Tenant> {
+    const hasTenant = await this.findByPhone(input.phone);
+
+    if (hasTenant) {
+      throw new ConflictError("Tenant already exists");
+    }
+
     const entity = Tenant.create(input);
 
     const tenant = await db
