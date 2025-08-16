@@ -8,7 +8,6 @@
     "build": "tsc && bun build ./src/index.ts --compile --outfile project",
     "dev": "bun --hot run src/index.ts",
     "start": "bun run src/index.ts",
-    "prepare": "husky",
     "lint": "eslint . --fix",
     "db:push": "drizzle-kit push",
     "db:migration": "drizzle-kit generate",
