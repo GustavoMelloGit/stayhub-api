@@ -1,7 +1,7 @@
 import { type Hasher } from "../../application/service/hasher";
-import { AddUserUseCase } from "../../application/use_case/auth/add_user";
+import { RegisterUserUseCase } from "../../application/use_case/auth/register_user";
 import type { AuthRepository } from "../../domain/repository/auth_repository";
-import { AddUserController } from "../../presentation/controller/auth/add_user.controller";
+import { RegisterUserController } from "../../presentation/controller/auth/register_user.controller";
 import { AuthPostgresRepository } from "../database/postgres_repository/auth_postgres_repository";
 import { BunHasher } from "../service/bun_hasher";
 
@@ -15,12 +15,12 @@ export class AuthDi {
   }
 
   // Use Cases
-  makeAddUserUseCase() {
-    return new AddUserUseCase(this.#authRepository, this.#hasher);
+  makeRegisterUserUseCase() {
+    return new RegisterUserUseCase(this.#authRepository, this.#hasher);
   }
 
   // Controllers
-  makeAddUserController() {
-    return new AddUserController(this.makeAddUserUseCase());
+  makeRegisterUserController() {
+    return new RegisterUserController(this.makeRegisterUserUseCase());
   }
 }

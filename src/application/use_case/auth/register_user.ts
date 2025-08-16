@@ -16,7 +16,7 @@ type Output = {
   email: string;
 };
 
-export class AddUserUseCase implements UseCase<Input, Output> {
+export class RegisterUserUseCase implements UseCase<Input, Output> {
   constructor(
     private readonly userRepository: AuthRepository,
     private readonly hasher: Hasher,

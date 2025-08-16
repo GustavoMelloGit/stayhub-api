@@ -1,6 +1,6 @@
 import z from "zod";
 import { ValidationError } from "../../../application/error/validation_error";
-import type { AddUserUseCase } from "../../../application/use_case/auth/add_user";
+import type { RegisterUserUseCase } from "../../../application/use_case/auth/register_user";
 import {
   HttpControllerMethod,
   type Controller,
@@ -15,11 +15,11 @@ const inputSchema = z.object({
 
 type Input = z.infer<typeof inputSchema>;
 
-export class AddUserController implements Controller {
+export class RegisterUserController implements Controller {
   path = "/auth/users";
   method = HttpControllerMethod.POST;
 
-  constructor(private readonly useCase: AddUserUseCase) {}
+  constructor(private readonly useCase: RegisterUserUseCase) {}
 
   #validate(request: ControllerRequest): Input {
     const parsedInput = inputSchema.safeParse(request.body);
