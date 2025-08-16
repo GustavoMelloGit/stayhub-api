@@ -63,9 +63,9 @@ export class Stay {
   public get data() {
     return {
       id: this.id,
-      checkIn: this.check_in,
-      checkOut: this.check_out,
-      tenantId: this.tenant_id,
+      check_in: this.check_in,
+      check_out: this.check_out,
+      tenant_id: this.tenant_id,
       guests: this.guests,
       password: this.password,
       tenant: this.tenant,
