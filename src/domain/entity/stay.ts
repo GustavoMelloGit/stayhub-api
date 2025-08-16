@@ -7,6 +7,7 @@ type StayCreateProps = {
   check_in: Date;
   check_out: Date;
   tenant_id: string;
+  calendar_id: string;
   guests: number;
   password: string;
 };
@@ -21,18 +22,26 @@ export class Stay {
   readonly check_in: Date;
   readonly check_out: Date;
   readonly tenant_id: string;
+  readonly calendar_id: string;
   readonly guests: number;
   readonly password: string;
   readonly tenant?: Tenant;
+  readonly created_at: Date;
+  readonly updated_at: Date;
+  readonly deleted_at?: Date | null;
 
   private constructor(props: StayProps) {
     this.id = props.id;
     this.check_in = props.check_in;
     this.check_out = props.check_out;
     this.tenant_id = props.tenant_id;
+    this.calendar_id = props.calendar_id;
     this.guests = props.guests;
     this.password = props.password;
     this.tenant = props.tenant;
+    this.created_at = props.created_at;
+    this.updated_at = props.updated_at;
+    this.deleted_at = props.deleted_at;
   }
 
   private static nextId(): string {
@@ -66,9 +75,13 @@ export class Stay {
       check_in: this.check_in,
       check_out: this.check_out,
       tenant_id: this.tenant_id,
+      calendar_id: this.calendar_id,
       guests: this.guests,
       password: this.password,
       tenant: this.tenant,
+      created_at: this.created_at,
+      updated_at: this.updated_at,
+      deleted_at: this.deleted_at,
     };
   }
 }

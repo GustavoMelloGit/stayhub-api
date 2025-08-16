@@ -17,11 +17,17 @@ export class Tenant {
   readonly id: string;
   readonly name: string;
   readonly phone: string;
+  readonly created_at: Date;
+  readonly updated_at: Date;
+  readonly deleted_at?: Date | null;
 
   private constructor(props: TenantProps) {
     this.id = props.id;
     this.name = props.name;
     this.phone = props.phone;
+    this.created_at = props.created_at;
+    this.updated_at = props.updated_at;
+    this.deleted_at = props.deleted_at;
   }
 
   private static nextId(): string {
@@ -72,6 +78,9 @@ export class Tenant {
       id: this.id,
       name: this.name,
       phone: this.phone,
+      created_at: this.created_at,
+      updated_at: this.updated_at,
+      deleted_at: this.deleted_at,
     };
   }
 }
