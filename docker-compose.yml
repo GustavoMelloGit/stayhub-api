@@ -12,20 +12,20 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
   api:
-    image: oven/bun:1
+    build: .
     container_name: stayhub_api
     restart: unless-stopped
-    ports:
-      - "3000:3000"
     depends_on:
       - db
+    ports:
+      - "3030:3000"
     environment:
       PORT: 3000
       DATABASE_URL: postgresql://postgres:mypassword@db:5432/stayhub
+    working_dir: /usr/src/app
     volumes:
-      - .:/app
-    working_dir: /app
-    command: bun run src/index.ts
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 10s
