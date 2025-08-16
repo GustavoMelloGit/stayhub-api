@@ -23,7 +23,12 @@ async function main() {
     routes: bunRoutes,
   });
 
-  console.log(`🚀 Listening on http://localhost:${server.port} ...`);
+  const isProduction = env.NODE_ENV === "production";
+  console.log(
+    isProduction
+      ? `🚀 API running in production mode`
+      : `🚀 Listening on http://localhost:${server.port}`,
+  );
 }
 
 main();
