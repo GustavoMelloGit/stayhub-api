@@ -1,15 +1,18 @@
 import { HealthController } from "../../../presentation/controller/health/health.controller";
+import { AuthDi } from "../../di/auth_di";
 import { StayDi } from "../../di/stay_di";
 import { TenantDi } from "../../di/tenant_di";
 import { BunHttpControllerAdapter } from "../adapters/http_controller_adapter";
 
 const tenantDi = new TenantDi();
 const stayDi = new StayDi();
+const authDi = new AuthDi();
 
 const listTenantsController = tenantDi.makeListTenantsController();
 const createTenantController = tenantDi.makeCreateTenantController();
 const getStayController = stayDi.makeGetStayController();
 const createStayController = stayDi.makeCreateStayController();
+const addUserController = authDi.makeAddUserController();
 const healthController = new HealthController();
 
 const controllers = [
@@ -17,6 +20,7 @@ const controllers = [
   createTenantController,
   getStayController,
   createStayController,
+  addUserController,
   healthController,
 ];
 
