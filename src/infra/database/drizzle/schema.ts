@@ -7,8 +7,19 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-export const tenantsTable = pgTable("tenants", {
+const baseSchema = {
   id: uuid().primaryKey().defaultRandom(),
+  created_at: timestamp({ withTimezone: true, mode: "date" })
+    .notNull()
+    .defaultNow(),
+  updated_at: timestamp({ withTimezone: true, mode: "date" })
+    .notNull()
+    .defaultNow(),
+  deleted_at: timestamp({ withTimezone: true, mode: "date" }),
+};
+
+export const tenantsTable = pgTable("tenants", {
+  ...baseSchema,
   name: varchar({ length: 255 }).notNull(),
   phone: varchar({ length: 15 }).notNull().unique(),
 });
@@ -18,9 +29,14 @@ export const tenantsRelations = relations(tenantsTable, ({ many }) => ({
 }));
 
 export const staysTable = pgTable("stays", {
-  id: uuid().primaryKey().defaultRandom(),
+  ...baseSchema,
   tenant_id: uuid()
     .references(() => tenantsTable.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  calendar_id: uuid()
+    .references(() => calendarsTable.id, {
       onDelete: "cascade",
     })
     .notNull(),
@@ -35,11 +51,40 @@ export const staysRelations = relations(staysTable, ({ one }) => ({
     fields: [staysTable.tenant_id],
     references: [tenantsTable.id],
   }),
+  calendar: one(calendarsTable, {
+    fields: [staysTable.calendar_id],
+    references: [calendarsTable.id],
+  }),
 }));
 
 export const usersTable = pgTable("users", {
-  id: uuid().primaryKey().defaultRandom(),
+  ...baseSchema,
   name: varchar({ length: 255 }).notNull(),
   email: varchar({ length: 255 }).notNull().unique(),
   password: varchar({ length: 255 }).notNull(),
 });
+
+export const usersRelations = relations(usersTable, ({ many }) => ({
+  calendars: many(calendarsTable),
+}));
+
+export const calendarsTable = pgTable("calendars", {
+  ...baseSchema,
+  name: varchar({ length: 255 }).notNull(),
+  user_id: uuid()
+    .references(() => usersTable.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+});
+
+export const calendarsRelations = relations(
+  calendarsTable,
+  ({ one, many }) => ({
+    user: one(usersTable, {
+      fields: [calendarsTable.user_id],
+      references: [usersTable.id],
+    }),
+    stays: many(staysTable),
+  }),
+);
