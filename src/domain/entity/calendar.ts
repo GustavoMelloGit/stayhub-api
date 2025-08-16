@@ -14,7 +14,7 @@ export class Calendar implements BaseEntity {
   readonly user_id: string;
   readonly created_at: Date;
   readonly updated_at: Date;
-  readonly deleted_at?: Date;
+  readonly deleted_at?: Date | null;
 
   private constructor(props: CalendarProps) {
     this.id = props.id;
