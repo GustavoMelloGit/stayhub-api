@@ -1,14 +1,13 @@
 import { randomUUID } from "node:crypto";
-import { ValidationError } from "../../application/error/validation_error"; // Reutilize seu erro customizado
+import { ValidationError } from "../../application/error/validation_error";
+import type { BaseEntity } from "./base_entity";
 
 type TenantCreateProps = {
   name: string;
   phone: string;
 };
 
-type TenantProps = TenantCreateProps & {
-  id: string;
-};
+type TenantProps = TenantCreateProps & BaseEntity;
 
 export type WithTenant<T> = T & {
   tenant: Tenant;
@@ -56,7 +55,12 @@ export class Tenant {
       throw new ValidationError(JSON.stringify(validationErrors));
     }
 
-    return new Tenant({ ...props, id: this.nextId() });
+    return new Tenant({
+      ...props,
+      id: this.nextId(),
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
   }
 
   public static reconstitute(props: TenantProps): Tenant {

@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import type { BaseEntity } from "./base_entity";
 
 type UserCreateProps = {
   name: string;
@@ -6,9 +7,7 @@ type UserCreateProps = {
   password: string;
 };
 
-type UserProps = UserCreateProps & {
-  id: string;
-};
+type UserProps = UserCreateProps & BaseEntity;
 
 export class User {
   readonly id: string;
@@ -28,7 +27,12 @@ export class User {
   }
 
   public static create(props: UserCreateProps): User {
-    return new User({ ...props, id: this.nextId() });
+    return new User({
+      ...props,
+      id: this.nextId(),
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
   }
 
   public static reconstitute(props: UserProps): User {

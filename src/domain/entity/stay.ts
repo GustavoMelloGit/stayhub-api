@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { ValidationError } from "../../application/error/validation_error"; // Supondo que você tem um erro customizado
+import { ValidationError } from "../../application/error/validation_error";
+import type { BaseEntity } from "./base_entity";
 import type { Tenant } from "./tenant";
 
 type StayCreateProps = {
@@ -10,10 +11,10 @@ type StayCreateProps = {
   password: string;
 };
 
-type StayProps = StayCreateProps & {
-  id: string;
-  tenant?: Tenant;
-};
+type StayProps = StayCreateProps &
+  BaseEntity & {
+    tenant?: Tenant;
+  };
 
 export class Stay {
   readonly id: string;
@@ -47,7 +48,12 @@ export class Stay {
       throw new ValidationError("Guests must be an integer greater than zero");
     }
 
-    return new Stay({ ...props, id: this.nextId() });
+    return new Stay({
+      ...props,
+      id: this.nextId(),
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
   }
 
   public static reconstitute(props: StayProps): Stay {
