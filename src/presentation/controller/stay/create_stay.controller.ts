@@ -10,6 +10,7 @@ import {
 const inputSchema = z.object({
   guests: z.number().gt(0),
   tenant_id: z.uuid(),
+  calendar_id: z.uuid(),
   password: z.string(),
   check_in: z.coerce.date(),
   check_out: z.coerce.date(),
