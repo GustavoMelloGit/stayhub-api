@@ -1,3 +1,7 @@
+import type {
+  Controller,
+  HttpControllerMethod,
+} from "../../../presentation/controller/controller";
 import { HealthController } from "../../../presentation/controller/health/health.controller";
 import { AuthDi } from "../../di/auth_di";
 import { PropertyDi } from "../../di/property_di";
@@ -33,7 +37,10 @@ const controllers = [
   healthController,
 ];
 
-const routeMap = new Map();
+const routeMap = new Map<
+  string,
+  Partial<Record<HttpControllerMethod, Controller>>
+>();
 
 controllers.forEach((controller) => {
   const alreadyExists = routeMap.get(controller.path);
