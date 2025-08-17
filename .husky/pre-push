@@ -1,1 +1,1 @@
-bun run build
+git diff HEAD --quiet && bun run build
