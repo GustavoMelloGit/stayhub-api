@@ -19,13 +19,19 @@ const inputSchema = z.object({
 type Input = z.infer<typeof inputSchema>;
 
 export class BookStayController implements Controller {
-  path = "/stays";
+  path = "/property/:property_id/book";
   method = HttpControllerMethod.POST;
 
   constructor(private readonly useCase: BookStayUseCase) {}
 
   #validate(request: ControllerRequest): Input {
-    const parsedInput = inputSchema.safeParse(request.body);
+    const { property_id } = request.params;
+    const data = {
+      ...request.body,
+      property_id,
+    };
+
+    const parsedInput = inputSchema.safeParse(data);
 
     if (!parsedInput.success) {
       const errors = z.prettifyError(parsedInput.error);
