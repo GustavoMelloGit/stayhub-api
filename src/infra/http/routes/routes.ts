@@ -68,7 +68,7 @@ const controllers = [
 
 const routeMap = new Map<
   string,
-  Partial<Record<HttpControllerMethod, Controller>>
+  Partial<Record<HttpControllerMethod, (request: Request) => Promise<Response>>>
 >();
 
 controllers.forEach(({ authenticated, controller }) => {
