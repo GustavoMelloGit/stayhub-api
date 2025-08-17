@@ -42,27 +42,15 @@ export class PropertyPostgresRepository implements PropertyRepository {
       },
     });
 
-    return property
-      ? Property.reconstitute({
-          ...property,
-          stays: property.stays.map((s) => Stay.reconstitute(s)),
-        })
-      : null;
+    return property ? Property.reconstitute(property) : null;
   }
 
-  async addProperty(input: Property): Promise<Property> {
+  async addProperty(input: Property): Promise<void> {
     const result = await db
       .insert(propertiesTable)
       .values(input.data)
       .returning();
 
-    const property = result[0];
-
-    if (!property) throw new Error("Failed to save property");
-
-    return Property.reconstitute({
-      ...property,
-      stays: [],
-    });
+    if (!result[0]) throw new Error("Failed to save property");
   }
 }
