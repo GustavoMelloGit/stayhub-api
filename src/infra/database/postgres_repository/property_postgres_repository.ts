@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { Property } from "../../../domain/entity/property";
 import { Stay } from "../../../domain/entity/stay";
 import { Tenant, type WithTenant } from "../../../domain/entity/tenant";
@@ -7,9 +7,15 @@ import { db } from "../drizzle/database";
 import { propertiesTable, staysTable } from "../drizzle/schema";
 
 export class PropertyPostgresRepository implements PropertyRepository {
-  async stayOfId(id: string): Promise<WithTenant<Stay> | null> {
+  async stayOfId(
+    id: string,
+    property_id: string,
+  ): Promise<WithTenant<Stay> | null> {
     const stay = await db.query.staysTable.findFirst({
-      where: eq(staysTable.id, id),
+      where: and(
+        eq(staysTable.id, id),
+        eq(staysTable.property_id, property_id),
+      ),
       with: {
         tenant: true,
       },

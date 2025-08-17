@@ -5,6 +5,6 @@ import type { WithTenant } from "../entity/tenant";
 export interface PropertyRepository {
   propertyOfId(id: string): Promise<Property | null>;
   addProperty(property: Property): Promise<void>;
-  stayOfId(id: string): Promise<WithTenant<Stay> | null>;
+  stayOfId(id: string, property_id: string): Promise<WithTenant<Stay> | null>;
   saveStay(stay: Stay): Promise<void>;
 }

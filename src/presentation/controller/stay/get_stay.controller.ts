@@ -9,12 +9,13 @@ import {
 
 const inputSchema = z.object({
   stay_id: z.uuid(),
+  property_id: z.uuid(),
 });
 
 type Input = z.infer<typeof inputSchema>;
 
 export class GetStayController implements Controller {
-  path = "/stays/:stay_id";
+  path = "/property/:property_id/stay/:stay_id";
   method = HttpControllerMethod.GET;
 
   constructor(private readonly useCase: GetStayUseCase) {}
@@ -33,9 +34,7 @@ export class GetStayController implements Controller {
   async handle(request: ControllerRequest) {
     const validationResponse = this.#validate(request);
 
-    const output = await this.useCase.execute({
-      stay_id: validationResponse.stay_id,
-    });
+    const output = await this.useCase.execute(validationResponse);
 
     return output;
   }

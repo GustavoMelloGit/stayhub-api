@@ -5,6 +5,7 @@ import type { UseCase } from "../use_case";
 
 type Input = {
   stay_id: string;
+  property_id: string;
 };
 
 type Output = {
@@ -24,7 +25,10 @@ export class GetStayUseCase implements UseCase<Input, Output> {
   constructor(private readonly propertyRepository: PropertyRepository) {}
 
   async execute(input: Input): Promise<Output> {
-    const stay = await this.propertyRepository.stayOfId(input.stay_id);
+    const stay = await this.propertyRepository.stayOfId(
+      input.stay_id,
+      input.property_id,
+    );
 
     if (!stay) {
       throw new ResourceNotFoundError("Stay");
