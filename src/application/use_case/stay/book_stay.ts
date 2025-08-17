@@ -1,5 +1,6 @@
 import type { PropertyRepository } from "../../../domain/repository/property_repository";
 import type { TenantRepository } from "../../../domain/repository/tenant_repository";
+import type { BookingPolicy } from "../../../domain/service/booking_policy";
 import { ResourceNotFoundError } from "../../error/resource_not_found_error";
 import type { UseCase } from "../use_case";
 
@@ -25,6 +26,7 @@ export class BookStayUseCase implements UseCase<Input, Output> {
   constructor(
     private readonly tenantRepository: TenantRepository,
     private readonly propertyRepository: PropertyRepository,
+    private readonly bookingPolicy: BookingPolicy,
   ) {}
 
   async execute(input: Input): Promise<Output> {
@@ -41,7 +43,10 @@ export class BookStayUseCase implements UseCase<Input, Output> {
       throw new ResourceNotFoundError("Property");
     }
 
-    const stay = property.bookStay(input);
+    const stay = await property.bookStay({
+      ...input,
+      bookingPolicy: this.bookingPolicy,
+    });
 
     await this.propertyRepository.saveStay(stay);
 

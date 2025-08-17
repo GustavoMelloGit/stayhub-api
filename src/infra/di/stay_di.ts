@@ -2,18 +2,22 @@ import { BookStayUseCase } from "../../application/use_case/stay/book_stay";
 import { GetStayUseCase } from "../../application/use_case/stay/get_stay";
 import type { PropertyRepository } from "../../domain/repository/property_repository";
 import type { TenantRepository } from "../../domain/repository/tenant_repository";
+import type { BookingPolicy } from "../../domain/service/booking_policy";
 import { BookStayController } from "../../presentation/controller/stay/book_stay.controller";
 import { GetStayController } from "../../presentation/controller/stay/get_stay.controller";
 import { PropertyPostgresRepository } from "../database/postgres_repository/property_postgres_repository";
 import { TenantPostgresRepository } from "../database/postgres_repository/tenant_postgres_repository";
+import { PostgresBookingPolicy } from "../database/postgres_service/postgres_booking_service";
 
 export class StayDi {
   #tenantRepository: TenantRepository;
   #propertyRepository: PropertyRepository;
+  #bookingPolicy: BookingPolicy;
 
   constructor() {
     this.#tenantRepository = new TenantPostgresRepository();
     this.#propertyRepository = new PropertyPostgresRepository();
+    this.#bookingPolicy = new PostgresBookingPolicy();
   }
 
   // Use Cases
@@ -24,6 +28,7 @@ export class StayDi {
     return new BookStayUseCase(
       this.#tenantRepository,
       this.#propertyRepository,
+      this.#bookingPolicy,
     );
   }
 
