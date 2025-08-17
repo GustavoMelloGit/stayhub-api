@@ -42,8 +42,6 @@ export class PropertyPostgresRepository implements PropertyRepository {
       },
     });
 
-    console.log(property);
-
     return property
       ? Property.reconstitute({
           ...property,
