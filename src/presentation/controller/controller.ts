@@ -1,3 +1,5 @@
+import type { User } from "../../domain/entity/user";
+
 export enum HttpControllerMethod {
   GET = "GET",
   POST = "POST",
@@ -12,11 +14,14 @@ export type ControllerRequest = {
   headers: Record<string, string>;
   method: HttpControllerMethod;
   url: string;
-  token?: string;
+};
+
+export type AuthenticatedControllerRequest = ControllerRequest & {
+  user: User;
 };
 
 export interface Controller {
   path: string;
   method: HttpControllerMethod;
-  handle(request: ControllerRequest): Promise<unknown>;
+  handle(request: ControllerRequest, user?: User): Promise<unknown>;
 }

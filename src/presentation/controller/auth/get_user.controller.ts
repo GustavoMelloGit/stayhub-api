@@ -1,24 +1,31 @@
-import { UnauthorizedError } from "../../../application/error/unauthorized_error";
-import type { GetUserUseCase } from "../../../application/use_case/auth/get_user";
+import type { User } from "../../../domain/entity/user";
 import {
   HttpControllerMethod,
   type Controller,
   type ControllerRequest,
 } from "../controller";
 
+type Output = {
+  id: string;
+  name: string;
+  email: string;
+  created_at: Date;
+  updated_at: Date;
+};
+
 export class GetUserController implements Controller {
   path = "/auth/me";
   method = HttpControllerMethod.GET;
 
-  constructor(private readonly useCase: GetUserUseCase) {}
+  constructor() {}
 
-  async handle(request: ControllerRequest) {
-    if (!request.token) {
-      throw new UnauthorizedError("Unauthorized");
-    }
-
-    const output = await this.useCase.execute({ token: request.token });
-
-    return output;
+  async handle(_request: ControllerRequest, user: User): Promise<Output> {
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
+    };
   }
 }

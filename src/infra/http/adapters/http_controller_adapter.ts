@@ -3,11 +3,15 @@ import { IllegalStateError } from "../../../application/error/illegal_state_erro
 import { ResourceNotFoundError } from "../../../application/error/resource_not_found_error";
 import { UnauthorizedError } from "../../../application/error/unauthorized_error";
 import { ValidationError } from "../../../application/error/validation_error";
+import type { User } from "../../../domain/entity/user";
 import type {
   Controller,
   ControllerRequest,
   HttpControllerMethod,
 } from "../../../presentation/controller/controller";
+import { AuthMiddleware } from "../../../presentation/middleware/auth.middleware";
+import { AuthPostgresRepository } from "../../database/postgres_repository/auth_postgres_repository";
+import { JwtEncrypter } from "../../service/jwt_encrypter";
 
 class ControllerRequestParser {
   constructor(
@@ -16,7 +20,6 @@ class ControllerRequestParser {
   ) {}
 
   async parse(): Promise<ControllerRequest> {
-    const token = this.request.headers.get("Authorization")?.split(" ")[1];
     return {
       params: this.#parseParams(),
       body: await this.#parseBody(),
@@ -24,7 +27,6 @@ class ControllerRequestParser {
       headers: this.#parseHeaders(),
       method: this.request.method as HttpControllerMethod,
       url: this.request.url,
-      token,
     };
   }
 
@@ -93,7 +95,10 @@ const errorCodeMap: Record<string, number> = {
   [IllegalStateError.name]: 500,
 };
 
-export function BunHttpControllerAdapter(controller: Controller) {
+export function BunHttpControllerAdapter(
+  controller: Controller,
+  authenticated: boolean,
+) {
   return async function (request: Request): Promise<Response> {
     try {
       const controllerRequestParser = new ControllerRequestParser(
@@ -101,7 +106,16 @@ export function BunHttpControllerAdapter(controller: Controller) {
         controller,
       );
       const controllerRequest = await controllerRequestParser.parse();
-      const response = await controller.handle(controllerRequest);
+
+      let user: User | undefined;
+      if (authenticated) {
+        const authMiddleware = new AuthMiddleware(
+          new AuthPostgresRepository(),
+          new JwtEncrypter(),
+        );
+        user = await authMiddleware.handle(controllerRequest);
+      }
+      const response = await controller.handle(controllerRequest, user);
 
       return Response.json(response);
     } catch (e) {

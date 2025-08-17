@@ -12,22 +12,51 @@ const tenantDi = new TenantDi();
 const propertyDi = new PropertyDi();
 const authDi = new AuthDi();
 
-const healthController = new HealthController();
+type Route = {
+  controller: Controller;
+  authenticated: boolean;
+};
 
-const tenantControllers = [
-  tenantDi.makeListTenantsController(),
-  tenantDi.makeCreateTenantController(),
+const healthController: Route = {
+  authenticated: false,
+  controller: new HealthController(),
+};
+
+const tenantControllers: Route[] = [
+  {
+    authenticated: true,
+    controller: tenantDi.makeListTenantsController(),
+  },
+  {
+    authenticated: true,
+    controller: tenantDi.makeCreateTenantController(),
+  },
 ];
 
-const propertyControllers = [
-  propertyDi.makeGetStayController(),
-  propertyDi.makeBookStayController(),
+const propertyControllers: Route[] = [
+  {
+    authenticated: true,
+    controller: propertyDi.makeGetStayController(),
+  },
+  {
+    authenticated: true,
+    controller: propertyDi.makeBookStayController(),
+  },
 ];
 
-const authControllers = [
-  authDi.makeRegisterUserController(),
-  authDi.makeSignInController(),
-  authDi.makeGetUserController(),
+const authControllers: Route[] = [
+  {
+    authenticated: false,
+    controller: authDi.makeRegisterUserController(),
+  },
+  {
+    authenticated: false,
+    controller: authDi.makeSignInController(),
+  },
+  {
+    authenticated: true,
+    controller: authDi.makeGetUserController(),
+  },
 ];
 
 const controllers = [
@@ -42,16 +71,16 @@ const routeMap = new Map<
   Partial<Record<HttpControllerMethod, Controller>>
 >();
 
-controllers.forEach((controller) => {
+controllers.forEach(({ authenticated, controller }) => {
   const alreadyExists = routeMap.get(controller.path);
   if (!alreadyExists) {
     routeMap.set(controller.path, {
-      [controller.method]: BunHttpControllerAdapter(controller),
+      [controller.method]: BunHttpControllerAdapter(controller, authenticated),
     });
   }
   routeMap.set(controller.path, {
     ...alreadyExists,
-    [controller.method]: BunHttpControllerAdapter(controller),
+    [controller.method]: BunHttpControllerAdapter(controller, authenticated),
   });
 });
 

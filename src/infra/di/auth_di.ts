@@ -1,6 +1,5 @@
 import type { Encrypter } from "../../application/service/encrypter";
 import { type Hasher } from "../../application/service/hasher";
-import { GetUserUseCase } from "../../application/use_case/auth/get_user";
 import { RegisterUserUseCase } from "../../application/use_case/auth/register_user";
 import { SignInUseCase } from "../../application/use_case/auth/sign_in";
 import type { AuthRepository } from "../../domain/repository/auth_repository";
@@ -43,10 +42,6 @@ export class AuthDi {
     );
   }
 
-  makeGetUserUseCase() {
-    return new GetUserUseCase(this.#authRepository, this.#encrypter);
-  }
-
   // Controllers
   makeRegisterUserController() {
     return new RegisterUserController(this.makeRegisterUserUseCase());
@@ -55,6 +50,6 @@ export class AuthDi {
     return new SignInController(this.makeSignInUseCase());
   }
   makeGetUserController() {
-    return new GetUserController(this.makeGetUserUseCase());
+    return new GetUserController();
   }
 }
