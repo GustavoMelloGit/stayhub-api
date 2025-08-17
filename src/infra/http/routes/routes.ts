@@ -1,30 +1,35 @@
 import { HealthController } from "../../../presentation/controller/health/health.controller";
 import { AuthDi } from "../../di/auth_di";
-import { StayDi } from "../../di/stay_di";
+import { PropertyDi } from "../../di/property_di";
 import { TenantDi } from "../../di/tenant_di";
 import { BunHttpControllerAdapter } from "../adapters/http_controller_adapter";
 
 const tenantDi = new TenantDi();
-const stayDi = new StayDi();
+const propertyDi = new PropertyDi();
 const authDi = new AuthDi();
 
-const listTenantsController = tenantDi.makeListTenantsController();
-const createTenantController = tenantDi.makeCreateTenantController();
-const getStayController = stayDi.makeGetStayController();
-const createStayController = stayDi.makeBookStayController();
-const addUserController = authDi.makeRegisterUserController();
-const signInController = authDi.makeSignInController();
-const getUserController = authDi.makeGetUserController();
 const healthController = new HealthController();
 
+const tenantControllers = [
+  tenantDi.makeListTenantsController(),
+  tenantDi.makeCreateTenantController(),
+];
+
+const propertyControllers = [
+  propertyDi.makeGetStayController(),
+  propertyDi.makeBookStayController(),
+];
+
+const authControllers = [
+  authDi.makeRegisterUserController(),
+  authDi.makeSignInController(),
+  authDi.makeGetUserController(),
+];
+
 const controllers = [
-  listTenantsController,
-  createTenantController,
-  getStayController,
-  createStayController,
-  addUserController,
-  signInController,
-  getUserController,
+  ...tenantControllers,
+  ...propertyControllers,
+  ...authControllers,
   healthController,
 ];
 

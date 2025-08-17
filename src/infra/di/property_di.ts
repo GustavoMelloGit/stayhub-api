@@ -1,5 +1,5 @@
-import { BookStayUseCase } from "../../application/use_case/stay/book_stay";
-import { GetStayUseCase } from "../../application/use_case/stay/get_stay";
+import { BookStayUseCase } from "../../application/use_case/property/book_stay";
+import { GetStayUseCase } from "../../application/use_case/property/get_stay";
 import type { BookingPolicy } from "../../domain/policies/booking_policy";
 import type { PropertyRepository } from "../../domain/repository/property_repository";
 import type { TenantRepository } from "../../domain/repository/tenant_repository";
@@ -9,7 +9,7 @@ import { PostgresBookingPolicy } from "../database/postgres_policies/postgres_bo
 import { PropertyPostgresRepository } from "../database/postgres_repository/property_postgres_repository";
 import { TenantPostgresRepository } from "../database/postgres_repository/tenant_postgres_repository";
 
-export class StayDi {
+export class PropertyDi {
   #tenantRepository: TenantRepository;
   #propertyRepository: PropertyRepository;
   #bookingPolicy: BookingPolicy;

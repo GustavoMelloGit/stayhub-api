@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ValidationError } from "../../../application/error/validation_error";
-import { BookStayUseCase } from "../../../application/use_case/stay/book_stay";
+import { BookStayUseCase } from "../../../application/use_case/property/book_stay";
 import {
   HttpControllerMethod,
   type Controller,
