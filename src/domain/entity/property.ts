@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { BookingPolicy } from "../service/booking_policy";
+import type { BookingPolicy } from "../policies/booking_policy";
 import type { BaseEntity } from "./base_entity";
 import { Stay } from "./stay";
 

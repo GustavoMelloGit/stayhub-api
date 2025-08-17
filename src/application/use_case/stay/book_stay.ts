@@ -1,6 +1,6 @@
+import type { BookingPolicy } from "../../../domain/policies/booking_policy";
 import type { PropertyRepository } from "../../../domain/repository/property_repository";
 import type { TenantRepository } from "../../../domain/repository/tenant_repository";
-import type { BookingPolicy } from "../../../domain/service/booking_policy";
 import { ResourceNotFoundError } from "../../error/resource_not_found_error";
 import type { UseCase } from "../use_case";
 

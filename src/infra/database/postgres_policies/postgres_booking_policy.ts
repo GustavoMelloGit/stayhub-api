@@ -1,7 +1,7 @@
 import { and, between, eq, or } from "drizzle-orm";
 import { ConflictError } from "../../../application/error/conflict_error";
 import { ValidationError } from "../../../application/error/validation_error";
-import type { BookingPolicy } from "../../../domain/service/booking_policy";
+import type { BookingPolicy } from "../../../domain/policies/booking_policy";
 import { db } from "../drizzle/database";
 import { staysTable } from "../drizzle/schema";
 
