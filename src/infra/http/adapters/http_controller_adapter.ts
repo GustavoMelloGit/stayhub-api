@@ -1,5 +1,7 @@
 import { ConflictError } from "../../../application/error/conflict_error";
+import { IllegalStateError } from "../../../application/error/illegal_state_error";
 import { ResourceNotFoundError } from "../../../application/error/resource_not_found_error";
+import { UnauthorizedError } from "../../../application/error/unauthorized_error";
 import { ValidationError } from "../../../application/error/validation_error";
 import type {
   Controller,
@@ -85,6 +87,8 @@ const errorCodeMap: Record<string, number> = {
   [ConflictError.name]: 409,
   [ValidationError.name]: 422,
   [ResourceNotFoundError.name]: 404,
+  [UnauthorizedError.name]: 401,
+  [IllegalStateError.name]: 500,
 };
 
 export function BunHttpControllerAdapter(controller: Controller) {
