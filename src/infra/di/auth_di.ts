@@ -1,9 +1,11 @@
 import type { Encrypter } from "../../application/service/encrypter";
 import { type Hasher } from "../../application/service/hasher";
+import { GetUserUseCase } from "../../application/use_case/auth/get_user";
 import { RegisterUserUseCase } from "../../application/use_case/auth/register_user";
 import { SignInUseCase } from "../../application/use_case/auth/sign_in";
 import type { AuthRepository } from "../../domain/repository/auth_repository";
 import type { PropertyRepository } from "../../domain/repository/property_repository";
+import { GetUserController } from "../../presentation/controller/auth/get_user.controller";
 import { RegisterUserController } from "../../presentation/controller/auth/register_user.controller";
 import { SignInController } from "../../presentation/controller/auth/sign_in.controller";
 import { AuthPostgresRepository } from "../database/postgres_repository/auth_postgres_repository";
@@ -40,11 +42,19 @@ export class AuthDi {
       this.#encrypter,
     );
   }
+
+  makeGetUserUseCase() {
+    return new GetUserUseCase(this.#authRepository, this.#encrypter);
+  }
+
   // Controllers
   makeRegisterUserController() {
     return new RegisterUserController(this.makeRegisterUserUseCase());
   }
   makeSignInController() {
     return new SignInController(this.makeSignInUseCase());
+  }
+  makeGetUserController() {
+    return new GetUserController(this.makeGetUserUseCase());
   }
 }

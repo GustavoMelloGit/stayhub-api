@@ -16,6 +16,7 @@ class ControllerRequestParser {
   ) {}
 
   async parse(): Promise<ControllerRequest> {
+    const token = this.request.headers.get("Authorization")?.split(" ")[1];
     return {
       params: this.#parseParams(),
       body: await this.#parseBody(),
@@ -23,6 +24,7 @@ class ControllerRequestParser {
       headers: this.#parseHeaders(),
       method: this.request.method as HttpControllerMethod,
       url: this.request.url,
+      token,
     };
   }
 

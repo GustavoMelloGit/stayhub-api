@@ -12,6 +12,7 @@ export type ControllerRequest = {
   headers: Record<string, string>;
   method: HttpControllerMethod;
   url: string;
+  token?: string;
 };
 
 export interface Controller {

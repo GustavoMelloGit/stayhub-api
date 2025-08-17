@@ -14,6 +14,7 @@ const getStayController = stayDi.makeGetStayController();
 const createStayController = stayDi.makeBookStayController();
 const addUserController = authDi.makeRegisterUserController();
 const signInController = authDi.makeSignInController();
+const getUserController = authDi.makeGetUserController();
 const healthController = new HealthController();
 
 const controllers = [
@@ -23,6 +24,7 @@ const controllers = [
   createStayController,
   addUserController,
   signInController,
+  getUserController,
   healthController,
 ];
 
