@@ -43,10 +43,7 @@ export class BookStayUseCase implements UseCase<Input, Output> {
       throw new ResourceNotFoundError("Property");
     }
 
-    const stay = await property.bookStay({
-      ...input,
-      bookingPolicy: this.bookingPolicy,
-    });
+    const stay = await property.bookStay(input, this.bookingPolicy);
 
     await this.propertyRepository.saveStay(stay);
 

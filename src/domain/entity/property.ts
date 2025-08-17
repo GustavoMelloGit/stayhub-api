@@ -47,15 +47,13 @@ export class Property implements BaseEntity {
     return new Property(props);
   }
 
-  public async bookStay(args: BookStayArgs): Promise<Stay> {
+  public async bookStay(
+    args: BookStayArgs,
+    bookingPolicy: BookingPolicy,
+  ): Promise<Stay> {
     const { check_in, check_out, guests } = args;
 
-    await args.bookingPolicy.isBookingAllowed(
-      this.id,
-      check_in,
-      check_out,
-      guests,
-    );
+    await bookingPolicy.isBookingAllowed(this.id, check_in, check_out, guests);
 
     const stay = Stay.create({
       ...args,
@@ -83,5 +81,4 @@ type BookStayArgs = {
   tenant_id: string;
   guests: number;
   password: string;
-  bookingPolicy: BookingPolicy;
 };
