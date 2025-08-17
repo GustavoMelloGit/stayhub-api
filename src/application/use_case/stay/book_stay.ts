@@ -1,6 +1,4 @@
-import { Stay } from "../../../domain/entity/stay";
 import type { PropertyRepository } from "../../../domain/repository/property_repository";
-import type { StayRepository } from "../../../domain/repository/stay_repository";
 import type { TenantRepository } from "../../../domain/repository/tenant_repository";
 import { ResourceNotFoundError } from "../../error/resource_not_found_error";
 import type { UseCase } from "../use_case";
@@ -25,27 +23,27 @@ type Output = {
 
 export class BookStayUseCase implements UseCase<Input, Output> {
   constructor(
-    private readonly stayRepository: StayRepository,
     private readonly tenantRepository: TenantRepository,
     private readonly propertyRepository: PropertyRepository,
   ) {}
 
   async execute(input: Input): Promise<Output> {
-    const tenant = await this.tenantRepository.findById(input.tenant_id);
+    const [tenant, property] = await Promise.all([
+      this.tenantRepository.findById(input.tenant_id),
+      this.propertyRepository.propertyOfId(input.property_id),
+    ]);
 
     if (!tenant) {
       throw new ResourceNotFoundError("Tenant");
     }
 
-    const property = await this.propertyRepository.findById(input.property_id);
-
     if (!property) {
       throw new ResourceNotFoundError("Property");
     }
 
-    const stayToCreate = Stay.create(input);
+    const stay = property.bookStay(input);
 
-    const stay = await this.stayRepository.save(stayToCreate);
+    await this.propertyRepository.saveStay(stay);
 
     return {
       id: stay.id,

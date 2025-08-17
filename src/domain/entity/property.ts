@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
+import { ConflictError } from "../../application/error/conflict_error";
 import { ValidationError } from "../../application/error/validation_error";
 import type { BaseEntity } from "./base_entity";
-import type { Stay } from "./stay";
+import { Stay } from "./stay";
 import type { User } from "./user";
 
 type CreatePropertyProps = {
@@ -12,9 +13,12 @@ type CreatePropertyProps = {
 type PropertyProps = CreatePropertyProps &
   BaseEntity & {
     user?: User;
-    stays?: Stay[];
+    stays: Stay[];
   };
 
+/**
+ * @kind Entity, Aggregate Root
+ */
 export class Property implements BaseEntity {
   readonly id: string;
   readonly name: string;
@@ -23,7 +27,7 @@ export class Property implements BaseEntity {
   readonly updated_at: Date;
   readonly deleted_at?: Date | null;
   readonly user?: User;
-  readonly stays?: Stay[];
+  readonly stays: Stay[];
 
   private constructor(props: PropertyProps) {
     this.id = props.id;
@@ -32,6 +36,7 @@ export class Property implements BaseEntity {
     this.created_at = props.created_at;
     this.updated_at = props.updated_at;
     this.deleted_at = props.deleted_at;
+    this.stays = props.stays;
   }
 
   private static nextId(): string {
@@ -44,6 +49,7 @@ export class Property implements BaseEntity {
       id: this.nextId(),
       created_at: new Date(),
       updated_at: new Date(),
+      stays: [],
     });
   }
 
@@ -51,20 +57,41 @@ export class Property implements BaseEntity {
     return new Property(props);
   }
 
-  public bookStay(stay: Stay) {
-    if (this.stays?.some((s) => s.id === stay.id)) {
-      throw new ValidationError("Stay already booked");
+  public bookStay(args: BookStayArgs): Stay {
+    const { check_in, check_out, guests } = args;
+
+    const isOccupied = this.stays?.some((s) => {
+      return s.check_in <= check_out && s.check_out >= check_in;
+    });
+
+    if (isOccupied) {
+      throw new ConflictError("Property is occupied");
     }
 
-    if (stay.check_in >= stay.check_out) {
+    if (check_in >= check_out) {
       throw new ValidationError("Check-in date must be before check-out date");
     }
 
-    if (stay.guests < 1 || !Number.isInteger(stay.guests)) {
-      throw new ValidationError("Guests must be an integer greater than zero");
+    const isDateInThePast = check_in < new Date();
+
+    if (isDateInThePast) {
+      throw new ValidationError("Check-in date must be in the future");
     }
 
-    this.stays?.push(stay);
+    const invalidNumberOfGuests = guests < 1 || !Number.isInteger(guests);
+
+    if (invalidNumberOfGuests) {
+      throw new ValidationError("Invalid guests");
+    }
+
+    const stay = Stay.create({
+      ...args,
+      property_id: this.id,
+    });
+
+    this.stays.push(stay);
+
+    return stay;
   }
 
   public get data() {
@@ -78,3 +105,11 @@ export class Property implements BaseEntity {
     };
   }
 }
+
+type BookStayArgs = {
+  check_in: Date;
+  check_out: Date;
+  tenant_id: string;
+  guests: number;
+  password: string;
+};

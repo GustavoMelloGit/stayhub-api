@@ -13,6 +13,9 @@ export type WithTenant<T> = T & {
   tenant: Tenant;
 };
 
+/**
+ * @kind Entity, Aggregate Root
+ */
 export class Tenant {
   readonly id: string;
   readonly name: string;

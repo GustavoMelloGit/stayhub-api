@@ -43,7 +43,7 @@ export class RegisterUserUseCase implements UseCase<Input, Output> {
       user_id: savedUser.id,
     });
 
-    await this.propertyRepository.save(property);
+    await this.propertyRepository.addProperty(property);
 
     return {
       id: savedUser.id,

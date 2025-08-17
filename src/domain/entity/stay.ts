@@ -1,7 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { ValidationError } from "../../application/error/validation_error";
 import type { BaseEntity } from "./base_entity";
-import type { Tenant } from "./tenant";
 
 type StayCreateProps = {
   check_in: Date;
@@ -12,11 +11,11 @@ type StayCreateProps = {
   password: string;
 };
 
-type StayProps = StayCreateProps &
-  BaseEntity & {
-    tenant?: Tenant;
-  };
+type StayProps = StayCreateProps & BaseEntity;
 
+/**
+ * @kind Entity
+ */
 export class Stay {
   readonly id: string;
   readonly check_in: Date;
@@ -25,7 +24,6 @@ export class Stay {
   readonly property_id: string;
   readonly guests: number;
   readonly password: string;
-  readonly tenant?: Tenant;
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly deleted_at?: Date | null;
@@ -38,7 +36,6 @@ export class Stay {
     this.property_id = props.property_id;
     this.guests = props.guests;
     this.password = props.password;
-    this.tenant = props.tenant;
     this.created_at = props.created_at;
     this.updated_at = props.updated_at;
     this.deleted_at = props.deleted_at;
@@ -78,7 +75,6 @@ export class Stay {
       property_id: this.property_id,
       guests: this.guests,
       password: this.password,
-      tenant: this.tenant,
       created_at: this.created_at,
       updated_at: this.updated_at,
       deleted_at: this.deleted_at,
