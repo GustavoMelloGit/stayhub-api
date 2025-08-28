@@ -11,25 +11,5 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-  api:
-    build: .
-    container_name: stayhub_api
-    restart: unless-stopped
-    depends_on:
-      - db
-    ports:
-      - "3030:3000"
-    environment:
-      PORT: 3000
-      DATABASE_URL: postgresql://postgres:mypassword@db:5432/stayhub
-    working_dir: /usr/src/app
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 volumes:
   postgres_data:
