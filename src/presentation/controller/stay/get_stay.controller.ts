@@ -6,6 +6,7 @@ import {
   type Controller,
   type ControllerRequest,
 } from "../controller";
+import type { User } from "../../../domain/entity/user";
 
 const inputSchema = z.object({
   stay_id: z.uuid(),
@@ -31,10 +32,10 @@ export class GetStayController implements Controller {
     return parsedInput.data;
   }
 
-  async handle(request: ControllerRequest) {
+  async handle(request: ControllerRequest, user: User) {
     const validationResponse = this.#validate(request);
 
-    const output = await this.useCase.execute(validationResponse);
+    const output = await this.useCase.execute(validationResponse, user);
 
     return output;
   }

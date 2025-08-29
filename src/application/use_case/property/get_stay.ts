@@ -24,13 +24,26 @@ type Output = {
 export class GetStayUseCase implements UseCase<Input, Output> {
   constructor(private readonly propertyRepository: PropertyRepository) {}
 
-  async execute(input: Input): Promise<Output> {
+  async execute(input: Input, user: User): Promise<Output> {
     const stay = await this.propertyRepository.stayOfId(
       input.stay_id,
       input.property_id,
     );
 
     if (!stay) {
+      throw new ResourceNotFoundError("Stay");
+    }
+
+    const property = await this.propertyRepository.propertyOfId(
+      input.property_id,
+    );
+
+    if (!property) {
+      throw new ResourceNotFoundError("Property");
+    }
+
+    const userOwnsProperty = property.user_id === user.id;
+    if (!userOwnsProperty) {
       throw new ResourceNotFoundError("Stay");
     }
 
