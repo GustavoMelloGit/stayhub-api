@@ -1,8 +1,7 @@
 import type { AuthRepository } from "../../../domain/repository/auth_repository";
 import { UnauthorizedError } from "../../error/unauthorized_error";
-import type { Cache } from "../../service/cache";
-import type { Encrypter } from "../../service/encrypter";
 import type { Hasher } from "../../service/hasher";
+import type { ISessionManager } from "../../service/session_manager";
 import type { UseCase } from "../use_case";
 
 type Input = {
@@ -23,8 +22,7 @@ export class SignInUseCase implements UseCase<Input, Output> {
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly hasher: Hasher,
-    private readonly encrypter: Encrypter,
-    private readonly cache: Cache,
+    private readonly sessionManager: ISessionManager,
   ) {}
 
   async execute(input: Input): Promise<Output> {
@@ -43,14 +41,7 @@ export class SignInUseCase implements UseCase<Input, Output> {
       throw new UnauthorizedError("Incorrect e-mail or password");
     }
 
-    const token = await this.encrypter.sign(user.id);
-
-    const oneDayInSeconds = 60 * 60 * 24;
-    await this.cache.set(
-      this.cache.authCacheKey(user.id),
-      token,
-      oneDayInSeconds,
-    );
+    const token = await this.sessionManager.createSession(user.id);
 
     return {
       token,

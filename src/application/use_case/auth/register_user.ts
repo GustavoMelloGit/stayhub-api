@@ -4,6 +4,7 @@ import type { AuthRepository } from "../../../domain/repository/auth_repository"
 import type { PropertyRepository } from "../../../domain/repository/property_repository";
 import { ConflictError } from "../../error/conflict_error";
 import type { Hasher } from "../../service/hasher";
+import type { ISessionManager } from "../../service/session_manager";
 import type { UseCase } from "../use_case";
 
 type Input = {
@@ -13,9 +14,12 @@ type Input = {
 };
 
 type Output = {
-  id: string;
-  name: string;
-  email: string;
+  token: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
 };
 
 export class RegisterUserUseCase implements UseCase<Input, Output> {
@@ -23,6 +27,7 @@ export class RegisterUserUseCase implements UseCase<Input, Output> {
     private readonly userRepository: AuthRepository,
     private readonly hasher: Hasher,
     private readonly propertyRepository: PropertyRepository,
+    private readonly sessionManager: ISessionManager,
   ) {}
 
   async execute(input: Input): Promise<Output> {
@@ -45,10 +50,15 @@ export class RegisterUserUseCase implements UseCase<Input, Output> {
 
     await this.propertyRepository.addProperty(property);
 
+    const token = await this.sessionManager.createSession(savedUser.id);
+
     return {
-      id: savedUser.id,
-      name: savedUser.name,
-      email: savedUser.email,
+      token,
+      user: {
+        id: savedUser.id,
+        name: savedUser.name,
+        email: savedUser.email,
+      },
     };
   }
 }

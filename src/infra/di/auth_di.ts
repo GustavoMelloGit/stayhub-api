@@ -1,6 +1,10 @@
 import type { Cache } from "../../application/service/cache";
 import type { Encrypter } from "../../application/service/encrypter";
 import { type Hasher } from "../../application/service/hasher";
+import {
+  SessionManager,
+  type ISessionManager,
+} from "../../application/service/session_manager";
 import { RegisterUserUseCase } from "../../application/use_case/auth/register_user";
 import { SignInUseCase } from "../../application/use_case/auth/sign_in";
 import type { AuthRepository } from "../../domain/repository/auth_repository";
@@ -20,6 +24,7 @@ export class AuthDi {
   #propertyRepository: PropertyRepository;
   #encrypter: Encrypter;
   #cache: Cache;
+  #sessionManager: ISessionManager;
 
   constructor() {
     this.#authRepository = new AuthPostgresRepository();
@@ -27,6 +32,7 @@ export class AuthDi {
     this.#propertyRepository = new PropertyPostgresRepository();
     this.#encrypter = new JwtEncrypter();
     this.#cache = new RedisCache();
+    this.#sessionManager = new SessionManager(this.#cache, this.#encrypter);
   }
 
   // Use Cases
@@ -35,6 +41,7 @@ export class AuthDi {
       this.#authRepository,
       this.#hasher,
       this.#propertyRepository,
+      this.#sessionManager,
     );
   }
 
@@ -42,8 +49,7 @@ export class AuthDi {
     return new SignInUseCase(
       this.#authRepository,
       this.#hasher,
-      this.#encrypter,
-      this.#cache,
+      this.#sessionManager,
     );
   }
 
