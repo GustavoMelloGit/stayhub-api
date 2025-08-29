@@ -2,6 +2,7 @@ import { formatISO } from "date-fns";
 import type { PropertyRepository } from "../../../domain/repository/property_repository";
 import { ResourceNotFoundError } from "../../error/resource_not_found_error";
 import type { UseCase } from "../use_case";
+import type { User } from "../../../domain/entity/user";
 
 type Input = {
   stay_id: string;
