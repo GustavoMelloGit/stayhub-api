@@ -3,10 +3,10 @@ import type { PropertyRepository } from "../../../domain/repository/property_rep
 import { ResourceNotFoundError } from "../../error/resource_not_found_error";
 import type { UseCase } from "../use_case";
 import type { User } from "../../../domain/entity/user";
+import type { StayRepository } from "../../../domain/repository/stay_repository";
 
 type Input = {
   stay_id: string;
-  property_id: string;
 };
 
 type Output = {
@@ -23,24 +23,24 @@ type Output = {
 };
 
 export class GetStayUseCase implements UseCase<Input, Output> {
-  constructor(private readonly propertyRepository: PropertyRepository) {}
+  constructor(
+    private readonly propertyRepository: PropertyRepository,
+    private readonly stayRepository: StayRepository,
+  ) {}
 
   async execute(input: Input, user: User): Promise<Output> {
-    const stay = await this.propertyRepository.stayOfId(
-      input.stay_id,
-      input.property_id,
-    );
+    const stay = await this.stayRepository.stayOfId(input.stay_id);
 
     if (!stay) {
       throw new ResourceNotFoundError("Stay");
     }
 
     const property = await this.propertyRepository.propertyOfId(
-      input.property_id,
+      stay.property_id,
     );
 
     if (!property) {
-      throw new ResourceNotFoundError("Property");
+      throw new ResourceNotFoundError("Stay");
     }
 
     const userOwnsProperty = property.user_id === user.id;

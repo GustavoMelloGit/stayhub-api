@@ -5,12 +5,14 @@ import type {
 import { HealthController } from "../../../presentation/controller/health/health.controller";
 import { AuthDi } from "../../di/auth_di";
 import { PropertyDi } from "../../di/property_di";
+import { StayDi } from "../../di/stay_di";
 import { TenantDi } from "../../di/tenant_di";
 import { BunHttpControllerAdapter } from "../adapters/http_controller_adapter";
 
 const tenantDi = new TenantDi();
 const propertyDi = new PropertyDi();
 const authDi = new AuthDi();
+const stayDi = new StayDi();
 
 type Route = {
   controller: Controller;
@@ -36,11 +38,14 @@ const tenantControllers: Route[] = [
 const propertyControllers: Route[] = [
   {
     authenticated: true,
-    controller: propertyDi.makeGetStayController(),
+    controller: propertyDi.makeBookStayController(),
   },
+];
+
+const stayControllers: Route[] = [
   {
     authenticated: true,
-    controller: propertyDi.makeBookStayController(),
+    controller: stayDi.makeGetStayController(),
   },
 ];
 
@@ -63,6 +68,7 @@ const controllers = [
   ...tenantControllers,
   ...propertyControllers,
   ...authControllers,
+  ...stayControllers,
   healthController,
 ];
 

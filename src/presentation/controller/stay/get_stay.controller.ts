@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ValidationError } from "../../../application/error/validation_error";
-import { GetStayUseCase } from "../../../application/use_case/property/get_stay";
+import { GetStayUseCase } from "../../../application/use_case/stay/get_stay";
 import {
   HttpControllerMethod,
   type Controller,
@@ -10,13 +10,12 @@ import type { User } from "../../../domain/entity/user";
 
 const inputSchema = z.object({
   stay_id: z.uuid(),
-  property_id: z.uuid(),
 });
 
 type Input = z.infer<typeof inputSchema>;
 
 export class GetStayController implements Controller {
-  path = "/property/:property_id/stay/:stay_id";
+  path = "/stay/:stay_id";
   method = HttpControllerMethod.GET;
 
   constructor(private readonly useCase: GetStayUseCase) {}

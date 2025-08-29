@@ -1,6 +1,7 @@
 import type { User } from "../../../domain/entity/user";
 import type { BookingPolicy } from "../../../domain/policies/booking_policy";
 import type { PropertyRepository } from "../../../domain/repository/property_repository";
+import type { StayRepository } from "../../../domain/repository/stay_repository";
 import type { TenantRepository } from "../../../domain/repository/tenant_repository";
 import { ResourceNotFoundError } from "../../error/resource_not_found_error";
 import type { UseCase } from "../use_case";
@@ -27,6 +28,7 @@ export class BookStayUseCase implements UseCase<Input, Output> {
   constructor(
     private readonly tenantRepository: TenantRepository,
     private readonly propertyRepository: PropertyRepository,
+    private readonly stayRepository: StayRepository,
     private readonly bookingPolicy: BookingPolicy,
   ) {}
 
@@ -52,7 +54,7 @@ export class BookStayUseCase implements UseCase<Input, Output> {
 
     const stay = await property.bookStay(input, this.bookingPolicy);
 
-    await this.propertyRepository.saveStay(stay);
+    await this.stayRepository.saveStay(stay);
 
     return {
       id: stay.id,

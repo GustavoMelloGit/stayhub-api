@@ -1,0 +1,35 @@
+import { and, eq } from "drizzle-orm";
+import { Stay } from "../../../domain/entity/stay";
+import { Tenant, type WithTenant } from "../../../domain/entity/tenant";
+import type { StayRepository } from "../../../domain/repository/stay_repository";
+import { db } from "../drizzle/database";
+import { staysTable } from "../drizzle/schema";
+
+export class StayPostgresRepository implements StayRepository {
+  async stayOfId(id: string): Promise<WithTenant<Stay> | null> {
+    const stay = await db.query.staysTable.findFirst({
+      where: and(eq(staysTable.id, id)),
+      with: {
+        tenant: true,
+      },
+    });
+
+    if (!stay) {
+      return null;
+    }
+
+    const stayEntity = Stay.reconstitute(stay);
+
+    return {
+      ...stayEntity,
+      data: stayEntity.data,
+      tenant: Tenant.reconstitute(stay.tenant),
+    };
+  }
+
+  async saveStay(input: Stay): Promise<void> {
+    const result = await db.insert(staysTable).values(input.data).returning();
+
+    if (!result[0]) throw new Error("Failed to save stay");
+  }
+}
