@@ -9,9 +9,9 @@ import type {
   ControllerRequest,
   HttpControllerMethod,
 } from "../../../presentation/controller/controller";
-import { AuthMiddleware } from "../../../presentation/middleware/auth.middleware";
-import { AuthPostgresRepository } from "../../database/postgres_repository/auth_postgres_repository";
-import { JwtEncrypter } from "../../service/jwt_encrypter";
+import { MiddlewareDi } from "../../di/middleware";
+
+const middlewareDi = new MiddlewareDi();
 
 class ControllerRequestParser {
   constructor(
@@ -109,10 +109,7 @@ export function BunHttpControllerAdapter(
 
       let user: User | undefined;
       if (authenticated) {
-        const authMiddleware = new AuthMiddleware(
-          new AuthPostgresRepository(),
-          new JwtEncrypter(),
-        );
+        const authMiddleware = middlewareDi.makeAuthMiddleware();
         user = await authMiddleware.handle(controllerRequest);
       }
       const response = await controller.handle(controllerRequest, user);
