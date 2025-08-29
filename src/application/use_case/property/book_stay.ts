@@ -1,3 +1,4 @@
+import type { User } from "../../../domain/entity/user";
 import type { BookingPolicy } from "../../../domain/policies/booking_policy";
 import type { PropertyRepository } from "../../../domain/repository/property_repository";
 import type { TenantRepository } from "../../../domain/repository/tenant_repository";
@@ -29,7 +30,7 @@ export class BookStayUseCase implements UseCase<Input, Output> {
     private readonly bookingPolicy: BookingPolicy,
   ) {}
 
-  async execute(input: Input): Promise<Output> {
+  async execute(input: Input, user: User): Promise<Output> {
     const [tenant, property] = await Promise.all([
       this.tenantRepository.tenantOfId(input.tenant_id),
       this.propertyRepository.propertyOfId(input.property_id),
@@ -40,6 +41,12 @@ export class BookStayUseCase implements UseCase<Input, Output> {
     }
 
     if (!property) {
+      throw new ResourceNotFoundError("Property");
+    }
+
+    const userOwnProperty = property?.user_id === user.id;
+
+    if (!userOwnProperty) {
       throw new ResourceNotFoundError("Property");
     }
 
