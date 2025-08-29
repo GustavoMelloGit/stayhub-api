@@ -1,5 +1,6 @@
 import type { AuthRepository } from "../../../domain/repository/auth_repository";
 import { UnauthorizedError } from "../../error/unauthorized_error";
+import type { Cache } from "../../service/cache";
 import type { Encrypter } from "../../service/encrypter";
 import type { Hasher } from "../../service/hasher";
 import type { UseCase } from "../use_case";
@@ -23,6 +24,7 @@ export class SignInUseCase implements UseCase<Input, Output> {
     private readonly authRepository: AuthRepository,
     private readonly hasher: Hasher,
     private readonly encrypter: Encrypter,
+    private readonly cache: Cache,
   ) {}
 
   async execute(input: Input): Promise<Output> {
@@ -42,6 +44,13 @@ export class SignInUseCase implements UseCase<Input, Output> {
     }
 
     const token = await this.encrypter.sign(user.id);
+
+    const oneDayInSeconds = 60 * 60 * 24;
+    await this.cache.set(
+      this.cache.authCacheKey(user.id),
+      token,
+      oneDayInSeconds,
+    );
 
     return {
       token,
