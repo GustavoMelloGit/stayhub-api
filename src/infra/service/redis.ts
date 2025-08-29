@@ -26,4 +26,8 @@ export class RedisCache implements Cache {
   async delete(key: string): Promise<void> {
     await client.del(key);
   }
+
+  authCacheKey(userId: string): string {
+    return `auth_token:${userId}`;
+  }
 }

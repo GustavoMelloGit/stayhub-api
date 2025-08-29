@@ -17,4 +17,6 @@ export interface Cache {
    * @param key - Item key name
    */
   delete(key: string): Promise<void>;
+
+  authCacheKey(userId: string): string;
 }
