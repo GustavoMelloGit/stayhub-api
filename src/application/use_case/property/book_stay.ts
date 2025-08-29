@@ -31,7 +31,7 @@ export class BookStayUseCase implements UseCase<Input, Output> {
 
   async execute(input: Input): Promise<Output> {
     const [tenant, property] = await Promise.all([
-      this.tenantRepository.findById(input.tenant_id),
+      this.tenantRepository.tenantOfId(input.tenant_id),
       this.propertyRepository.propertyOfId(input.property_id),
     ]);
 

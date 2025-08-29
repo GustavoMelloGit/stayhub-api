@@ -32,7 +32,7 @@ export class TenantPostgresRepository implements TenantRepository {
     return tenants.map((tenant) => Tenant.reconstitute(tenant));
   }
 
-  async findById(id: string): Promise<Tenant | null> {
+  async tenantOfId(id: string): Promise<Tenant | null> {
     const tenant = await db.query.tenantsTable.findFirst({
       where: eq(tenantsTable.id, id),
     });
