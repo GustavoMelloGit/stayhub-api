@@ -10,6 +10,7 @@ import {
 const schema = z.object({
   name: z.string().min(2, "Name is required"),
   phone: z.string().length(13),
+  sex: z.enum(["MALE", "FEMALE", "OTHER"]),
 });
 
 type Input = z.infer<typeof schema>;

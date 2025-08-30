@@ -3,6 +3,7 @@ import {
   integer,
   pgTable,
   timestamp,
+  pgEnum,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -18,10 +19,13 @@ const baseSchema = {
   deleted_at: timestamp({ withTimezone: true, mode: "date" }),
 };
 
+export const sexEnum = pgEnum("sex", ["MALE", "FEMALE", "OTHER"]);
+
 export const tenantsTable = pgTable("tenants", {
   ...baseSchema,
   name: varchar({ length: 255 }).notNull(),
   phone: varchar({ length: 15 }).notNull().unique(),
+  sex: sexEnum("sex").notNull(),
 });
 
 export const tenantsRelations = relations(tenantsTable, ({ many }) => ({

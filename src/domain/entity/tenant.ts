@@ -2,9 +2,12 @@ import { randomUUID } from "node:crypto";
 import { ValidationError } from "../../application/error/validation_error";
 import type { BaseEntity } from "./base_entity";
 
+export type Sex = "MALE" | "FEMALE" | "OTHER";
+
 type TenantCreateProps = {
   name: string;
   phone: string;
+  sex: Sex;
 };
 
 type TenantProps = TenantCreateProps & BaseEntity;
@@ -20,6 +23,7 @@ export class Tenant {
   readonly id: string;
   readonly name: string;
   readonly phone: string;
+  readonly sex: Sex;
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly deleted_at?: Date | null;
@@ -28,6 +32,7 @@ export class Tenant {
     this.id = props.id;
     this.name = props.name;
     this.phone = props.phone;
+    this.sex = props.sex;
     this.created_at = props.created_at;
     this.updated_at = props.updated_at;
     this.deleted_at = props.deleted_at;
@@ -81,6 +86,7 @@ export class Tenant {
       id: this.id,
       name: this.name,
       phone: this.phone,
+      sex: this.sex,
       created_at: this.created_at,
       updated_at: this.updated_at,
       deleted_at: this.deleted_at,
