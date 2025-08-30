@@ -1,6 +1,6 @@
+import jwt from "jsonwebtoken";
 import { UnauthorizedError } from "../error/unauthorized_error";
-import type { Cache } from "./cache";
-import type { Encrypter } from "./encrypter";
+import { env } from "../../infra/config/environments";
 
 export interface ISessionManager {
   createSession(userId: string): Promise<string>;
@@ -8,37 +8,40 @@ export interface ISessionManager {
 }
 
 export class SessionManager implements ISessionManager {
-  constructor(
-    private readonly cache: Cache,
-    private readonly encrypter: Encrypter,
-  ) {}
+  constructor() {}
 
   async createSession(userId: string): Promise<string> {
-    const token = await this.encrypter.sign(userId);
-
-    const oneDayInSeconds = 60 * 60 * 24;
-    await this.cache.set(
-      this.cache.authCacheKey(userId),
-      token,
-      oneDayInSeconds,
-    );
+    const token = this.#sign(userId);
 
     return token;
   }
 
   async verifySession(token: string): Promise<{ userId: string }> {
-    const userId = await this.encrypter.verify(token);
+    const userId = this.#verify(token);
 
     if (!userId) {
       throw new UnauthorizedError("Unauthorized");
     }
 
-    const cachedToken = await this.cache.get(this.cache.authCacheKey(userId));
+    return { userId };
+  }
 
-    if (cachedToken !== token || !cachedToken) {
+  #sign(userId: string): string {
+    return jwt.sign({ userId }, env.JWT_SECRET, { expiresIn: "1d" });
+  }
+
+  #verify(token: string): string {
+    try {
+      const decoded = jwt.verify(token, env.JWT_SECRET);
+
+      if (typeof decoded !== "object" || !("userId" in decoded)) {
+        throw new UnauthorizedError("Unauthorized");
+      }
+
+      return decoded.userId as string;
+    } catch (error) {
+      console.error(error);
       throw new UnauthorizedError("Unauthorized");
     }
-
-    return { userId };
   }
 }

@@ -1,5 +1,3 @@
-import type { Cache } from "../../application/service/cache";
-import type { Encrypter } from "../../application/service/encrypter";
 import { type Hasher } from "../../application/service/hasher";
 import {
   SessionManager,
@@ -15,24 +13,18 @@ import { SignInController } from "../../presentation/controller/auth/sign_in.con
 import { AuthPostgresRepository } from "../database/postgres_repository/auth_postgres_repository";
 import { PropertyPostgresRepository } from "../database/postgres_repository/property_postgres_repository";
 import { BunHasher } from "../service/bun_hasher";
-import { JwtEncrypter } from "../service/jwt_encrypter";
-import { RedisCache } from "../service/redis";
 
 export class AuthDi {
   #authRepository: AuthRepository;
   #hasher: Hasher;
   #propertyRepository: PropertyRepository;
-  #encrypter: Encrypter;
-  #cache: Cache;
   #sessionManager: ISessionManager;
 
   constructor() {
     this.#authRepository = new AuthPostgresRepository();
     this.#hasher = new BunHasher();
     this.#propertyRepository = new PropertyPostgresRepository();
-    this.#encrypter = new JwtEncrypter();
-    this.#cache = new RedisCache();
-    this.#sessionManager = new SessionManager(this.#cache, this.#encrypter);
+    this.#sessionManager = new SessionManager();
   }
 
   // Use Cases
