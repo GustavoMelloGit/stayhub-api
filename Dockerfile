@@ -22,5 +22,5 @@ COPY --from=build /usr/src/app/out .
 
 # Expõe a porta e executa o binário
 USER bun
-EXPOSE 3000/tcp
+EXPOSE 8080/tcp
 CMD ["./out"]
