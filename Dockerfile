@@ -14,7 +14,7 @@ RUN bun run build
 
 # ---
 # Etapa 2: Release - A imagem final, super enxuta
-FROM oven/bun:1-slim AS release
+FROM oven/bun:1 AS release
 WORKDIR /usr/src/app
 
 # Copia APENAS o executável binário da etapa de build
