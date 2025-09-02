@@ -92,3 +92,27 @@ export const propertiesRelations = relations(
     stays: many(staysTable),
   }),
 );
+
+export const calendarSyncPlatformsEnum = pgEnum("calendar_sync_platforms", [
+  "AIRBNB",
+  "BOOKING",
+]);
+
+export const externalBookingSources = pgTable("external_booking_sources", {
+  ...baseSchema,
+  property_id: uuid()
+    .references(() => propertiesTable.id)
+    .notNull(),
+  platform_name: calendarSyncPlatformsEnum().notNull(),
+  sync_url: varchar({ length: 512 }).notNull(),
+});
+
+export const externalBookingSourcesRelations = relations(
+  externalBookingSources,
+  ({ one }) => ({
+    property: one(propertiesTable, {
+      fields: [externalBookingSources.property_id],
+      references: [propertiesTable.id],
+    }),
+  }),
+);
