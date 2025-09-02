@@ -34,6 +34,7 @@
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.44.4",
     "jsonwebtoken": "^9.0.2",
+    "node-ical": "^0.20.1",
     "zod": "^4.0.10"
   },
   "lint-staged": {
