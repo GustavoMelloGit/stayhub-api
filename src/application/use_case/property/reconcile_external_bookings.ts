@@ -1,5 +1,6 @@
 // src/application/use-case/reconcile-external-bookings.ts
 
+import type { Property } from "../../../domain/entity/property";
 import type { User } from "../../../domain/entity/user";
 import type { PropertyRepository } from "../../../domain/repository/property_repository";
 import type { StayRepository } from "../../../domain/repository/stay_repository";
@@ -13,7 +14,6 @@ import type {
 import type { UseCase } from "../use_case";
 
 type Input = {
-  propertyId: string;
   user: User;
 };
 
@@ -21,6 +21,10 @@ type Output = {
   start: Date;
   end: Date;
   sourcePlatform: ExternalBookingSource["platform_name"];
+  property: {
+    id: string;
+    name: string;
+  };
 };
 
 export class ReconcileExternalBookingsUseCase
@@ -34,14 +38,20 @@ export class ReconcileExternalBookingsUseCase
   ) {}
 
   async execute(input: Input) {
-    const { propertyId, user } = input;
+    const { user } = input;
 
-    const property = await this.propertyRepository.propertyOfId(propertyId);
-    if (!property) throw new ResourceNotFoundError("Property");
+    const properties = await this.propertyRepository.allFromUser(user.id);
+    if (!properties) throw new ResourceNotFoundError("Properties");
 
-    const userOwnsProperty = property.user_id === user.id;
-    if (!userOwnsProperty) throw new ResourceNotFoundError("Property");
+    const unreconciledBookings = await Promise.all(
+      properties.map(async (property) => this.#reconcileForProperty(property)),
+    );
 
+    return unreconciledBookings.flat();
+  }
+
+  async #reconcileForProperty(property: Property) {
+    const propertyId = property.id;
     const externalSources =
       await this.externalBookingSourceRepository.allFromProperty(propertyId);
     if (externalSources.length === 0) return [];
@@ -69,6 +79,10 @@ export class ReconcileExternalBookingsUseCase
           start: externalBooking.period.start,
           end: externalBooking.period.end,
           sourcePlatform: externalBooking.platform,
+          property: {
+            id: property.id,
+            name: property.name,
+          },
         });
       }
     });
@@ -91,13 +105,13 @@ export class ReconcileExternalBookingsUseCase
   async #getExternalBookings(
     externalSources: ExternalBookingSource[],
   ): Promise<ExternalBooking[]> {
-    const [externalBookings] = await Promise.all(
+    const externalBookings = await Promise.all(
       externalSources.map(async (source) => {
         return this.#sourceToBookings(source);
       }),
     );
 
-    return externalBookings ?? [];
+    return externalBookings.flat();
   }
 }
 

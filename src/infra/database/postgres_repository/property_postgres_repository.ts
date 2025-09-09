@@ -24,4 +24,12 @@ export class PropertyPostgresRepository implements PropertyRepository {
 
     if (!result[0]) throw new Error("Failed to save property");
   }
+
+  async allFromUser(userId: string): Promise<Property[]> {
+    const properties = await db.query.propertiesTable.findMany({
+      where: eq(propertiesTable.user_id, userId),
+    });
+
+    return properties.map((property) => Property.reconstitute(property));
+  }
 }
