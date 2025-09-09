@@ -44,6 +44,10 @@ const propertyControllers: Route[] = [
     authenticated: true,
     controller: propertyDi.makeReconcileExternalBookingController(),
   },
+  {
+    authenticated: true,
+    controller: propertyDi.makeCreateExternalBookingSourceController(),
+  },
 ];
 
 const stayControllers: Route[] = [

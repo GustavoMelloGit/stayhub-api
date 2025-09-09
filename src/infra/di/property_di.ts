@@ -1,12 +1,14 @@
 import type { CalendarAdapter } from "../../application/adapter/calendar_adapter";
 import type { ExternalBookingSourcesRepository } from "../../application/repository/external_booking_source_repository";
 import { BookStayUseCase } from "../../application/use_case/property/book_stay";
+import { CreateExternalBookingSourceUseCase } from "../../application/use_case/property/create_external_booking_source";
 import { ReconcileExternalBookingsUseCase } from "../../application/use_case/property/reconcile_external_bookings";
 import type { BookingPolicy } from "../../domain/policies/booking_policy";
 import type { PropertyRepository } from "../../domain/repository/property_repository";
 import type { StayRepository } from "../../domain/repository/stay_repository";
 import type { TenantRepository } from "../../domain/repository/tenant_repository";
 import { BookStayController } from "../../presentation/controller/property/book_stay.controller";
+import { CreateExternalBookingSourceController } from "../../presentation/controller/property/create_external_booking.controller";
 import { ReconcileExternalBookingController } from "../../presentation/controller/property/reconcile_external_booking.controller";
 import { ICalendarAdapter } from "../adapter/i_calendar_adapter";
 import { PostgresBookingPolicy } from "../database/postgres_policies/postgres_booking_policy";
@@ -50,6 +52,12 @@ export class PropertyDi {
       this.#propertyRepository,
     );
   }
+  makeCreateExternalBookingSourceUseCase() {
+    return new CreateExternalBookingSourceUseCase(
+      this.#externalBookingSourceRepository,
+      this.#propertyRepository,
+    );
+  }
 
   // Controllers
   makeBookStayController() {
@@ -58,6 +66,11 @@ export class PropertyDi {
   makeReconcileExternalBookingController() {
     return new ReconcileExternalBookingController(
       this.makeReconcileExternalBookingUseCase(),
+    );
+  }
+  makeCreateExternalBookingSourceController() {
+    return new CreateExternalBookingSourceController(
+      this.makeCreateExternalBookingSourceUseCase(),
     );
   }
 }
