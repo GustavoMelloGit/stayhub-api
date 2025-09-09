@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import { ValidationError } from "../../application/error/validation_error";
 import type { BaseEntity } from "./base_entity";
 
@@ -39,7 +38,7 @@ export class Tenant {
   }
 
   private static nextId(): string {
-    return randomUUID();
+    return crypto.randomUUID();
   }
 
   public static create(props: TenantCreateProps): Tenant {

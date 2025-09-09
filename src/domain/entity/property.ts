@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import type { BookingPolicy } from "../policies/booking_policy";
 import type { BaseEntity } from "./base_entity";
 import { Stay } from "./stay";
@@ -31,7 +30,7 @@ export class Property implements BaseEntity {
   }
 
   private static nextId(): string {
-    return randomUUID();
+    return crypto.randomUUID();
   }
 
   public static create(props: CreatePropertyProps): Property {

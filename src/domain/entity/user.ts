@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import type { BaseEntity } from "./base_entity";
 
 type UserCreateProps = {
@@ -29,7 +28,7 @@ export class User {
   }
 
   private static nextId(): string {
-    return randomUUID();
+    return crypto.randomUUID();
   }
 
   public static create(props: UserCreateProps): User {
