@@ -7,11 +7,12 @@ import type { StayRepository } from "../../../domain/repository/stay_repository"
 import type { BookedPeriod } from "../../../domain/value_object/booked_period";
 import type { CalendarAdapter } from "../../adapter/calendar_adapter";
 import { ResourceNotFoundError } from "../../error/resource_not_found_error";
+import type { ExternalBookingSourcesRepository } from "../../../domain/repository/external_booking_source_repository";
+import type { UseCase } from "../use_case";
 import type {
   ExternalBookingSource,
-  ExternalBookingSourcesRepository,
-} from "../../repository/external_booking_source_repository";
-import type { UseCase } from "../use_case";
+  ExternalBookingSourcePlatformName,
+} from "../../../domain/entity/external_booking_source";
 
 type Input = {
   user: User;
@@ -20,7 +21,7 @@ type Input = {
 type Output = {
   start: Date;
   end: Date;
-  sourcePlatform: ExternalBookingSource["platform_name"];
+  sourcePlatform: ExternalBookingSourcePlatformName;
   property: {
     id: string;
     name: string;

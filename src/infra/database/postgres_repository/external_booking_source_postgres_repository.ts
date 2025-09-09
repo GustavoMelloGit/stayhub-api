@@ -1,10 +1,8 @@
 import { eq } from "drizzle-orm";
-import {
-  ExternalBookingSource,
-  type ExternalBookingSourcesRepository,
-} from "../../../application/repository/external_booking_source_repository";
+import { type ExternalBookingSourcesRepository } from "../../../domain/repository/external_booking_source_repository";
 import { db } from "../drizzle/database";
 import { externalBookingSources } from "../drizzle/schema";
+import { ExternalBookingSource } from "../../../domain/entity/external_booking_source";
 
 export class ExternalBookingSourcePostgresRepository
   implements ExternalBookingSourcesRepository

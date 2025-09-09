@@ -1,5 +1,5 @@
 import type { CalendarAdapter } from "../../application/adapter/calendar_adapter";
-import type { ExternalBookingSourcesRepository } from "../../application/repository/external_booking_source_repository";
+import type { ExternalBookingSourcesRepository } from "../../domain/repository/external_booking_source_repository";
 import { BookStayUseCase } from "../../application/use_case/property/book_stay";
 import { CreateExternalBookingSourceUseCase } from "../../application/use_case/property/create_external_booking_source";
 import { ReconcileExternalBookingsUseCase } from "../../application/use_case/property/reconcile_external_bookings";

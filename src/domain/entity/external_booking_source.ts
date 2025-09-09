@@ -1,4 +1,4 @@
-import type { BaseEntity } from "../../domain/entity/base_entity";
+import type { BaseEntity } from "./base_entity";
 
 export type ExternalBookingSourcePlatformName = "AIRBNB" | "BOOKING";
 
@@ -63,9 +63,4 @@ export class ExternalBookingSource {
       deleted_at: this.deleted_at,
     };
   }
-}
-
-export interface ExternalBookingSourcesRepository {
-  allFromProperty(propertyId: string): Promise<ExternalBookingSource[]>;
-  save(externalBookingSource: ExternalBookingSource): Promise<void>;
 }
