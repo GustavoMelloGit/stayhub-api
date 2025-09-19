@@ -55,6 +55,10 @@ const stayControllers: Route[] = [
     authenticated: true,
     controller: stayDi.makeGetStayController(),
   },
+  {
+    authenticated: false,
+    controller: stayDi.makeGetPublicStayController(),
+  },
 ];
 
 const authControllers: Route[] = [

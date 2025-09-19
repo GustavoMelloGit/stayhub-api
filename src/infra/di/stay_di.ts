@@ -1,6 +1,8 @@
+import { GetPublicStayUseCase } from "../../application/use_case/stay/get_public_stay";
 import { GetStayUseCase } from "../../application/use_case/stay/get_stay";
 import type { PropertyRepository } from "../../domain/repository/property_repository";
 import type { StayRepository } from "../../domain/repository/stay_repository";
+import { GetPublicStayController } from "../../presentation/controller/stay/get_public_stay.controller";
 import { GetStayController } from "../../presentation/controller/stay/get_stay.controller";
 import { PropertyPostgresRepository } from "../database/postgres_repository/property_postgres_repository";
 import { StayPostgresRepository } from "../database/postgres_repository/stay_postgres_repository";
@@ -18,9 +20,15 @@ export class StayDi {
   makeGetStayUseCase() {
     return new GetStayUseCase(this.#propertyRepository, this.#stayRepository);
   }
+  makeGetPublicStayUseCase() {
+    return new GetPublicStayUseCase(this.#stayRepository);
+  }
 
   // Controllers
   makeGetStayController() {
     return new GetStayController(this.makeGetStayUseCase());
+  }
+  makeGetPublicStayController() {
+    return new GetPublicStayController(this.makeGetPublicStayUseCase());
   }
 }
