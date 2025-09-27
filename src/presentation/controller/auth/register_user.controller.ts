@@ -36,9 +36,6 @@ export class RegisterUserController implements Controller {
 
     const output = await this.useCase.execute(validationResponse);
 
-    return {
-      message: "User created successfully",
-      data: output,
-    };
+    return output;
   }
 }
