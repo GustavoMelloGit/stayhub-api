@@ -16,6 +16,8 @@ import { ExternalBookingSourcePostgresRepository } from "../database/postgres_re
 import { PropertyPostgresRepository } from "../database/postgres_repository/property_postgres_repository";
 import { StayPostgresRepository } from "../database/postgres_repository/stay_postgres_repository";
 import { TenantPostgresRepository } from "../database/postgres_repository/tenant_postgres_repository";
+import { FindUserPropertiesController } from "../../presentation/controller/property/find_user_properties.controller";
+import { FindUserPropertiesUseCase } from "../../application/use_case/property/find_user_properties";
 
 export class PropertyDi {
   #tenantRepository: TenantRepository;
@@ -58,7 +60,9 @@ export class PropertyDi {
       this.#propertyRepository,
     );
   }
-
+  makeFindUserPropertiesUseCase() {
+    return new FindUserPropertiesUseCase(this.#propertyRepository);
+  }
   // Controllers
   makeBookStayController() {
     return new BookStayController(this.makeBookStayUseCase());
@@ -71,6 +75,11 @@ export class PropertyDi {
   makeCreateExternalBookingSourceController() {
     return new CreateExternalBookingSourceController(
       this.makeCreateExternalBookingSourceUseCase(),
+    );
+  }
+  makeFindUserPropertiesController() {
+    return new FindUserPropertiesController(
+      this.makeFindUserPropertiesUseCase(),
     );
   }
 }
