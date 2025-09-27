@@ -1,8 +1,9 @@
-import type {
-  Controller,
+import {
   HttpControllerMethod,
+  type Controller,
 } from "../../../presentation/controller/controller";
 import { HealthController } from "../../../presentation/controller/health/health.controller";
+import { CorsMiddleware } from "../../../presentation/middleware/cors.middleware";
 import { AuthDi } from "../../di/auth_di";
 import { PropertyDi } from "../../di/property_di";
 import { StayDi } from "../../di/stay_di";
@@ -13,6 +14,7 @@ const tenantDi = new TenantDi();
 const propertyDi = new PropertyDi();
 const authDi = new AuthDi();
 const stayDi = new StayDi();
+const corsMiddleware = new CorsMiddleware();
 
 type Route = {
   controller: Controller;
@@ -94,12 +96,19 @@ controllers.forEach(({ authenticated, controller }) => {
   if (!alreadyExists) {
     routeMap.set(controller.path, {
       [controller.method]: BunHttpControllerAdapter(controller, authenticated),
+      // Add OPTIONS handler for CORS preflight
+      [HttpControllerMethod.OPTIONS]: async (request: Request) =>
+        corsMiddleware.handlePreflightRequest(request),
+    });
+  } else {
+    routeMap.set(controller.path, {
+      ...alreadyExists,
+      [controller.method]: BunHttpControllerAdapter(controller, authenticated),
+      // Add OPTIONS handler for CORS preflight
+      [HttpControllerMethod.OPTIONS]: async (request: Request) =>
+        corsMiddleware.handlePreflightRequest(request),
     });
   }
-  routeMap.set(controller.path, {
-    ...alreadyExists,
-    [controller.method]: BunHttpControllerAdapter(controller, authenticated),
-  });
 });
 
 export const bunRoutes = Object.fromEntries(routeMap.entries());

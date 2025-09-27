@@ -9,9 +9,11 @@ import type {
   ControllerRequest,
   HttpControllerMethod,
 } from "../../../presentation/controller/controller";
+import { CorsMiddleware } from "../../../presentation/middleware/cors.middleware";
 import { MiddlewareDi } from "../../di/middleware";
 
 const middlewareDi = new MiddlewareDi();
+const corsMiddleware = new CorsMiddleware();
 
 class ControllerRequestParser {
   constructor(
@@ -100,6 +102,11 @@ export function BunHttpControllerAdapter(
   authenticated: boolean,
 ) {
   return async function (request: Request): Promise<Response> {
+    // Handle CORS preflight requests
+    if (request.method === "OPTIONS") {
+      return corsMiddleware.handlePreflightRequest(request);
+    }
+
     try {
       const controllerRequestParser = new ControllerRequestParser(
         request,
@@ -114,22 +121,46 @@ export function BunHttpControllerAdapter(
       }
       const response = await controller.handle(controllerRequest, user);
 
-      return Response.json(response);
+      const jsonResponse = Response.json(response);
+      return corsMiddleware.addCorsHeaders(
+        jsonResponse,
+        request.headers.get("Origin"),
+      );
     } catch (e) {
       console.error(e);
+      let errorResponse: Response;
+
       if (Error.isError(e)) {
         const errorCode = errorCodeMap[e.name];
         if (errorCode) {
-          return Response.json({ message: e.message }, { status: errorCode });
+          errorResponse = Response.json(
+            { message: e.message },
+            { status: errorCode },
+          );
+        } else {
+          errorResponse = Response.json(
+            {
+              message: "Internal server error",
+            },
+            {
+              status: 500,
+            },
+          );
         }
+      } else {
+        errorResponse = Response.json(
+          {
+            message: "Internal server error",
+          },
+          {
+            status: 500,
+          },
+        );
       }
-      return Response.json(
-        {
-          message: "Internal server error",
-        },
-        {
-          status: 500,
-        },
+
+      return corsMiddleware.addCorsHeaders(
+        errorResponse,
+        request.headers.get("Origin"),
       );
     }
   };
