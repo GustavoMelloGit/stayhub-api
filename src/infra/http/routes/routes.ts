@@ -54,6 +54,10 @@ const propertyControllers: Route[] = [
     authenticated: true,
     controller: propertyDi.makeFindUserPropertiesController(),
   },
+  {
+    authenticated: true,
+    controller: propertyDi.makeFindPropertyController(),
+  },
 ];
 
 const stayControllers: Route[] = [

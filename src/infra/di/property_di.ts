@@ -18,6 +18,8 @@ import { StayPostgresRepository } from "../database/postgres_repository/stay_pos
 import { TenantPostgresRepository } from "../database/postgres_repository/tenant_postgres_repository";
 import { FindUserPropertiesController } from "../../presentation/controller/property/find_user_properties.controller";
 import { FindUserPropertiesUseCase } from "../../application/use_case/property/find_user_properties";
+import { FindPropertyController } from "../../presentation/controller/property/find_property.controller";
+import { FindPropertyUseCase } from "../../application/use_case/property/find_property";
 
 export class PropertyDi {
   #tenantRepository: TenantRepository;
@@ -63,6 +65,9 @@ export class PropertyDi {
   makeFindUserPropertiesUseCase() {
     return new FindUserPropertiesUseCase(this.#propertyRepository);
   }
+  makeFindPropertyUseCase() {
+    return new FindPropertyUseCase(this.#propertyRepository);
+  }
   // Controllers
   makeBookStayController() {
     return new BookStayController(this.makeBookStayUseCase());
@@ -81,5 +86,8 @@ export class PropertyDi {
     return new FindUserPropertiesController(
       this.makeFindUserPropertiesUseCase(),
     );
+  }
+  makeFindPropertyController() {
+    return new FindPropertyController(this.makeFindPropertyUseCase());
   }
 }
