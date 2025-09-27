@@ -19,6 +19,8 @@ type Output = {
     id: string;
     name: string;
     email: string;
+    created_at: Date;
+    updated_at: Date;
   };
 };
 
@@ -58,6 +60,8 @@ export class RegisterUserUseCase implements UseCase<Input, Output> {
         id: savedUser.id,
         name: savedUser.name,
         email: savedUser.email,
+        created_at: savedUser.created_at,
+        updated_at: savedUser.updated_at,
       },
     };
   }

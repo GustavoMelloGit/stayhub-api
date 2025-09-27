@@ -15,6 +15,8 @@ type Output = {
     id: string;
     name: string;
     email: string;
+    created_at: Date;
+    updated_at: Date;
   };
 };
 
@@ -49,6 +51,8 @@ export class SignInUseCase implements UseCase<Input, Output> {
         id: user.id,
         email: user.email,
         name: user.name,
+        created_at: user.created_at,
+        updated_at: user.updated_at,
       },
     };
   }
