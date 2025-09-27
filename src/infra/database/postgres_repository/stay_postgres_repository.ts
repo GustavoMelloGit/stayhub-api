@@ -50,4 +50,19 @@ export class StayPostgresRepository implements StayRepository {
       tenant: Tenant.reconstitute(stay.tenant),
     }));
   }
+
+  async allFromProperty(propertyId: string): Promise<WithTenant<Stay>[]> {
+    const stays = await db.query.staysTable.findMany({
+      where: eq(staysTable.property_id, propertyId),
+      with: {
+        tenant: true,
+      },
+    });
+
+    return stays.map((stay) => ({
+      ...Stay.reconstitute(stay),
+      data: stay,
+      tenant: Tenant.reconstitute(stay.tenant),
+    }));
+  }
 }
