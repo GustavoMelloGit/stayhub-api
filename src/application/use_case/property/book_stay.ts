@@ -10,7 +10,7 @@ type Input = {
   guests: number;
   tenant_id: string;
   property_id: string;
-  password: string;
+  entrance_code: string;
   check_in: Date;
   check_out: Date;
 };
@@ -18,7 +18,7 @@ type Input = {
 type Output = {
   id: string;
   guests: number;
-  password: string;
+  entrance_code: string;
   tenant_id: string;
   check_in: string;
   check_out: string;
@@ -58,7 +58,7 @@ export class BookStayUseCase implements UseCase<Input, Output> {
 
     return {
       id: stay.id,
-      password: stay.password,
+      entrance_code: stay.entrance_code,
       tenant_id: stay.tenant_id,
       guests: stay.guests,
       check_in: stay.check_in.toISOString(),

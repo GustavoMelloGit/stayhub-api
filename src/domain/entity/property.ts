@@ -79,5 +79,5 @@ type BookStayArgs = {
   check_out: Date;
   tenant_id: string;
   guests: number;
-  password: string;
+  entrance_code: string;
 };

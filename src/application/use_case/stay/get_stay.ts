@@ -14,7 +14,7 @@ type Output = {
   check_out: string;
   guests: number;
   id: string;
-  password: string;
+  entrance_code: string;
   tenant: {
     id: string;
     name: string;
@@ -53,7 +53,7 @@ export class GetStayUseCase implements UseCase<Input, Output> {
       check_in: formatISO(stay.check_in),
       check_out: formatISO(stay.check_out),
       guests: stay.guests,
-      password: stay.password,
+      entrance_code: stay.entrance_code,
       tenant: stay.tenant.data,
     };
   }

@@ -47,7 +47,7 @@ export const staysTable = pgTable("stays", {
   check_in: timestamp({ withTimezone: true, mode: "date" }).notNull(),
   check_out: timestamp({ withTimezone: true, mode: "date" }).notNull(),
   guests: integer().notNull(),
-  password: varchar({ length: 255 }).notNull(),
+  entrance_code: varchar({ length: 255 }).notNull(),
 });
 
 export const staysRelations = relations(staysTable, ({ one }) => ({

@@ -28,7 +28,7 @@ export class GetPublicStayUseCase implements UseCase<Input, Output> {
     return {
       check_in: formatISO(stay.check_in),
       check_out: formatISO(stay.check_out),
-      entrance_code: stay.password,
+      entrance_code: stay.entrance_code,
       tenant: {
         name: stay.tenant.data.name,
       },

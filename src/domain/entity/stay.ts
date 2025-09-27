@@ -7,7 +7,7 @@ type StayCreateProps = {
   tenant_id: string;
   property_id: string;
   guests: number;
-  password: string;
+  entrance_code: string;
 };
 
 type StayProps = StayCreateProps & BaseEntity;
@@ -22,7 +22,7 @@ export class Stay {
   readonly tenant_id: string;
   readonly property_id: string;
   readonly guests: number;
-  readonly password: string;
+  readonly entrance_code: string;
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly deleted_at?: Date | null;
@@ -34,7 +34,7 @@ export class Stay {
     this.tenant_id = props.tenant_id;
     this.property_id = props.property_id;
     this.guests = props.guests;
-    this.password = props.password;
+    this.entrance_code = props.entrance_code;
     this.created_at = props.created_at;
     this.updated_at = props.updated_at;
     this.deleted_at = props.deleted_at;
@@ -73,7 +73,7 @@ export class Stay {
       tenant_id: this.tenant_id,
       property_id: this.property_id,
       guests: this.guests,
-      password: this.password,
+      entrance_code: this.entrance_code,
       created_at: this.created_at,
       updated_at: this.updated_at,
       deleted_at: this.deleted_at,
