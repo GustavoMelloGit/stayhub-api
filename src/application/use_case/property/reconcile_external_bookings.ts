@@ -46,7 +46,9 @@ export class ReconcileExternalBookingsUseCase
       properties.map(async (property) => this.#reconcileForProperty(property)),
     );
 
-    return unreconciledBookings.flat();
+    return unreconciledBookings
+      .flat()
+      .sort((a, b) => a.start.getTime() - b.start.getTime());
   }
 
   async #reconcileForProperty(property: Property) {
