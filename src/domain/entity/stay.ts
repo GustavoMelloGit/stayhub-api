@@ -62,6 +62,10 @@ export class Stay {
       );
     }
 
+    if (props.entrance_code.length !== 7) {
+      throw new ValidationError("Entrance code must be 7 characters long");
+    }
+
     return new Stay({
       ...props,
       id: this.nextId(),
