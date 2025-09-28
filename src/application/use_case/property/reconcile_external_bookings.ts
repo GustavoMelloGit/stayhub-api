@@ -1,5 +1,3 @@
-// src/application/use-case/reconcile-external-bookings.ts
-
 import type { Property } from "../../../domain/entity/property";
 import type { User } from "../../../domain/entity/user";
 import type { PropertyRepository } from "../../../domain/repository/property_repository";

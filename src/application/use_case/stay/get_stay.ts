@@ -1,4 +1,3 @@
-import { formatISO } from "date-fns";
 import type { PropertyRepository } from "../../../domain/repository/property_repository";
 import { ResourceNotFoundError } from "../../error/resource_not_found_error";
 import type { UseCase } from "../use_case";
@@ -10,8 +9,8 @@ type Input = {
 };
 
 type Output = {
-  check_in: string;
-  check_out: string;
+  check_in: Date;
+  check_out: Date;
   guests: number;
   id: string;
   entrance_code: string;
@@ -50,8 +49,8 @@ export class GetStayUseCase implements UseCase<Input, Output> {
 
     return {
       id: stay.id,
-      check_in: formatISO(stay.check_in),
-      check_out: formatISO(stay.check_out),
+      check_in: stay.check_in,
+      check_out: stay.check_out,
       guests: stay.guests,
       entrance_code: stay.entrance_code,
       tenant: stay.tenant.data,

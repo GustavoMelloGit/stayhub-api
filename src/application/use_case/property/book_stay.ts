@@ -20,8 +20,8 @@ type Output = {
   guests: number;
   entrance_code: string;
   tenant_id: string;
-  check_in: string;
-  check_out: string;
+  check_in: Date;
+  check_out: Date;
 };
 
 export class BookStayUseCase implements UseCase<Input, Output> {
@@ -61,8 +61,8 @@ export class BookStayUseCase implements UseCase<Input, Output> {
       entrance_code: stay.entrance_code,
       tenant_id: stay.tenant_id,
       guests: stay.guests,
-      check_in: stay.check_in.toISOString(),
-      check_out: stay.check_out.toISOString(),
+      check_in: stay.check_in,
+      check_out: stay.check_out,
     };
   }
 }

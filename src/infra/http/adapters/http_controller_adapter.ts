@@ -11,6 +11,7 @@ import type {
 } from "../../../presentation/controller/controller";
 import { CorsMiddleware } from "../../../presentation/middleware/cors.middleware";
 import { MiddlewareDi } from "../../di/middleware";
+import { serializeDatesRecursively } from "../utils/date_serializer";
 
 const middlewareDi = new MiddlewareDi();
 const corsMiddleware = new CorsMiddleware();
@@ -121,7 +122,9 @@ export function BunHttpControllerAdapter(
       }
       const response = await controller.handle(controllerRequest, user);
 
-      const jsonResponse = Response.json(response);
+      const serializedResponse = serializeDatesRecursively(response);
+
+      const jsonResponse = Response.json(serializedResponse);
       return corsMiddleware.addCorsHeaders(
         jsonResponse,
         request.headers.get("Origin"),
