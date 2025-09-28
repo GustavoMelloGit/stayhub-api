@@ -11,7 +11,9 @@ import type { User } from "../../../domain/entity/user";
 const inputSchema = z.object({
   guests: z.number().gt(0),
   property_id: z.uuid(),
-  entrance_code: z.string(),
+  entrance_code: z
+    .string()
+    .length(7, "Entrance code must be 7 characters long"),
   check_in: z.coerce.date(),
   check_out: z.coerce.date(),
   price: z
