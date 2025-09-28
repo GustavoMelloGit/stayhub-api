@@ -13,6 +13,7 @@ type Input = {
   entrance_code: string;
   check_in: Date;
   check_out: Date;
+  price: number;
   tenant: {
     name: string;
     phone: string;
@@ -27,6 +28,7 @@ type Output = {
   tenant_id: string;
   check_in: Date;
   check_out: Date;
+  price: number;
 };
 
 export class BookStayUseCase implements UseCase<Input, Output> {
@@ -66,6 +68,7 @@ export class BookStayUseCase implements UseCase<Input, Output> {
       entrance_code: input.entrance_code,
       check_in: input.check_in,
       check_out: input.check_out,
+      price: input.price,
     };
 
     const stay = await property.bookStay(stayInput, this.bookingPolicy);
@@ -79,6 +82,7 @@ export class BookStayUseCase implements UseCase<Input, Output> {
       guests: stay.guests,
       check_in: stay.check_in,
       check_out: stay.check_out,
+      price: stay.price,
     };
   }
 }

@@ -8,6 +8,7 @@ type StayCreateProps = {
   property_id: string;
   guests: number;
   entrance_code: string;
+  price: number;
 };
 
 type StayProps = StayCreateProps & BaseEntity;
@@ -23,6 +24,7 @@ export class Stay {
   readonly property_id: string;
   readonly guests: number;
   readonly entrance_code: string;
+  readonly price: number;
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly deleted_at?: Date | null;
@@ -35,6 +37,7 @@ export class Stay {
     this.property_id = props.property_id;
     this.guests = props.guests;
     this.entrance_code = props.entrance_code;
+    this.price = props.price;
     this.created_at = props.created_at;
     this.updated_at = props.updated_at;
     this.deleted_at = props.deleted_at;
@@ -51,6 +54,12 @@ export class Stay {
 
     if (props.guests < 1 || !Number.isInteger(props.guests)) {
       throw new ValidationError("Guests must be an integer greater than zero");
+    }
+
+    if (props.price < 0 || !Number.isInteger(props.price)) {
+      throw new ValidationError(
+        "Price must be a non-negative integer representing cents",
+      );
     }
 
     return new Stay({
@@ -74,6 +83,7 @@ export class Stay {
       property_id: this.property_id,
       guests: this.guests,
       entrance_code: this.entrance_code,
+      price: this.price,
       created_at: this.created_at,
       updated_at: this.updated_at,
       deleted_at: this.deleted_at,

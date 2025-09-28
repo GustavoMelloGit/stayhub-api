@@ -80,4 +80,5 @@ type BookStayArgs = {
   tenant_id: string;
   guests: number;
   entrance_code: string;
+  price: number;
 };

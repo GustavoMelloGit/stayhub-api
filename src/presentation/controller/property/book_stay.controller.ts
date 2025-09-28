@@ -14,6 +14,10 @@ const inputSchema = z.object({
   entrance_code: z.string(),
   check_in: z.coerce.date(),
   check_out: z.coerce.date(),
+  price: z
+    .number()
+    .int()
+    .min(0, "Price must be a non-negative integer representing cents"),
   tenant: z.object({
     name: z.string().min(2, "Name is required"),
     phone: z.string().length(13),
