@@ -42,6 +42,7 @@ export class StayPostgresRepository implements StayRepository {
       with: {
         tenant: true,
       },
+      orderBy: (staysTable, { asc }) => [asc(staysTable.check_in)],
     });
 
     return stays.map((stay) => ({
@@ -57,6 +58,7 @@ export class StayPostgresRepository implements StayRepository {
       with: {
         tenant: true,
       },
+      orderBy: (staysTable, { asc }) => [asc(staysTable.check_in)],
     });
 
     return stays.map((stay) => ({
