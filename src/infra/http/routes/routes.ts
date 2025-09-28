@@ -31,10 +31,6 @@ const tenantControllers: Route[] = [
     authenticated: true,
     controller: tenantDi.makeListTenantsController(),
   },
-  {
-    authenticated: true,
-    controller: tenantDi.makeCreateTenantController(),
-  },
 ];
 
 const propertyControllers: Route[] = [

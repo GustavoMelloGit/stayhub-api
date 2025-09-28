@@ -10,11 +10,15 @@ import type { User } from "../../../domain/entity/user";
 
 const inputSchema = z.object({
   guests: z.number().gt(0),
-  tenant_id: z.uuid(),
   property_id: z.uuid(),
   entrance_code: z.string(),
   check_in: z.coerce.date(),
   check_out: z.coerce.date(),
+  tenant: z.object({
+    name: z.string().min(2, "Name is required"),
+    phone: z.string().length(13),
+    sex: z.enum(["MALE", "FEMALE", "OTHER"]),
+  }),
 });
 
 type Input = z.infer<typeof inputSchema>;

@@ -1,4 +1,5 @@
 import type { User } from "../../../domain/entity/user";
+import { Tenant } from "../../../domain/entity/tenant";
 import type { BookingPolicy } from "../../../domain/policies/booking_policy";
 import type { PropertyRepository } from "../../../domain/repository/property_repository";
 import type { StayRepository } from "../../../domain/repository/stay_repository";
@@ -8,11 +9,15 @@ import type { UseCase } from "../use_case";
 
 type Input = {
   guests: number;
-  tenant_id: string;
   property_id: string;
   entrance_code: string;
   check_in: Date;
   check_out: Date;
+  tenant: {
+    name: string;
+    phone: string;
+    sex: "MALE" | "FEMALE" | "OTHER";
+  };
 };
 
 type Output = {
@@ -33,14 +38,9 @@ export class BookStayUseCase implements UseCase<Input, Output> {
   ) {}
 
   async execute(input: Input, user: User): Promise<Output> {
-    const [tenant, property] = await Promise.all([
-      this.tenantRepository.tenantOfId(input.tenant_id),
-      this.propertyRepository.propertyOfId(input.property_id),
-    ]);
-
-    if (!tenant) {
-      throw new ResourceNotFoundError("Tenant");
-    }
+    const property = await this.propertyRepository.propertyOfId(
+      input.property_id,
+    );
 
     if (!property) {
       throw new ResourceNotFoundError("Property");
@@ -52,7 +52,23 @@ export class BookStayUseCase implements UseCase<Input, Output> {
       throw new ResourceNotFoundError("Property");
     }
 
-    const stay = await property.bookStay(input, this.bookingPolicy);
+    let tenant = await this.tenantRepository.findByPhone(input.tenant.phone);
+
+    if (!tenant) {
+      const newTenant = Tenant.create(input.tenant);
+      tenant = await this.tenantRepository.save(newTenant);
+    }
+
+    const stayInput = {
+      guests: input.guests,
+      tenant_id: tenant.id,
+      property_id: input.property_id,
+      entrance_code: input.entrance_code,
+      check_in: input.check_in,
+      check_out: input.check_out,
+    };
+
+    const stay = await property.bookStay(stayInput, this.bookingPolicy);
 
     await this.stayRepository.saveStay(stay);
 
