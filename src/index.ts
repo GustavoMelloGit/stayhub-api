@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
-import { env } from "./infra/config/environments";
-import { db } from "./infra/database/drizzle/database";
-import { bunRoutes } from "./infra/http/routes/routes";
+import { db } from "./core/infra/database/drizzle/database";
+import { env } from "./core/infra/config/environments";
+import { bunRoutes } from "./core/infra/http/routes/routes";
 
 async function checkDatabaseConnection() {
   try {

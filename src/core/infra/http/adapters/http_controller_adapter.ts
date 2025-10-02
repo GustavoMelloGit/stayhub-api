@@ -1,0 +1,170 @@
+import { ConflictError } from "../../../application/error/conflict_error";
+import { IllegalStateError } from "../../../application/error/illegal_state_error";
+import { ResourceNotFoundError } from "../../../application/error/resource_not_found_error";
+import { UnauthorizedError } from "../../../application/error/unauthorized_error";
+import { ValidationError } from "../../../application/error/validation_error";
+import type { User } from "../../../../auth/domain/entity/user";
+import type {
+  Controller,
+  ControllerRequest,
+  HttpControllerMethod,
+} from "../../../presentation/controller/controller";
+import { CorsMiddleware } from "../../../presentation/middleware/cors.middleware";
+import { MiddlewareDi } from "../../../../auth/infra/di/middleware";
+import { serializeDatesRecursively } from "../utils/date_serializer";
+
+const middlewareDi = new MiddlewareDi();
+const corsMiddleware = new CorsMiddleware();
+
+class ControllerRequestParser {
+  constructor(
+    private readonly request: Request,
+    private readonly controller: Controller,
+  ) {}
+
+  async parse(): Promise<ControllerRequest> {
+    return {
+      params: this.#parseParams(),
+      body: await this.#parseBody(),
+      query: this.#parseQuery(),
+      headers: this.#parseHeaders(),
+      method: this.request.method as HttpControllerMethod,
+      url: this.request.url,
+    };
+  }
+
+  #parseParams(): Record<string, string> {
+    const path = this.controller.path;
+    const pathParts = path.split("/");
+    const params = pathParts.map((part) =>
+      part.startsWith(":") ? part.slice(1) : null,
+    );
+
+    const paramsObject = params.reduce(
+      (acc, param, index) => {
+        if (!param) {
+          return acc;
+        }
+        const url = new URL(this.request.url);
+        const pathname = url.pathname.split("/");
+        if (!pathname[index]) {
+          return acc;
+        }
+        acc[param] = pathname[index];
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
+
+    return paramsObject;
+  }
+
+  async #parseBody(): Promise<Record<string, unknown>> {
+    if (this.request.body === null) {
+      return {};
+    }
+
+    const body = await this.request.json();
+
+    if (!body) {
+      return {};
+    }
+
+    if (typeof body !== "object") {
+      return {};
+    }
+
+    return body as Record<string, unknown>;
+  }
+
+  #parseQuery(): Record<string, string> {
+    const url = new URL(this.request.url);
+
+    const query = Object.fromEntries(url.searchParams.entries());
+
+    return query;
+  }
+
+  #parseHeaders(): Record<string, string> {
+    return Object.fromEntries(this.request.headers.entries());
+  }
+}
+
+const errorCodeMap: Record<string, number> = {
+  [ConflictError.name]: 409,
+  [ValidationError.name]: 422,
+  [ResourceNotFoundError.name]: 404,
+  [UnauthorizedError.name]: 401,
+  [IllegalStateError.name]: 500,
+};
+
+export function BunHttpControllerAdapter(
+  controller: Controller,
+  authenticated: boolean,
+) {
+  return async function (request: Request): Promise<Response> {
+    // Handle CORS preflight requests
+    if (request.method === "OPTIONS") {
+      return corsMiddleware.handlePreflightRequest(request);
+    }
+
+    try {
+      const controllerRequestParser = new ControllerRequestParser(
+        request,
+        controller,
+      );
+      const controllerRequest = await controllerRequestParser.parse();
+
+      let user: User | undefined;
+      if (authenticated) {
+        const authMiddleware = middlewareDi.makeAuthMiddleware();
+        user = await authMiddleware.handle(controllerRequest);
+      }
+      const response = await controller.handle(controllerRequest, user);
+
+      const serializedResponse = serializeDatesRecursively(response);
+
+      const jsonResponse = Response.json(serializedResponse);
+      return corsMiddleware.addCorsHeaders(
+        jsonResponse,
+        request.headers.get("Origin"),
+      );
+    } catch (e) {
+      console.error(e);
+      let errorResponse: Response;
+
+      if (Error.isError(e)) {
+        const errorCode = errorCodeMap[e.name];
+        if (errorCode) {
+          errorResponse = Response.json(
+            { message: e.message },
+            { status: errorCode },
+          );
+        } else {
+          errorResponse = Response.json(
+            {
+              message: "Internal server error",
+            },
+            {
+              status: 500,
+            },
+          );
+        }
+      } else {
+        errorResponse = Response.json(
+          {
+            message: "Internal server error",
+          },
+          {
+            status: 500,
+          },
+        );
+      }
+
+      return corsMiddleware.addCorsHeaders(
+        errorResponse,
+        request.headers.get("Origin"),
+      );
+    }
+  };
+}
