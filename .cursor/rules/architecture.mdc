@@ -4,6 +4,14 @@ globs:
 alwaysApply: true
 ---
 
+## Project Structure
+
+- The project follows Domain Driven Design principles and has multiples bounded contexts.
+- All the BCs are located in the `src` folder. For example, the `booking` BC is located in the `src/booking` folder.
+- The `core` is not necessarily a BC, but it is a folder that contains files that are shared across all the BCs.
+
+## Clean Architecture Pattern
+
 - The project follows a clean architecture pattern and Domain Driven Design, separating concerns into the following layers:
   - **`src/domain`**: Contains the core business logic of the application, including entities and repository interfaces.
   - **`src/application`**: Contains the application-specific logic, such as use cases and data transfer objects.
