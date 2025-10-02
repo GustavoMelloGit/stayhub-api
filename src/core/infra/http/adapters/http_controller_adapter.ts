@@ -12,9 +12,12 @@ import type {
 import { CorsMiddleware } from "../../../presentation/middleware/cors.middleware";
 import { MiddlewareDi } from "../../../../auth/infra/di/middleware";
 import { serializeDatesRecursively } from "../utils/date_serializer";
+import { CoreDi } from "../../di/core_di";
 
 const middlewareDi = new MiddlewareDi();
 const corsMiddleware = new CorsMiddleware();
+const coreDi = new CoreDi();
+const logger = coreDi.makeLogger();
 
 class ControllerRequestParser {
   constructor(
@@ -130,7 +133,7 @@ export function BunHttpControllerAdapter(
         request.headers.get("Origin"),
       );
     } catch (e) {
-      console.error(e);
+      logger.error("Error in HTTP controller adapter", { error: e });
       let errorResponse: Response;
 
       if (Error.isError(e)) {

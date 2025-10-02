@@ -39,8 +39,7 @@ export class SessionManager implements ISessionManager {
       }
 
       return decoded.userId as string;
-    } catch (error) {
-      console.error(error);
+    } catch {
       throw new UnauthorizedError("Unauthorized");
     }
   }
