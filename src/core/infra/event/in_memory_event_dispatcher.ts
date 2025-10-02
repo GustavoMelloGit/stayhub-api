@@ -4,8 +4,9 @@ import type { EventDispatcher } from "../../application/event/event_dispatcher";
 import type { EventHandler } from "../../application/event/event_handler";
 import type { DomainEvent } from "../../domain/event/domain_event";
 import type { Logger } from "../../application/logger/logger";
+import { ConsoleLogger } from "../logger/console_logger";
 
-export class InMemoryEventDispatcher implements EventDispatcher {
+class InMemoryEventDispatcher implements EventDispatcher {
   private handlers: Map<string, EventHandler<DomainEvent>[]> = new Map();
 
   constructor(private readonly logger: Logger) {}
@@ -30,3 +31,7 @@ export class InMemoryEventDispatcher implements EventDispatcher {
     }
   }
 }
+
+export const inMemoryEventDispatcher = new InMemoryEventDispatcher(
+  new ConsoleLogger(),
+);

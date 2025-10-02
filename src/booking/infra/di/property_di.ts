@@ -20,6 +20,8 @@ import { FindUserPropertiesController } from "../../presentation/controller/prop
 import { FindUserPropertiesUseCase } from "../../application/use_case/property/find_user_properties";
 import { FindPropertyController } from "../../presentation/controller/property/find_property.controller";
 import { FindPropertyUseCase } from "../../application/use_case/property/find_property";
+import type { EventDispatcher } from "../../../core/application/event/event_dispatcher";
+import { inMemoryEventDispatcher } from "../../../core/infra/event/in_memory_event_dispatcher";
 
 export class PropertyDi {
   #tenantRepository: TenantRepository;
@@ -28,6 +30,7 @@ export class PropertyDi {
   #stayRepository: StayRepository;
   #externalBookingSourceRepository: ExternalBookingSourcesRepository;
   #calendarAdapter: CalendarAdapter;
+  #eventDispatcher: EventDispatcher;
 
   constructor() {
     this.#tenantRepository = new TenantPostgresRepository();
@@ -37,6 +40,7 @@ export class PropertyDi {
     this.#externalBookingSourceRepository =
       new ExternalBookingSourcePostgresRepository();
     this.#calendarAdapter = new ICalendarAdapter();
+    this.#eventDispatcher = inMemoryEventDispatcher;
   }
 
   // Use Cases
@@ -46,6 +50,7 @@ export class PropertyDi {
       this.#propertyRepository,
       this.#stayRepository,
       this.#bookingPolicy,
+      this.#eventDispatcher,
     );
   }
   makeReconcileExternalBookingUseCase() {

@@ -9,12 +9,14 @@ import { PropertyDi } from "../../../../booking/infra/di/property_di";
 import { StayDi } from "../../../../booking/infra/di/stay_di";
 import { TenantDi } from "../../../../booking/infra/di/tenant_di";
 import { BunHttpControllerAdapter } from "../adapters/http_controller_adapter";
+import { FinanceDi } from "../../../../finance/infra/di/finance_di";
 
 const tenantDi = new TenantDi();
 const propertyDi = new PropertyDi();
 const authDi = new AuthDi();
 const stayDi = new StayDi();
 const corsMiddleware = new CorsMiddleware();
+new FinanceDi();
 
 type Route = {
   controller: Controller;
