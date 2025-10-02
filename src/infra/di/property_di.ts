@@ -3,7 +3,7 @@ import type { ExternalBookingSourcesRepository } from "../../domain/repository/e
 import { BookStayUseCase } from "../../application/use_case/property/book_stay";
 import { CreateExternalBookingSourceUseCase } from "../../application/use_case/property/create_external_booking_source";
 import { ReconcileExternalBookingsUseCase } from "../../application/use_case/property/reconcile_external_bookings";
-import type { BookingPolicy } from "../../domain/policies/booking_policy";
+import type { BookingPolicy } from "../../domain/policy/booking_policy";
 import type { PropertyRepository } from "../../domain/repository/property_repository";
 import type { StayRepository } from "../../domain/repository/stay_repository";
 import type { TenantRepository } from "../../domain/repository/tenant_repository";

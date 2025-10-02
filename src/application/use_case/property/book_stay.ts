@@ -1,6 +1,6 @@
 import type { User } from "../../../domain/entity/user";
 import { Tenant } from "../../../domain/entity/tenant";
-import type { BookingPolicy } from "../../../domain/policies/booking_policy";
+import type { BookingPolicy } from "../../../domain/policy/booking_policy";
 import type { PropertyRepository } from "../../../domain/repository/property_repository";
 import type { StayRepository } from "../../../domain/repository/stay_repository";
 import type { TenantRepository } from "../../../domain/repository/tenant_repository";
