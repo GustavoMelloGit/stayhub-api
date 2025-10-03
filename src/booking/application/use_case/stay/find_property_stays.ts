@@ -1,7 +1,6 @@
 import type { PropertyRepository } from "../../../domain/repository/property_repository";
 import type { Stay } from "../../../domain/entity/stay";
 import type { StayRepository } from "../../../domain/repository/stay_repository";
-import type { WithTenant } from "../../../domain/entity/tenant";
 import { ResourceNotFoundError } from "../../../../core/application/error/resource_not_found_error";
 import type { UseCase } from "../use_case";
 
@@ -12,7 +11,7 @@ type Input = {
 };
 
 type Output = {
-  stays: WithTenant<Stay>[];
+  stays: Stay[];
 };
 
 /**

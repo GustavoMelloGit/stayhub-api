@@ -8,22 +8,33 @@ import { GetStayController } from "../../presentation/controller/stay/get_stay.c
 import { FindPropertyStaysController } from "../../presentation/controller/stay/find_property_stays.controller";
 import { PropertyPostgresRepository } from "../database/postgres_repository/property_postgres_repository";
 import { StayPostgresRepository } from "../database/postgres_repository/stay_postgres_repository";
+import type { TenantRepository } from "../../domain/repository/tenant_repository";
+import { TenantPostgresRepository } from "../database/postgres_repository/tenant_postgres_repository";
 
 export class StayDi {
   #propertyRepository: PropertyRepository;
   #stayRepository: StayRepository;
+  #tenantRepository: TenantRepository;
 
   constructor() {
     this.#propertyRepository = new PropertyPostgresRepository();
     this.#stayRepository = new StayPostgresRepository();
+    this.#tenantRepository = new TenantPostgresRepository();
   }
 
   // Use Cases
   makeGetStayUseCase() {
-    return new GetStayUseCase(this.#propertyRepository, this.#stayRepository);
+    return new GetStayUseCase(
+      this.#propertyRepository,
+      this.#stayRepository,
+      this.#tenantRepository,
+    );
   }
   makeGetPublicStayUseCase() {
-    return new GetPublicStayUseCase(this.#stayRepository);
+    return new GetPublicStayUseCase(
+      this.#stayRepository,
+      this.#tenantRepository,
+    );
   }
   makeFindPropertyStaysUseCase() {
     return new FindPropertyStaysUseCase(

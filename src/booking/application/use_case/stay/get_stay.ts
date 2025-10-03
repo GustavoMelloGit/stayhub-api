@@ -3,6 +3,7 @@ import { ResourceNotFoundError } from "../../../../core/application/error/resour
 import type { UseCase } from "../use_case";
 import type { User } from "../../../../auth/domain/entity/user";
 import type { StayRepository } from "../../../domain/repository/stay_repository";
+import type { TenantRepository } from "../../../domain/repository/tenant_repository";
 
 type Input = {
   stay_id: string;
@@ -26,6 +27,7 @@ export class GetStayUseCase implements UseCase<Input, Output> {
   constructor(
     private readonly propertyRepository: PropertyRepository,
     private readonly stayRepository: StayRepository,
+    private readonly tenantRepository: TenantRepository,
   ) {}
 
   async execute(input: Input, user: User): Promise<Output> {
@@ -48,6 +50,12 @@ export class GetStayUseCase implements UseCase<Input, Output> {
       throw new ResourceNotFoundError("Stay");
     }
 
+    const tenant = await this.tenantRepository.tenantOfId(stay.tenant_id);
+
+    if (!tenant) {
+      throw new ResourceNotFoundError("Tenant");
+    }
+
     return {
       id: stay.id,
       check_in: stay.check_in,
@@ -56,9 +64,9 @@ export class GetStayUseCase implements UseCase<Input, Output> {
       entrance_code: stay.entrance_code,
       price: stay.price,
       tenant: {
-        id: stay.tenant.id,
-        name: stay.tenant.name,
-        phone: stay.tenant.phone,
+        id: tenant.id,
+        name: tenant.name,
+        phone: tenant.phone,
       },
     };
   }
