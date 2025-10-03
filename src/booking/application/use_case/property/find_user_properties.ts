@@ -1,4 +1,3 @@
-import type { Property } from "../../../domain/entity/property";
 import type { PropertyRepository } from "../../../domain/repository/property_repository";
 import type { UseCase } from "../use_case";
 
@@ -7,7 +6,7 @@ type Input = {
 };
 
 type Output = {
-  properties: Property[];
+  properties: Array<{ name: string; id: string }>;
 };
 
 export class FindUserPropertiesUseCase implements UseCase<Input, Output> {
@@ -15,6 +14,11 @@ export class FindUserPropertiesUseCase implements UseCase<Input, Output> {
 
   async execute(input: Input): Promise<Output> {
     const properties = await this.propertyRepository.allFromUser(input.user_id);
-    return { properties };
+    return {
+      properties: properties.map((property) => ({
+        name: property.name,
+        id: property.id,
+      })),
+    };
   }
 }

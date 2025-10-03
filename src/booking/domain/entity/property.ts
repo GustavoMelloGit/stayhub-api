@@ -17,10 +17,10 @@ type PropertyData = z.infer<typeof propertySchema>;
  * @kind Entity, Aggregate Root
  */
 export class Property {
-  private readonly data: PropertyData;
+  readonly #data: PropertyData;
 
   private constructor(data: PropertyData) {
-    this.data = propertySchema.parse(data);
+    this.#data = propertySchema.parse(data);
   }
 
   private static nextId(): string {
@@ -57,27 +57,27 @@ export class Property {
   }
 
   get id() {
-    return this.data.id;
+    return this.#data.id;
   }
 
   get name() {
-    return this.data.name;
+    return this.#data.name;
   }
 
   get user_id() {
-    return this.data.user_id;
+    return this.#data.user_id;
   }
 
   get created_at() {
-    return this.data.created_at;
+    return this.#data.created_at;
   }
 
   get updated_at() {
-    return this.data.updated_at;
+    return this.#data.updated_at;
   }
 
   get deleted_at() {
-    return this.data.deleted_at;
+    return this.#data.deleted_at;
   }
 }
 
