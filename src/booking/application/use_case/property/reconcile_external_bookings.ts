@@ -68,7 +68,7 @@ export class ReconcileExternalBookingsUseCase
 
     externalBookings.forEach((externalBooking) => {
       const isAlreadyRegistered = nextStays.some((internalStay) => {
-        const internalStayDate = internalStay.check_in.toDateString();
+        const internalStayDate = internalStay.stay.check_in.toDateString();
         const externalBookingDate = externalBooking.period.start.toDateString();
         const isSameCheckInDay = internalStayDate === externalBookingDate;
 
