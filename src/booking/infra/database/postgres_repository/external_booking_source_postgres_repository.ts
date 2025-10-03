@@ -20,7 +20,7 @@ export class ExternalBookingSourcePostgresRepository
   async save(externalBookingSource: ExternalBookingSource): Promise<void> {
     const result = await db
       .insert(externalBookingSources)
-      .values(externalBookingSource.data)
+      .values(externalBookingSource)
       .returning();
 
     if (!result[0]) {

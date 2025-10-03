@@ -29,7 +29,7 @@ export class GetPublicStayUseCase implements UseCase<Input, Output> {
       check_out: stay.check_out,
       entrance_code: stay.entrance_code,
       tenant: {
-        name: stay.tenant.data.name,
+        name: stay.tenant.name,
       },
     };
   }

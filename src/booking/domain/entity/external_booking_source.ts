@@ -1,33 +1,24 @@
-import type { BaseEntity } from "../../../core/domain/entity/base_entity";
+import {
+  baseEntitySchema,
+  type WithoutBaseEntity,
+} from "../../../core/domain/entity/base_entity";
+import { z } from "zod";
 
 export type ExternalBookingSourcePlatformName = "AIRBNB" | "BOOKING";
 
-export type CreateExternalBookingSource = {
-  property_id: string;
-  platform_name: ExternalBookingSourcePlatformName;
-  sync_url: string;
-};
+export const externalBookingSourceSchema = baseEntitySchema.extend({
+  property_id: z.string().uuid(),
+  platform_name: z.enum(["AIRBNB", "BOOKING"]),
+  sync_url: z.string().url(),
+});
 
-export type ExternalBookingSourceProps = BaseEntity &
-  CreateExternalBookingSource;
+type ExternalBookingSourceData = z.infer<typeof externalBookingSourceSchema>;
 
 export class ExternalBookingSource {
-  readonly id: string;
-  readonly property_id: string;
-  readonly platform_name: ExternalBookingSourcePlatformName;
-  readonly sync_url: string;
-  readonly created_at: Date;
-  readonly updated_at: Date;
-  readonly deleted_at?: Date | null;
+  private readonly data: ExternalBookingSourceData;
 
-  private constructor(props: ExternalBookingSourceProps) {
-    this.id = props.id;
-    this.property_id = props.property_id;
-    this.platform_name = props.platform_name;
-    this.sync_url = props.sync_url;
-    this.created_at = props.created_at;
-    this.updated_at = props.updated_at;
-    this.deleted_at = props.deleted_at;
+  private constructor(data: ExternalBookingSourceData) {
+    this.data = externalBookingSourceSchema.parse(data);
   }
 
   static #nextId(): string {
@@ -35,32 +26,47 @@ export class ExternalBookingSource {
   }
 
   public static create(
-    props: CreateExternalBookingSource,
+    data: WithoutBaseEntity<ExternalBookingSourceData>,
   ): ExternalBookingSource {
     return new ExternalBookingSource({
-      ...props,
+      ...data,
       id: this.#nextId(),
       created_at: new Date(),
       updated_at: new Date(),
-      deleted_at: null,
     });
   }
 
   public static reconstitute(
-    props: ExternalBookingSourceProps,
+    data: ExternalBookingSourceData,
   ): ExternalBookingSource {
-    return new ExternalBookingSource(props);
+    return new ExternalBookingSource(data);
   }
 
-  public get data() {
-    return {
-      id: this.id,
-      property_id: this.property_id,
-      platform_name: this.platform_name,
-      sync_url: this.sync_url,
-      created_at: this.created_at,
-      updated_at: this.updated_at,
-      deleted_at: this.deleted_at,
-    };
+  get id() {
+    return this.data.id;
+  }
+
+  get property_id() {
+    return this.data.property_id;
+  }
+
+  get platform_name() {
+    return this.data.platform_name;
+  }
+
+  get sync_url() {
+    return this.data.sync_url;
+  }
+
+  get created_at() {
+    return this.data.created_at;
+  }
+
+  get updated_at() {
+    return this.data.updated_at;
+  }
+
+  get deleted_at() {
+    return this.data.deleted_at;
   }
 }

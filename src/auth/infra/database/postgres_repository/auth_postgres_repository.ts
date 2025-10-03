@@ -14,7 +14,7 @@ export class AuthPostgresRepository implements AuthRepository {
   }
 
   async addUser(input: User): Promise<User> {
-    const result = await db.insert(usersTable).values(input.data).returning();
+    const result = await db.insert(usersTable).values(input).returning();
 
     const user = result[0];
 

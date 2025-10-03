@@ -22,13 +22,12 @@ export class StayPostgresRepository implements StayRepository {
 
     return {
       ...stayEntity,
-      data: stayEntity.data,
       tenant: Tenant.reconstitute(stay.tenant),
     };
   }
 
   async saveStay(input: Stay): Promise<void> {
-    const result = await db.insert(staysTable).values(input.data).returning();
+    const result = await db.insert(staysTable).values(input).returning();
 
     if (!result[0]) throw new Error("Failed to save stay");
   }

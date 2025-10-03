@@ -1,49 +1,43 @@
 import type { BookingPolicy } from "../policy/booking_policy";
-import type { BaseEntity } from "../../../core/domain/entity/base_entity";
+import {
+  baseEntitySchema,
+  type WithoutBaseEntity,
+} from "../../../core/domain/entity/base_entity";
+import { z } from "zod";
 import { Stay } from "./stay";
 
-type CreatePropertyProps = {
-  name: string;
-  user_id: string;
-};
+export const propertySchema = baseEntitySchema.extend({
+  name: z.string().min(1),
+  user_id: z.string().uuid(),
+});
 
-type PropertyProps = CreatePropertyProps & BaseEntity;
+type PropertyData = z.infer<typeof propertySchema>;
 
 /**
  * @kind Entity, Aggregate Root
  */
-export class Property implements BaseEntity {
-  readonly id: string;
-  readonly name: string;
-  readonly user_id: string;
-  readonly created_at: Date;
-  readonly updated_at: Date;
-  readonly deleted_at?: Date | null;
+export class Property {
+  private readonly data: PropertyData;
 
-  private constructor(props: PropertyProps) {
-    this.id = props.id;
-    this.name = props.name;
-    this.user_id = props.user_id;
-    this.created_at = props.created_at;
-    this.updated_at = props.updated_at;
-    this.deleted_at = props.deleted_at;
+  private constructor(data: PropertyData) {
+    this.data = propertySchema.parse(data);
   }
 
   private static nextId(): string {
     return crypto.randomUUID();
   }
 
-  public static create(props: CreatePropertyProps): Property {
+  public static create(data: WithoutBaseEntity<PropertyData>): Property {
     return new Property({
-      ...props,
+      ...data,
       id: this.nextId(),
       created_at: new Date(),
       updated_at: new Date(),
     });
   }
 
-  public static reconstitute(props: PropertyProps): Property {
-    return new Property(props);
+  public static reconstitute(data: PropertyData): Property {
+    return new Property(data);
   }
 
   public async bookStay(
@@ -62,15 +56,28 @@ export class Property implements BaseEntity {
     return stay;
   }
 
-  public get data() {
-    return {
-      id: this.id,
-      name: this.name,
-      user_id: this.user_id,
-      created_at: this.created_at,
-      updated_at: this.updated_at,
-      deleted_at: this.deleted_at,
-    };
+  get id() {
+    return this.data.id;
+  }
+
+  get name() {
+    return this.data.name;
+  }
+
+  get user_id() {
+    return this.data.user_id;
+  }
+
+  get created_at() {
+    return this.data.created_at;
+  }
+
+  get updated_at() {
+    return this.data.updated_at;
+  }
+
+  get deleted_at() {
+    return this.data.deleted_at;
   }
 }
 

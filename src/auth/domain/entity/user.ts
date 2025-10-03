@@ -1,58 +1,66 @@
-import type { BaseEntity } from "../../../core/domain/entity/base_entity";
+import {
+  baseEntitySchema,
+  type WithoutBaseEntity,
+} from "../../../core/domain/entity/base_entity";
+import { z } from "zod";
 
-type UserCreateProps = {
-  name: string;
-  email: string;
-  password: string;
-};
+export const userSchema = baseEntitySchema.extend({
+  name: z.string().min(1),
+  email: z.string().email(),
+  password: z.string().min(8),
+});
 
-type UserProps = UserCreateProps & BaseEntity;
+type UserData = z.infer<typeof userSchema>;
 
 export class User {
-  readonly id: string;
-  readonly name: string;
-  readonly email: string;
-  readonly password: string;
-  readonly created_at: Date;
-  readonly updated_at: Date;
-  readonly deleted_at?: Date | null;
+  private readonly data: UserData;
 
-  private constructor(props: UserProps) {
-    this.id = props.id;
-    this.name = props.name;
-    this.email = props.email;
-    this.password = props.password;
-    this.created_at = props.created_at;
-    this.updated_at = props.updated_at;
-    this.deleted_at = props.deleted_at;
+  private constructor(data: UserData) {
+    this.data = userSchema.parse(data);
   }
 
   private static nextId(): string {
     return crypto.randomUUID();
   }
 
-  public static create(props: UserCreateProps): User {
+  public static create(data: WithoutBaseEntity<UserData>): User {
     return new User({
-      ...props,
+      ...data,
       id: this.nextId(),
       created_at: new Date(),
       updated_at: new Date(),
     });
   }
 
-  public static reconstitute(props: UserProps): User {
-    return new User(props);
+  public static reconstitute(data: UserData): User {
+    return new User(data);
   }
 
-  public get data() {
-    return {
-      id: this.id,
-      name: this.name,
-      email: this.email,
-      password: this.password,
-      created_at: this.created_at,
-      updated_at: this.updated_at,
-      deleted_at: this.deleted_at,
-    };
+  get id() {
+    return this.data.id;
+  }
+
+  get name() {
+    return this.data.name;
+  }
+
+  get email() {
+    return this.data.email;
+  }
+
+  get password() {
+    return this.data.password;
+  }
+
+  get created_at() {
+    return this.data.created_at;
+  }
+
+  get updated_at() {
+    return this.data.updated_at;
+  }
+
+  get deleted_at() {
+    return this.data.deleted_at;
   }
 }

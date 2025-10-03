@@ -17,10 +17,7 @@ export class PropertyPostgresRepository implements PropertyRepository {
   }
 
   async addProperty(input: Property): Promise<void> {
-    const result = await db
-      .insert(propertiesTable)
-      .values(input.data)
-      .returning();
+    const result = await db.insert(propertiesTable).values(input).returning();
 
     if (!result[0]) throw new Error("Failed to save property");
   }

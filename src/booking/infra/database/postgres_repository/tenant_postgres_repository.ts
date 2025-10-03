@@ -14,10 +14,7 @@ export class TenantPostgresRepository implements TenantRepository {
   }
 
   async save(tenant: Tenant): Promise<Tenant> {
-    const result = await db
-      .insert(tenantsTable)
-      .values(tenant.data)
-      .returning();
+    const result = await db.insert(tenantsTable).values(tenant).returning();
 
     if (!result[0]) {
       throw new Error("Failed to save tenant");

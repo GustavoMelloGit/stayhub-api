@@ -1,15 +1,22 @@
-import { ValidationError } from "../../../core/application/error/validation_error";
-import type { BaseEntity } from "../../../core/domain/entity/base_entity";
+import {
+  baseEntitySchema,
+  type WithoutBaseEntity,
+} from "../../../core/domain/entity/base_entity";
+import { z } from "zod";
 
 export type Sex = "MALE" | "FEMALE" | "OTHER";
 
-type TenantCreateProps = {
-  name: string;
-  phone: string;
-  sex: Sex;
-};
+export const tenantSchema = baseEntitySchema.extend({
+  name: z.string().min(3),
+  phone: z
+    .string()
+    .regex(/^[0-9]+$/, "Phone must contain only numbers")
+    .min(10)
+    .max(15),
+  sex: z.enum(["MALE", "FEMALE", "OTHER"]),
+});
 
-type TenantProps = TenantCreateProps & BaseEntity;
+type TenantData = z.infer<typeof tenantSchema>;
 
 export type WithTenant<T> = T & {
   tenant: Tenant;
@@ -19,76 +26,54 @@ export type WithTenant<T> = T & {
  * @kind Entity, Aggregate Root
  */
 export class Tenant {
-  readonly id: string;
-  readonly name: string;
-  readonly phone: string;
-  readonly sex: Sex;
-  readonly created_at: Date;
-  readonly updated_at: Date;
-  readonly deleted_at?: Date | null;
+  private readonly data: TenantData;
 
-  private constructor(props: TenantProps) {
-    this.id = props.id;
-    this.name = props.name;
-    this.phone = props.phone;
-    this.sex = props.sex;
-    this.created_at = props.created_at;
-    this.updated_at = props.updated_at;
-    this.deleted_at = props.deleted_at;
+  private constructor(data: TenantData) {
+    this.data = tenantSchema.parse(data);
   }
 
   private static nextId(): string {
     return crypto.randomUUID();
   }
 
-  public static create(props: TenantCreateProps): Tenant {
-    const validationErrors = [];
-
-    if (props.name.trim().length < 3) {
-      validationErrors.push({
-        field: "name",
-        message: "O nome deve ter pelo menos 3 caracteres.",
-      });
-    }
-
-    const phoneRegex = /^[0-9]+$/;
-    if (
-      !phoneRegex.test(props.phone) ||
-      props.phone.length < 10 ||
-      props.phone.length > 15
-    ) {
-      validationErrors.push({
-        field: "phone",
-        message:
-          "O telefone deve conter apenas números e ter entre 10 e 15 dígitos.",
-      });
-    }
-
-    if (validationErrors.length > 0) {
-      throw new ValidationError(JSON.stringify(validationErrors));
-    }
-
+  public static create(data: WithoutBaseEntity<TenantData>): Tenant {
     return new Tenant({
-      ...props,
+      ...data,
       id: this.nextId(),
       created_at: new Date(),
       updated_at: new Date(),
     });
   }
 
-  public static reconstitute(props: TenantProps): Tenant {
-    return new Tenant(props);
+  public static reconstitute(data: TenantData): Tenant {
+    return new Tenant(data);
   }
 
-  public get data() {
-    return {
-      id: this.id,
-      name: this.name,
-      phone: this.phone,
-      sex: this.sex,
-      created_at: this.created_at,
-      updated_at: this.updated_at,
-      deleted_at: this.deleted_at,
-    };
+  get id() {
+    return this.data.id;
+  }
+
+  get name() {
+    return this.data.name;
+  }
+
+  get phone() {
+    return this.data.phone;
+  }
+
+  get sex() {
+    return this.data.sex;
+  }
+
+  get created_at() {
+    return this.data.created_at;
+  }
+
+  get updated_at() {
+    return this.data.updated_at;
+  }
+
+  get deleted_at() {
+    return this.data.deleted_at;
   }
 }

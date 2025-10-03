@@ -55,7 +55,11 @@ export class GetStayUseCase implements UseCase<Input, Output> {
       guests: stay.guests,
       entrance_code: stay.entrance_code,
       price: stay.price,
-      tenant: stay.tenant.data,
+      tenant: {
+        id: stay.tenant.id,
+        name: stay.tenant.name,
+        phone: stay.tenant.phone,
+      },
     };
   }
 }
