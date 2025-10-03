@@ -6,6 +6,8 @@ import {
 
 export const tenantSexSchema = z.enum(["MALE", "FEMALE", "OTHER"]);
 
+export type TenantSex = z.infer<typeof tenantSexSchema>;
+
 export const tenantSchema = baseEntitySchema.extend({
   name: z.string().min(3),
   phone: z
