@@ -10,7 +10,10 @@ export class ICalendarAdapter implements CalendarAdapter {
     for (const event of Object.values(events)) {
       if (event.type === "VEVENT" && event.start && event.end) {
         bookedPeriods.push(
-          new BookedPeriod(new Date(event.start), new Date(event.end)),
+          new BookedPeriod({
+            start: new Date(event.start),
+            end: new Date(event.end),
+          }),
         );
       }
     }

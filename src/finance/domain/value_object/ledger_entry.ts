@@ -11,21 +11,21 @@ export const ledgerEntrySchema = z.object({
  * @kind Value Object
  */
 export class LedgerEntry {
-  private readonly data: z.infer<typeof ledgerEntrySchema>;
+  readonly #data: z.infer<typeof ledgerEntrySchema>;
 
   constructor(data: z.infer<typeof ledgerEntrySchema>) {
-    this.data = ledgerEntrySchema.parse(data);
+    this.#data = ledgerEntrySchema.parse(data);
   }
 
   get amount() {
-    return this.data.amount;
+    return this.#data.amount;
   }
 
   get description() {
-    return this.data.description;
+    return this.#data.description;
   }
 
   get category() {
-    return this.data.category;
+    return this.#data.category;
   }
 }
