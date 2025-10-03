@@ -14,11 +14,14 @@ export const externalBookingSourceSchema = baseEntitySchema.extend({
 
 type ExternalBookingSourceData = z.infer<typeof externalBookingSourceSchema>;
 
+/**
+ * @kind Entity
+ */
 export class ExternalBookingSource {
-  private readonly data: ExternalBookingSourceData;
+  readonly #data: ExternalBookingSourceData;
 
   private constructor(data: ExternalBookingSourceData) {
-    this.data = externalBookingSourceSchema.parse(data);
+    this.#data = externalBookingSourceSchema.parse(data);
   }
 
   static #nextId(): string {
@@ -43,30 +46,30 @@ export class ExternalBookingSource {
   }
 
   get id() {
-    return this.data.id;
+    return this.#data.id;
   }
 
   get property_id() {
-    return this.data.property_id;
+    return this.#data.property_id;
   }
 
   get platform_name() {
-    return this.data.platform_name;
+    return this.#data.platform_name;
   }
 
   get sync_url() {
-    return this.data.sync_url;
+    return this.#data.sync_url;
   }
 
   get created_at() {
-    return this.data.created_at;
+    return this.#data.created_at;
   }
 
   get updated_at() {
-    return this.data.updated_at;
+    return this.#data.updated_at;
   }
 
   get deleted_at() {
-    return this.data.deleted_at;
+    return this.#data.deleted_at;
   }
 }

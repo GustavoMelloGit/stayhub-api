@@ -21,10 +21,10 @@ type StayData = z.infer<typeof staySchema>;
  * @kind Entity
  */
 export class Stay {
-  private readonly data: StayData;
+  readonly #data: StayData;
 
   private constructor(data: StayData) {
-    this.data = staySchema.parse(data);
+    this.#data = staySchema.parse(data);
   }
 
   private static nextId(): string {
@@ -49,46 +49,46 @@ export class Stay {
   }
 
   get id() {
-    return this.data.id;
+    return this.#data.id;
   }
 
   get check_in() {
-    return this.data.check_in;
+    return this.#data.check_in;
   }
 
   get check_out() {
-    return this.data.check_out;
+    return this.#data.check_out;
   }
 
   get tenant_id() {
-    return this.data.tenant_id;
+    return this.#data.tenant_id;
   }
 
   get property_id() {
-    return this.data.property_id;
+    return this.#data.property_id;
   }
 
   get guests() {
-    return this.data.guests;
+    return this.#data.guests;
   }
 
   get entrance_code() {
-    return this.data.entrance_code;
+    return this.#data.entrance_code;
   }
 
   get price() {
-    return this.data.price;
+    return this.#data.price;
   }
 
   get created_at() {
-    return this.data.created_at;
+    return this.#data.created_at;
   }
 
   get updated_at() {
-    return this.data.updated_at;
+    return this.#data.updated_at;
   }
 
   get deleted_at() {
-    return this.data.deleted_at;
+    return this.#data.deleted_at;
   }
 }

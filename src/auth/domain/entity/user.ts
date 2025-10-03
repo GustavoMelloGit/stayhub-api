@@ -12,11 +12,14 @@ export const userSchema = baseEntitySchema.extend({
 
 type UserData = z.infer<typeof userSchema>;
 
+/**
+ * @kind Entity
+ */
 export class User {
-  private readonly data: UserData;
+  readonly #data: UserData;
 
   private constructor(data: UserData) {
-    this.data = userSchema.parse(data);
+    this.#data = userSchema.parse(data);
   }
 
   private static nextId(): string {
@@ -37,30 +40,30 @@ export class User {
   }
 
   get id() {
-    return this.data.id;
+    return this.#data.id;
   }
 
   get name() {
-    return this.data.name;
+    return this.#data.name;
   }
 
   get email() {
-    return this.data.email;
+    return this.#data.email;
   }
 
   get password() {
-    return this.data.password;
+    return this.#data.password;
   }
 
   get created_at() {
-    return this.data.created_at;
+    return this.#data.created_at;
   }
 
   get updated_at() {
-    return this.data.updated_at;
+    return this.#data.updated_at;
   }
 
   get deleted_at() {
-    return this.data.deleted_at;
+    return this.#data.deleted_at;
   }
 }

@@ -15,10 +15,10 @@ type LedgerData = z.infer<typeof ledgerSchema>;
  * @kind Entity, Aggregate Root
  */
 export class Ledger {
-  private readonly data: LedgerData;
+  readonly #data: LedgerData;
 
   private constructor(data: LedgerData) {
-    this.data = ledgerSchema.parse(data);
+    this.#data = ledgerSchema.parse(data);
   }
 
   private static nextId(): string {
@@ -39,10 +39,10 @@ export class Ledger {
   }
 
   get id() {
-    return this.data.id;
+    return this.#data.id;
   }
 
   get entries() {
-    return this.data.entries;
+    return this.#data.entries;
   }
 }
