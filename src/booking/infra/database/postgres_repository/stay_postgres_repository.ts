@@ -1,6 +1,9 @@
 import { and, eq, gte } from "drizzle-orm";
 import { Stay } from "../../../domain/entity/stay";
-import type { StayRepository } from "../../../domain/repository/stay_repository";
+import type {
+  StayRepository,
+  StayWithTenant,
+} from "../../../domain/repository/stay_repository";
 import { db } from "../../../../core/infra/database/drizzle/database";
 import {
   staysTable,
@@ -30,7 +33,7 @@ export class StayPostgresRepository implements StayRepository {
     if (!result[0]) throw new Error("Failed to save stay");
   }
 
-  async allFutureFromProperty(propertyId: string): Promise<Stay[]> {
+  async allFutureFromProperty(propertyId: string): Promise<StayWithTenant[]> {
     const stays = await db.query.staysTable.findMany({
       where: and(
         eq(staysTable.property_id, propertyId),
@@ -42,10 +45,13 @@ export class StayPostgresRepository implements StayRepository {
       orderBy: (staysTable, { asc }) => [asc(staysTable.check_in)],
     });
 
-    return stays.map((stay) => Stay.reconstitute(stay));
+    return stays.map((stay) => ({
+      stay: Stay.reconstitute(stay),
+      tenant: Tenant.reconstitute(stay.tenant),
+    }));
   }
 
-  async allFromProperty(propertyId: string): Promise<Stay[]> {
+  async allFromProperty(propertyId: string): Promise<StayWithTenant[]> {
     const stays = await db.query.staysTable.findMany({
       where: eq(staysTable.property_id, propertyId),
       with: {
@@ -54,7 +60,10 @@ export class StayPostgresRepository implements StayRepository {
       orderBy: (staysTable, { asc }) => [asc(staysTable.check_in)],
     });
 
-    return stays.map((stay) => Stay.reconstitute(stay));
+    return stays.map((stay) => ({
+      stay: Stay.reconstitute(stay),
+      tenant: Tenant.reconstitute(stay.tenant),
+    }));
   }
 
   async tenantWithPhone(phone: string): Promise<Tenant | null> {

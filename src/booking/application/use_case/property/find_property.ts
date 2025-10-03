@@ -1,4 +1,3 @@
-import type { Property } from "../../../domain/entity/property";
 import type { PropertyRepository } from "../../../domain/repository/property_repository";
 import { ResourceNotFoundError } from "../../../../core/application/error/resource_not_found_error";
 import type { UseCase } from "../use_case";
@@ -8,7 +7,13 @@ type Input = {
   user_id: string;
 };
 
-type Output = Property;
+type Output = {
+  id: string;
+  name: string;
+  user_id: string;
+  created_at: Date;
+  updated_at: Date;
+};
 
 export class FindPropertyUseCase implements UseCase<Input, Output> {
   constructor(private readonly propertyRepository: PropertyRepository) {}
@@ -22,6 +27,12 @@ export class FindPropertyUseCase implements UseCase<Input, Output> {
       throw new ResourceNotFoundError("Property");
     }
 
-    return property;
+    return {
+      id: property.id,
+      name: property.name,
+      user_id: property.user_id,
+      created_at: property.created_at,
+      updated_at: property.updated_at,
+    };
   }
 }
