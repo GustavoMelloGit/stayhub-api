@@ -5,8 +5,10 @@ import { inMemoryEventDispatcher } from "../../../core/infra/event/in_memory_eve
 import { ConsoleLogger } from "../../../core/infra/logger/console_logger";
 import { RecordRevenueOnStayPaymentConfirmed } from "../../application/handler/record_revenue_on_stay_payment_confirmed";
 import { RecordExpenseUseCase } from "../../application/use_case/record_expense";
+import { RecordRevenueUseCase } from "../../application/use_case/record_revenue";
 import type { LedgerEntryRepository } from "../../domain/repository/ledger_entry_repository";
 import { RecordExpenseController } from "../../presentation/controller/record_expense.controller";
+import { RecordRevenueController } from "../../presentation/controller/record_revenue.controller";
 import { LedgerEntryPostgresRepository } from "../database/postgres_repository/ledger_entry_postgres_repository";
 
 export class FinanceDi {
@@ -38,8 +40,16 @@ export class FinanceDi {
     return new RecordExpenseUseCase(this.#ledgerEntryRepository);
   }
 
+  makeRecordRevenueUseCase() {
+    return new RecordRevenueUseCase(this.#ledgerEntryRepository);
+  }
+
   // Controllers
   makeRecordExpenseController() {
     return new RecordExpenseController(this.makeRecordExpenseUseCase());
+  }
+
+  makeRecordRevenueController() {
+    return new RecordRevenueController(this.makeRecordRevenueUseCase());
   }
 }
