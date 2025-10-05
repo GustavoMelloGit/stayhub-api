@@ -10,7 +10,13 @@ export default defineConfig([
     plugins: { js },
     extends: ["js/recommended"],
     languageOptions: { globals: globals.node },
+    rules: {
+      "no-console": "warn",
+      "no-unused-vars": "error",
+      "prefer-const": "error",
+      "no-var": "error",
+    },
   },
   eslintConfigPrettier,
-  tseslint.configs.recommended,
+  ...tseslint.configs.recommended,
 ]);

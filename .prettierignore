@@ -1,4 +1,32 @@
-# Ignore artifacts:
-build
-coverage
-node_modules
+# Dependencies
+node_modules/
+bun.lock
+
+# Build outputs
+out/
+dist/
+build/
+
+# Database
+*.db
+*.sqlite
+
+# Logs
+*.log
+
+# Environment files
+.env*
+
+# Generated files
+drizzle/
+
+# Coverage
+coverage/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

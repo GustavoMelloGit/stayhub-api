@@ -9,6 +9,11 @@
     "dev": "bun --hot run src/index.ts",
     "start": "bun run ./src/index.ts",
     "lint": "eslint . --fix",
+    "lint:check": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "format:lint": "npm run lint && npm run format",
+    "prepare": "husky",
     "db:push": "drizzle-kit push",
     "db:migration": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate"
@@ -38,11 +43,15 @@
     "zod": "^4.0.10"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
+    "*.{ts,tsx}": [
       "eslint --fix",
       "prettier --write"
     ],
-    "*.{json,md}": [
+    "*.{js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
       "prettier --write"
     ]
   }
