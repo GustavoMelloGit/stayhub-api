@@ -20,12 +20,6 @@ export class PostgresBookingPolicy implements BookingPolicy {
       throw new ValidationError("Invalid guests");
     }
 
-    const isDateInThePast = check_in < new Date();
-
-    if (isDateInThePast) {
-      throw new ValidationError("Check-in date must be in the future");
-    }
-
     if (check_in >= check_out) {
       throw new ValidationError("Check-in date must be before check-out date");
     }
