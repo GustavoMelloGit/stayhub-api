@@ -1,4 +1,4 @@
-import { eq, sum } from "drizzle-orm";
+import { eq, sum, count, desc } from "drizzle-orm";
 import {
   LedgerEntry,
   type LedgerEntryData,
@@ -6,6 +6,11 @@ import {
 import type { LedgerEntryRepository } from "../../../domain/repository/ledger_entry_repository";
 import { db } from "../../../../core/infra/database/drizzle/database";
 import { ledgerEntriesTable } from "../../../../core/infra/database/drizzle/schema";
+import type {
+  PaginatedResult,
+  PaginationInput,
+} from "../../../../core/application/dto/pagination";
+import { calculatePaginationMetadata } from "../../../../core/application/dto/pagination";
 
 export class LedgerEntryPostgresRepository implements LedgerEntryRepository {
   async save(entry: LedgerEntry): Promise<void> {
@@ -27,14 +32,6 @@ export class LedgerEntryPostgresRepository implements LedgerEntryRepository {
     }
   }
 
-  async allFromProperty(propertyId: string): Promise<LedgerEntry[]> {
-    const entries = await db.query.ledgerEntriesTable.findMany({
-      where: eq(ledgerEntriesTable.property_id, propertyId),
-    });
-
-    return entries.map(entry => LedgerEntry.reconstitute(entry));
-  }
-
   async propertyBalance(propertyId: string): Promise<number> {
     const result = await db
       .select({ total: sum(ledgerEntriesTable.amount) })
@@ -43,5 +40,39 @@ export class LedgerEntryPostgresRepository implements LedgerEntryRepository {
 
     const total = result[0]?.total;
     return total ? Number(total) : 0;
+  }
+
+  async findByPropertyId(
+    propertyId: string,
+    pagination: PaginationInput
+  ): Promise<PaginatedResult<LedgerEntry>> {
+    const offset = (pagination.page - 1) * pagination.limit;
+
+    const [totalResult, entries] = await Promise.all([
+      db
+        .select({ count: count() })
+        .from(ledgerEntriesTable)
+        .where(eq(ledgerEntriesTable.property_id, propertyId)),
+      db
+        .select()
+        .from(ledgerEntriesTable)
+        .where(eq(ledgerEntriesTable.property_id, propertyId))
+        .orderBy(desc(ledgerEntriesTable.created_at))
+        .limit(pagination.limit)
+        .offset(offset),
+    ]);
+
+    const total = totalResult[0]?.count ? Number(totalResult[0].count) : 0;
+
+    const ledgerEntries = entries.map(entry => LedgerEntry.reconstitute(entry));
+
+    return {
+      data: ledgerEntries,
+      pagination: calculatePaginationMetadata(
+        pagination.page,
+        pagination.limit,
+        total
+      ),
+    };
   }
 }

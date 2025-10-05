@@ -67,6 +67,10 @@ const financeControllers: Route[] = [
     authenticated: true,
     controller: financeDi.makeRecordRevenueController(),
   },
+  {
+    authenticated: true,
+    controller: financeDi.makeFindPropertyFinancialMovementsController(),
+  },
 ];
 
 const stayControllers: Route[] = [

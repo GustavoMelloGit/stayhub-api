@@ -6,9 +6,11 @@ import { ConsoleLogger } from "../../../core/infra/logger/console_logger";
 import { RecordRevenueOnStayPaymentConfirmed } from "../../application/handler/record_revenue_on_stay_payment_confirmed";
 import { RecordExpenseUseCase } from "../../application/use_case/record_expense";
 import { RecordRevenueUseCase } from "../../application/use_case/record_revenue";
+import { FindPropertyFinancialMovementsUseCase } from "../../application/use_case/find_property_financial_movements";
 import type { LedgerEntryRepository } from "../../domain/repository/ledger_entry_repository";
 import { RecordExpenseController } from "../../presentation/controller/record_expense.controller";
 import { RecordRevenueController } from "../../presentation/controller/record_revenue.controller";
+import { FindPropertyFinancialMovementsController } from "../../presentation/controller/find_property_financial_movements.controller";
 import { LedgerEntryPostgresRepository } from "../database/postgres_repository/ledger_entry_postgres_repository";
 
 export class FinanceDi {
@@ -44,6 +46,12 @@ export class FinanceDi {
     return new RecordRevenueUseCase(this.#ledgerEntryRepository);
   }
 
+  makeFindPropertyFinancialMovementsUseCase() {
+    return new FindPropertyFinancialMovementsUseCase(
+      this.#ledgerEntryRepository
+    );
+  }
+
   // Controllers
   makeRecordExpenseController() {
     return new RecordExpenseController(this.makeRecordExpenseUseCase());
@@ -51,5 +59,11 @@ export class FinanceDi {
 
   makeRecordRevenueController() {
     return new RecordRevenueController(this.makeRecordRevenueUseCase());
+  }
+
+  makeFindPropertyFinancialMovementsController() {
+    return new FindPropertyFinancialMovementsController(
+      this.makeFindPropertyFinancialMovementsUseCase()
+    );
   }
 }
