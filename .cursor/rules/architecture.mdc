@@ -7,16 +7,16 @@ alwaysApply: true
 ## Project Structure
 
 - The project follows Domain Driven Design principles and has multiples bounded contexts.
-- All the BCs are located in the `src` folder. For example, the `booking` BC is located in the `src/booking` folder.
+- All the BCs (Bounded Contexts) are located in the `src` folder. For example, the `booking` BC is located in the `src/booking` folder.
 - The `core` is not necessarily a BC, but it is a folder that contains files that are shared across all the BCs.
 
 ## Clean Architecture Pattern
 
 - The project follows a clean architecture pattern and Domain Driven Design, separating concerns into the following layers:
-  - **`src/domain`**: Contains the core business logic of the application, including entities and repository interfaces.
-  - **`src/application`**: Contains the application-specific logic, such as use cases and data transfer objects.
-  - **`src/infra`**: Contains the implementation details of the application, such as database repositories, web frameworks, and dependency injection.
-  - **`src/presentation`**: Contains the API controllers, which handle incoming HTTP requests and call the appropriate use cases.
+  - **`src/<bc>/domain`**: Contains the core business logic of the application, including entities and repository interfaces.
+  - **`src/<bc>/application`**: Contains the application-specific logic, such as use cases and data transfer objects.
+  - **`src/<bc>/infra`**: Contains the implementation details of the application, such as database repositories, web frameworks, and dependency injection.
+  - **`src/<bc>/presentation`**: Contains the API controllers, which handle incoming HTTP requests and call the appropriate use cases.
 - The project uses Bun as the JavaScript runtime and toolkit.
 - The project uses TypeScript as the programming language.
 - The project uses PostgreSQL as the database.
@@ -25,7 +25,8 @@ alwaysApply: true
 
 ## Creating a new route
 
-- First, check if there is a repository method that can be used to create this new route. If there isn't, create it.
+- First, check if there is a BC that can be used to create this new route. If there isn't, create it.
+- Then, check if there is a repository method that can be used to create this new route. If there isn't, create it.
 - Then create the use case that will be used to create this new route.
 - Then create the controller that will be used to handle the incoming HTTP requests and call the appropriate use case.
 - Then add the factory methods to the DI container.
