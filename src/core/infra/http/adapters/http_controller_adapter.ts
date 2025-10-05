@@ -127,7 +127,9 @@ export function BunHttpControllerAdapter(
 
       const serializedResponse = serializeDatesRecursively(response);
 
-      const jsonResponse = Response.json(serializedResponse);
+      const jsonResponse = Response.json(serializedResponse, {
+        status: typeof response !== "undefined" ? 200 : 204,
+      });
       return corsMiddleware.addCorsHeaders(
         jsonResponse,
         request.headers.get("Origin")
