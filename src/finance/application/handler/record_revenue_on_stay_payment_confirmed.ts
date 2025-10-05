@@ -21,8 +21,8 @@ export class RecordRevenueOnStayPaymentConfirmed
 
     const ledgerEntry = LedgerEntry.newRevenue({
       amount: event.paid_amount,
-      description: "Stay payment",
-      category: "stay",
+      description: `Pagamento de estadia: ${event.stay_id}`,
+      category: "ESTADIA",
       property_id: event.property_id,
     });
 
