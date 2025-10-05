@@ -2,7 +2,7 @@ import type { AuthRepository } from "../../domain/repository/auth_repository";
 import { UnauthorizedError } from "../../../core/application/error/unauthorized_error";
 import type { Hasher } from "../service/hasher";
 import type { ISessionManager } from "../service/session_manager";
-import type { UseCase } from "../../../booking/application/use_case/use_case";
+import type { UseCase } from "../../../core/application/use_case/use_case";
 
 type Input = {
   email: string;

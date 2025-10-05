@@ -4,7 +4,7 @@ import type {
   StayWithTenant,
 } from "../../../domain/repository/stay_repository";
 import { ResourceNotFoundError } from "../../../../core/application/error/resource_not_found_error";
-import type { UseCase } from "../use_case";
+import type { UseCase } from "../../../../core/application/use_case/use_case";
 import type { TenantSex } from "../../../domain/entity/tenant";
 
 type Input = {

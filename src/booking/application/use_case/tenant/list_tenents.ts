@@ -1,5 +1,5 @@
 import type { TenantRepository } from "../../../domain/repository/tenant_repository";
-import type { UseCase } from "../use_case";
+import type { UseCase } from "../../../../core/application/use_case/use_case";
 
 type Output = {
   id: string;

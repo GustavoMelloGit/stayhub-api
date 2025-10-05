@@ -1,5 +1,5 @@
 import type { PropertyRepository } from "../../../domain/repository/property_repository";
-import type { UseCase } from "../use_case";
+import type { UseCase } from "../../../../core/application/use_case/use_case";
 
 type Input = {
   user_id: string;

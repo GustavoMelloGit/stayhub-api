@@ -1,6 +1,6 @@
 import type { PropertyRepository } from "../../../domain/repository/property_repository";
 import { ResourceNotFoundError } from "../../../../core/application/error/resource_not_found_error";
-import type { UseCase } from "../use_case";
+import type { UseCase } from "../../../../core/application/use_case/use_case";
 import type { User } from "../../../../auth/domain/entity/user";
 import type { StayRepository } from "../../../domain/repository/stay_repository";
 import type { TenantRepository } from "../../../domain/repository/tenant_repository";
