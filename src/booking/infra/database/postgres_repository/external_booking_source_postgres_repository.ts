@@ -12,8 +12,8 @@ export class ExternalBookingSourcePostgresRepository
       where: eq(externalBookingSources.property_id, propertyId),
     });
 
-    return bookingSources.map((bookingSource) =>
-      ExternalBookingSource.reconstitute(bookingSource),
+    return bookingSources.map(bookingSource =>
+      ExternalBookingSource.reconstitute(bookingSource)
     );
   }
 

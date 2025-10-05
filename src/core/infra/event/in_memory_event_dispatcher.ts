@@ -25,13 +25,13 @@ class InMemoryEventDispatcher implements EventDispatcher {
     if (handlers) {
       this.logger.info(
         `Dispatching event ${eventName} to ${handlers.length} handler(s).`,
-        { eventName, handlerCount: handlers.length },
+        { eventName, handlerCount: handlers.length }
       );
-      await Promise.all(handlers.map((handler) => handler.handle(event)));
+      await Promise.all(handlers.map(handler => handler.handle(event)));
     }
   }
 }
 
 export const inMemoryEventDispatcher = new InMemoryEventDispatcher(
-  new ConsoleLogger(),
+  new ConsoleLogger()
 );

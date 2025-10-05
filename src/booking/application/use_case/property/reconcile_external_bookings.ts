@@ -33,7 +33,7 @@ export class ReconcileExternalBookingsUseCase
     private readonly externalBookingSourceRepository: ExternalBookingSourcesRepository,
     private readonly stayRepository: StayRepository,
     private readonly calendarAdapter: CalendarAdapter,
-    private readonly propertyRepository: PropertyRepository,
+    private readonly propertyRepository: PropertyRepository
   ) {}
 
   async execute(input: Input) {
@@ -43,7 +43,7 @@ export class ReconcileExternalBookingsUseCase
     if (!properties) throw new ResourceNotFoundError("Properties");
 
     const unreconciledBookings = await Promise.all(
-      properties.map(async (property) => this.#reconcileForProperty(property)),
+      properties.map(async property => this.#reconcileForProperty(property))
     );
 
     return unreconciledBookings
@@ -66,8 +66,8 @@ export class ReconcileExternalBookingsUseCase
 
     const unreconciledBookings: Output[] = [];
 
-    externalBookings.forEach((externalBooking) => {
-      const isAlreadyRegistered = nextStays.some((internalStay) => {
+    externalBookings.forEach(externalBooking => {
+      const isAlreadyRegistered = nextStays.some(internalStay => {
         const internalStayDate = internalStay.stay.check_in.toDateString();
         const externalBookingDate = externalBooking.period.start.toDateString();
         const isSameCheckInDay = internalStayDate === externalBookingDate;
@@ -92,24 +92,24 @@ export class ReconcileExternalBookingsUseCase
   }
 
   async #sourceToBookings(
-    externalSource: ExternalBookingSource,
+    externalSource: ExternalBookingSource
   ): Promise<ExternalBooking[]> {
     const periods = await this.calendarAdapter.parseFrom(
-      externalSource.sync_url,
+      externalSource.sync_url
     );
-    return periods.map((p) => ({
+    return periods.map(p => ({
       period: p,
       platform: externalSource.platform_name,
     }));
   }
 
   async #getExternalBookings(
-    externalSources: ExternalBookingSource[],
+    externalSources: ExternalBookingSource[]
   ): Promise<ExternalBooking[]> {
     const externalBookings = await Promise.all(
-      externalSources.map(async (source) => {
+      externalSources.map(async source => {
         return this.#sourceToBookings(source);
-      }),
+      })
     );
 
     return externalBookings.flat();

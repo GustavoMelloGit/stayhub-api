@@ -7,7 +7,7 @@ import type { ControllerRequest } from "../../../core/presentation/controller/co
 export class AuthMiddleware {
   constructor(
     private readonly authRepository: AuthRepository,
-    private readonly sessionManager: ISessionManager,
+    private readonly sessionManager: ISessionManager
   ) {}
 
   async handle(request: ControllerRequest): Promise<User> {

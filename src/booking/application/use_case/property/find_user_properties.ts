@@ -15,7 +15,7 @@ export class FindUserPropertiesUseCase implements UseCase<Input, Output> {
   async execute(input: Input): Promise<Output> {
     const properties = await this.propertyRepository.allFromUser(input.user_id);
     return {
-      properties: properties.map((property) => ({
+      properties: properties.map(property => ({
         name: property.name,
         id: property.id,
       })),

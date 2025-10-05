@@ -22,7 +22,7 @@ const logger = coreDi.makeLogger();
 class ControllerRequestParser {
   constructor(
     private readonly request: Request,
-    private readonly controller: Controller,
+    private readonly controller: Controller
   ) {}
 
   async parse(): Promise<ControllerRequest> {
@@ -39,8 +39,8 @@ class ControllerRequestParser {
   #parseParams(): Record<string, string> {
     const path = this.controller.path;
     const pathParts = path.split("/");
-    const params = pathParts.map((part) =>
-      part.startsWith(":") ? part.slice(1) : null,
+    const params = pathParts.map(part =>
+      part.startsWith(":") ? part.slice(1) : null
     );
 
     const paramsObject = params.reduce(
@@ -56,7 +56,7 @@ class ControllerRequestParser {
         acc[param] = pathname[index];
         return acc;
       },
-      {} as Record<string, string>,
+      {} as Record<string, string>
     );
 
     return paramsObject;
@@ -103,7 +103,7 @@ const errorCodeMap: Record<string, number> = {
 
 export function BunHttpControllerAdapter(
   controller: Controller,
-  authenticated: boolean,
+  authenticated: boolean
 ) {
   return async function (request: Request): Promise<Response> {
     // Handle CORS preflight requests
@@ -114,7 +114,7 @@ export function BunHttpControllerAdapter(
     try {
       const controllerRequestParser = new ControllerRequestParser(
         request,
-        controller,
+        controller
       );
       const controllerRequest = await controllerRequestParser.parse();
 
@@ -130,7 +130,7 @@ export function BunHttpControllerAdapter(
       const jsonResponse = Response.json(serializedResponse);
       return corsMiddleware.addCorsHeaders(
         jsonResponse,
-        request.headers.get("Origin"),
+        request.headers.get("Origin")
       );
     } catch (e) {
       logger.error("Error in HTTP controller adapter", { error: e });
@@ -141,7 +141,7 @@ export function BunHttpControllerAdapter(
         if (errorCode) {
           errorResponse = Response.json(
             { message: e.message },
-            { status: errorCode },
+            { status: errorCode }
           );
         } else {
           errorResponse = Response.json(
@@ -150,7 +150,7 @@ export function BunHttpControllerAdapter(
             },
             {
               status: 500,
-            },
+            }
           );
         }
       } else {
@@ -160,13 +160,13 @@ export function BunHttpControllerAdapter(
           },
           {
             status: 500,
-          },
+          }
         );
       }
 
       return corsMiddleware.addCorsHeaders(
         errorResponse,
-        request.headers.get("Origin"),
+        request.headers.get("Origin")
       );
     }
   };

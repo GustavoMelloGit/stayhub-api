@@ -29,7 +29,7 @@ export class RegisterUserUseCase implements UseCase<Input, Output> {
     private readonly userRepository: AuthRepository,
     private readonly hasher: Hasher,
     private readonly propertyRepository: PropertyRepository,
-    private readonly sessionManager: ISessionManager,
+    private readonly sessionManager: ISessionManager
   ) {}
 
   async execute(input: Input): Promise<Output> {

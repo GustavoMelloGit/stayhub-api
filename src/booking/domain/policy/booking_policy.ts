@@ -3,6 +3,6 @@ export interface BookingPolicy {
     property_id: string,
     check_in: Date,
     check_out: Date,
-    guests: number,
+    guests: number
   ): Promise<boolean>;
 }

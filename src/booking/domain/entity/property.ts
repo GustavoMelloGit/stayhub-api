@@ -42,7 +42,7 @@ export class Property {
 
   public async bookStay(
     args: BookStayArgs,
-    bookingPolicy: BookingPolicy,
+    bookingPolicy: BookingPolicy
   ): Promise<Stay> {
     const { check_in, check_out, guests } = args;
 

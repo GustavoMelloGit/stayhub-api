@@ -24,7 +24,7 @@ export class SignInUseCase implements UseCase<Input, Output> {
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly hasher: Hasher,
-    private readonly sessionManager: ISessionManager,
+    private readonly sessionManager: ISessionManager
   ) {}
 
   async execute(input: Input): Promise<Output> {
@@ -36,7 +36,7 @@ export class SignInUseCase implements UseCase<Input, Output> {
 
     const isPasswordValid = await this.hasher.compare(
       input.password,
-      user.password,
+      user.password
     );
 
     if (!isPasswordValid) {

@@ -27,19 +27,19 @@ export class StayDi {
     return new GetStayUseCase(
       this.#propertyRepository,
       this.#stayRepository,
-      this.#tenantRepository,
+      this.#tenantRepository
     );
   }
   makeGetPublicStayUseCase() {
     return new GetPublicStayUseCase(
       this.#stayRepository,
-      this.#tenantRepository,
+      this.#tenantRepository
     );
   }
   makeFindPropertyStaysUseCase() {
     return new FindPropertyStaysUseCase(
       this.#propertyRepository,
-      this.#stayRepository,
+      this.#stayRepository
     );
   }
 

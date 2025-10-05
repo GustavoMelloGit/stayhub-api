@@ -26,7 +26,7 @@ export class TenantPostgresRepository implements TenantRepository {
   async findAll(): Promise<Tenant[]> {
     const tenants = await db.select().from(tenantsTable);
 
-    return tenants.map((tenant) => Tenant.reconstitute(tenant));
+    return tenants.map(tenant => Tenant.reconstitute(tenant));
   }
 
   async tenantOfId(id: string): Promise<Tenant | null> {

@@ -13,7 +13,7 @@ export class ICalendarAdapter implements CalendarAdapter {
           new BookedPeriod({
             start: new Date(event.start),
             end: new Date(event.end),
-          }),
+          })
         );
       }
     }

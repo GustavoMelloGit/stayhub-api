@@ -29,7 +29,7 @@ export class ExternalBookingSource {
   }
 
   public static create(
-    data: WithoutBaseEntity<ExternalBookingSourceData>,
+    data: WithoutBaseEntity<ExternalBookingSourceData>
   ): ExternalBookingSource {
     return new ExternalBookingSource({
       ...data,
@@ -40,7 +40,7 @@ export class ExternalBookingSource {
   }
 
   public static reconstitute(
-    data: ExternalBookingSourceData,
+    data: ExternalBookingSourceData
   ): ExternalBookingSource {
     return new ExternalBookingSource(data);
   }

@@ -27,6 +27,6 @@ export class PropertyPostgresRepository implements PropertyRepository {
       where: eq(propertiesTable.user_id, userId),
     });
 
-    return properties.map((property) => Property.reconstitute(property));
+    return properties.map(property => Property.reconstitute(property));
   }
 }

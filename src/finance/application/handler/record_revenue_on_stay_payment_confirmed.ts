@@ -9,7 +9,7 @@ export class RecordRevenueOnStayPaymentConfirmed
 {
   constructor(
     private readonly logger: Logger,
-    private readonly ledgerEntryRepository: LedgerEntryRepository,
+    private readonly ledgerEntryRepository: LedgerEntryRepository
   ) {}
 
   async handle(event: StayPaymentConfirmedEvent): Promise<void> {

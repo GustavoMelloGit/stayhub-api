@@ -75,7 +75,7 @@ export class CorsMiddleware {
       return false;
     }
 
-    const isAllowed = this.allowedOrigins.some((allowedOrigin) => {
+    const isAllowed = this.allowedOrigins.some(allowedOrigin => {
       return origin.startsWith(allowedOrigin.replace("*", ""));
     });
 

@@ -40,13 +40,13 @@ type Output = {
 export class FindPropertyStaysUseCase implements UseCase<Input, Output> {
   constructor(
     private readonly propertyRepository: PropertyRepository,
-    private readonly stayRepository: StayRepository,
+    private readonly stayRepository: StayRepository
   ) {}
 
   async execute(input: Input): Promise<Output> {
     // Verifica se a propriedade existe e pertence ao usuário
     const property = await this.propertyRepository.propertyOfId(
-      input.property_id,
+      input.property_id
     );
 
     if (!property || property.user_id !== input.user_id) {
@@ -56,17 +56,17 @@ export class FindPropertyStaysUseCase implements UseCase<Input, Output> {
     // Busca as estadias baseado no filtro
     if (input.onlyIncomingStays) {
       const stays = await this.stayRepository.allFutureFromProperty(
-        input.property_id,
+        input.property_id
       );
 
       return {
-        stays: stays.map((stay) => this.#mapStayWithTenant(stay)),
+        stays: stays.map(stay => this.#mapStayWithTenant(stay)),
       };
     }
 
     const stays = await this.stayRepository.allFromProperty(input.property_id);
     return {
-      stays: stays.map((stay) => this.#mapStayWithTenant(stay)),
+      stays: stays.map(stay => this.#mapStayWithTenant(stay)),
     };
   }
 

@@ -33,7 +33,7 @@ export class AuthDi {
       this.#authRepository,
       this.#hasher,
       this.#propertyRepository,
-      this.#sessionManager,
+      this.#sessionManager
     );
   }
 
@@ -41,7 +41,7 @@ export class AuthDi {
     return new SignInUseCase(
       this.#authRepository,
       this.#hasher,
-      this.#sessionManager,
+      this.#sessionManager
     );
   }
 

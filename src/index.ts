@@ -9,7 +9,7 @@ async function checkDatabaseConnection(logger: Logger) {
   try {
     await db.execute(sql`SELECT 1`);
     logger.info(
-      "✅ Connection to the database has been successfully verified.",
+      "✅ Connection to the database has been successfully verified."
     );
   } catch (error) {
     logger.error("❌ Unable to connect to the database", { error });
@@ -34,7 +34,7 @@ async function main() {
     isProduction
       ? `🚀 API running in production mode`
       : `🚀 Listening on http://localhost:${server.port}`,
-    { port: server.port, environment: env.NODE_ENV },
+    { port: server.port, environment: env.NODE_ENV }
   );
 }
 

@@ -39,12 +39,12 @@ export class BookStayUseCase implements UseCase<Input, Output> {
     private readonly propertyRepository: PropertyRepository,
     private readonly stayRepository: StayRepository,
     private readonly bookingPolicy: BookingPolicy,
-    private readonly eventDispatcher: EventDispatcher,
+    private readonly eventDispatcher: EventDispatcher
   ) {}
 
   async execute(input: Input, user: User): Promise<Output> {
     const property = await this.propertyRepository.propertyOfId(
-      input.property_id,
+      input.property_id
     );
 
     if (!property) {
@@ -81,7 +81,7 @@ export class BookStayUseCase implements UseCase<Input, Output> {
     const event = new StayPaymentConfirmedEvent(
       stay.id,
       property.id,
-      stay.price,
+      stay.price
     );
     await this.eventDispatcher.dispatch(event);
 

@@ -64,7 +64,7 @@ export class ConsoleLogger implements Logger {
     level: LogLevel,
     levelName: string,
     message: string,
-    context?: Record<string, unknown>,
+    context?: Record<string, unknown>
   ): void {
     if (level < this.minLevel) {
       return;

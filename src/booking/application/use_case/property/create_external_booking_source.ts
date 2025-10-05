@@ -23,7 +23,7 @@ export class CreateExternalBookingSourceUseCase
 {
   constructor(
     private readonly externalBookingSourceRepository: ExternalBookingSourcesRepository,
-    private readonly propertyRepository: PropertyRepository,
+    private readonly propertyRepository: PropertyRepository
   ) {}
 
   async execute(input: Input): Promise<Output> {

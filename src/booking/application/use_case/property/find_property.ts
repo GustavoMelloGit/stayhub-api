@@ -20,7 +20,7 @@ export class FindPropertyUseCase implements UseCase<Input, Output> {
 
   async execute(input: Input): Promise<Output> {
     const property = await this.propertyRepository.propertyOfId(
-      input.property_id,
+      input.property_id
     );
 
     if (!property || property.user_id !== input.user_id) {

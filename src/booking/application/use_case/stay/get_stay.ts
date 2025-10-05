@@ -27,7 +27,7 @@ export class GetStayUseCase implements UseCase<Input, Output> {
   constructor(
     private readonly propertyRepository: PropertyRepository,
     private readonly stayRepository: StayRepository,
-    private readonly tenantRepository: TenantRepository,
+    private readonly tenantRepository: TenantRepository
   ) {}
 
   async execute(input: Input, user: User): Promise<Output> {
@@ -38,7 +38,7 @@ export class GetStayUseCase implements UseCase<Input, Output> {
     }
 
     const property = await this.propertyRepository.propertyOfId(
-      stay.property_id,
+      stay.property_id
     );
 
     if (!property) {

@@ -8,7 +8,7 @@ export class StayPaymentConfirmedEvent implements DomainEvent {
   constructor(
     public readonly stay_id: string,
     public readonly property_id: string,
-    public readonly paid_amount: number,
+    public readonly paid_amount: number
   ) {
     this.name = StayPaymentConfirmedEvent.NAME;
     this.occurred_at = new Date();

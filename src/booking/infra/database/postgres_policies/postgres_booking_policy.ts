@@ -12,7 +12,7 @@ export class PostgresBookingPolicy implements BookingPolicy {
     property_id: string,
     check_in: Date,
     check_out: Date,
-    guests: number,
+    guests: number
   ): Promise<boolean> {
     const invalidNumberOfGuests = guests < 1 || !Number.isInteger(guests);
 
@@ -39,12 +39,12 @@ export class PostgresBookingPolicy implements BookingPolicy {
       where: or(
         and(
           eq(staysTable.property_id, property_id),
-          between(staysTable.check_in, check_in, check_out),
+          between(staysTable.check_in, check_in, check_out)
         ),
         and(
           eq(staysTable.property_id, property_id),
-          between(staysTable.check_out, check_in, check_out),
-        ),
+          between(staysTable.check_out, check_in, check_out)
+        )
       ),
     });
 

@@ -20,7 +20,7 @@ export class GetPublicStayUseCase implements UseCase<Input, Output> {
   constructor(
     private readonly stayRepository: StayRepository,
 
-    private readonly tenantRepository: TenantRepository,
+    private readonly tenantRepository: TenantRepository
   ) {}
   async execute(input: Input): Promise<Output> {
     const stay = await this.stayRepository.stayOfId(input.stay_id);

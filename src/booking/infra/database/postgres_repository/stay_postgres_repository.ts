@@ -37,7 +37,7 @@ export class StayPostgresRepository implements StayRepository {
     const stays = await db.query.staysTable.findMany({
       where: and(
         eq(staysTable.property_id, propertyId),
-        gte(staysTable.check_in, new Date()),
+        gte(staysTable.check_in, new Date())
       ),
       with: {
         tenant: true,
@@ -45,7 +45,7 @@ export class StayPostgresRepository implements StayRepository {
       orderBy: (staysTable, { asc }) => [asc(staysTable.check_in)],
     });
 
-    return stays.map((stay) => ({
+    return stays.map(stay => ({
       stay: Stay.reconstitute(stay),
       tenant: Tenant.reconstitute(stay.tenant),
     }));
@@ -60,7 +60,7 @@ export class StayPostgresRepository implements StayRepository {
       orderBy: (staysTable, { asc }) => [asc(staysTable.check_in)],
     });
 
-    return stays.map((stay) => ({
+    return stays.map(stay => ({
       stay: Stay.reconstitute(stay),
       tenant: Tenant.reconstitute(stay.tenant),
     }));

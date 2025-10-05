@@ -50,7 +50,7 @@ export class PropertyDi {
       this.#propertyRepository,
       this.#stayRepository,
       this.#bookingPolicy,
-      this.#eventDispatcher,
+      this.#eventDispatcher
     );
   }
   makeReconcileExternalBookingUseCase() {
@@ -58,13 +58,13 @@ export class PropertyDi {
       this.#externalBookingSourceRepository,
       this.#stayRepository,
       this.#calendarAdapter,
-      this.#propertyRepository,
+      this.#propertyRepository
     );
   }
   makeCreateExternalBookingSourceUseCase() {
     return new CreateExternalBookingSourceUseCase(
       this.#externalBookingSourceRepository,
-      this.#propertyRepository,
+      this.#propertyRepository
     );
   }
   makeFindUserPropertiesUseCase() {
@@ -79,17 +79,17 @@ export class PropertyDi {
   }
   makeReconcileExternalBookingController() {
     return new ReconcileExternalBookingController(
-      this.makeReconcileExternalBookingUseCase(),
+      this.makeReconcileExternalBookingUseCase()
     );
   }
   makeCreateExternalBookingSourceController() {
     return new CreateExternalBookingSourceController(
-      this.makeCreateExternalBookingSourceUseCase(),
+      this.makeCreateExternalBookingSourceUseCase()
     );
   }
   makeFindUserPropertiesController() {
     return new FindUserPropertiesController(
-      this.makeFindUserPropertiesUseCase(),
+      this.makeFindUserPropertiesUseCase()
     );
   }
   makeFindPropertyController() {

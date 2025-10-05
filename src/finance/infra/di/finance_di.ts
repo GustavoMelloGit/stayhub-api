@@ -16,7 +16,7 @@ export class FinanceDi {
     this.#eventDispatcher = inMemoryEventDispatcher;
     this.#eventDispatcher.register(
       StayPaymentConfirmedEvent.NAME,
-      this.makeRecordRevenueOnStayPaymentConfirmedHandler(),
+      this.makeRecordRevenueOnStayPaymentConfirmedHandler()
     );
   }
 
@@ -24,7 +24,7 @@ export class FinanceDi {
   makeRecordRevenueOnStayPaymentConfirmedHandler() {
     return new RecordRevenueOnStayPaymentConfirmed(
       this.#logger,
-      this.#ledgerEntryRepository,
+      this.#ledgerEntryRepository
     );
   }
 }
