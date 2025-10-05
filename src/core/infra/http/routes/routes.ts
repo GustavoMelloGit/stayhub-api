@@ -16,7 +16,7 @@ const propertyDi = new PropertyDi();
 const authDi = new AuthDi();
 const stayDi = new StayDi();
 const corsMiddleware = new CorsMiddleware();
-new FinanceDi();
+const financeDi = new FinanceDi();
 
 type Route = {
   controller: Controller;
@@ -58,6 +58,13 @@ const propertyControllers: Route[] = [
   },
 ];
 
+const financeControllers: Route[] = [
+  {
+    authenticated: true,
+    controller: financeDi.makeRecordExpenseController(),
+  },
+];
+
 const stayControllers: Route[] = [
   {
     authenticated: true,
@@ -93,6 +100,7 @@ const controllers = [
   ...propertyControllers,
   ...authControllers,
   ...stayControllers,
+  ...financeControllers,
   healthController,
 ];
 

@@ -4,7 +4,7 @@ import type { LedgerEntryRepository } from "../../domain/repository/ledger_entry
 
 type Input = {
   amount: number;
-  description: string;
+  description: string | null;
   category: string;
   property_id: string;
 };
@@ -15,7 +15,13 @@ export class RecordExpenseUseCase implements UseCase<Input, Output> {
   constructor(private readonly ledgerEntryRepository: LedgerEntryRepository) {}
 
   async execute(input: Input): Promise<Output> {
-    const ledgerEntry = LedgerEntry.newExpense(input);
+    const negativeAmount = input.amount * -1;
+
+    const ledgerEntry = LedgerEntry.newExpense({
+      ...input,
+      amount: negativeAmount,
+    });
+
     await this.ledgerEntryRepository.save(ledgerEntry);
   }
 }
