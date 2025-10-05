@@ -3,6 +3,7 @@ import {
   baseEntitySchema,
   type WithoutBaseEntity,
 } from "../../../core/domain/entity/base_entity";
+import { ValidationError } from "../../../core/application/error/validation_error";
 
 export const ledgerEntrySchema = baseEntitySchema.extend({
   amount: z.int(),
@@ -23,21 +24,46 @@ export class LedgerEntry {
     this.#data = ledgerEntrySchema.parse(data);
   }
 
-  private static nextId(): string {
+  static #nextId(): string {
     return crypto.randomUUID();
   }
 
-  public static create(data: WithoutBaseEntity<LedgerEntryData>): LedgerEntry {
-    return new LedgerEntry({
-      ...data,
-      id: this.nextId(),
+  static #baseEntityData() {
+    return {
+      id: this.#nextId(),
       created_at: new Date(),
       updated_at: new Date(),
-    });
+    };
   }
 
   public static reconstitute(data: LedgerEntryData): LedgerEntry {
     return new LedgerEntry(data);
+  }
+
+  public static newExpense(
+    data: WithoutBaseEntity<LedgerEntryData>
+  ): LedgerEntry {
+    if (data.amount >= 0) {
+      throw new ValidationError("Amount must be less than 0");
+    }
+
+    return new LedgerEntry({
+      ...data,
+      ...this.#baseEntityData(),
+    });
+  }
+
+  public static newRevenue(
+    data: WithoutBaseEntity<LedgerEntryData>
+  ): LedgerEntry {
+    if (data.amount <= 0) {
+      throw new ValidationError("Amount must be greater than 0");
+    }
+
+    return new LedgerEntry({
+      ...data,
+      ...this.#baseEntityData(),
+    });
   }
 
   get id() {

@@ -19,7 +19,7 @@ export class RecordRevenueOnStayPaymentConfirmed
       amount: event.paid_amount,
     });
 
-    const ledgerEntry = LedgerEntry.create({
+    const ledgerEntry = LedgerEntry.newRevenue({
       amount: event.paid_amount,
       description: "Stay payment",
       category: "stay",
