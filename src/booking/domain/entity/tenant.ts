@@ -18,7 +18,7 @@ export const tenantSchema = baseEntitySchema.extend({
   sex: tenantSexSchema,
 });
 
-type TenantData = z.infer<typeof tenantSchema>;
+export type TenantData = z.infer<typeof tenantSchema>;
 
 /**
  * @kind Entity, Aggregate Root

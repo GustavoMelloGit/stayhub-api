@@ -15,7 +15,7 @@ export const staySchema = baseEntitySchema.extend({
   price: z.number().int().nonnegative(),
 });
 
-type StayData = z.infer<typeof staySchema>;
+export type StayData = z.infer<typeof staySchema>;
 
 /**
  * @kind Entity

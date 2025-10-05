@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { Tenant } from "../../../domain/entity/tenant";
+import { Tenant, type TenantData } from "../../../domain/entity/tenant";
 import type { TenantRepository } from "../../../domain/repository/tenant_repository";
 import { db } from "../../../../core/infra/database/drizzle/database";
 import { tenantsTable } from "../../../../core/infra/database/drizzle/schema";
@@ -14,7 +14,16 @@ export class TenantPostgresRepository implements TenantRepository {
   }
 
   async save(tenant: Tenant): Promise<Tenant> {
-    const result = await db.insert(tenantsTable).values(tenant).returning();
+    const data: TenantData = {
+      id: tenant.id,
+      name: tenant.name,
+      phone: tenant.phone,
+      sex: tenant.sex,
+      created_at: tenant.created_at,
+      updated_at: tenant.updated_at,
+      deleted_at: tenant.deleted_at,
+    };
+    const result = await db.insert(tenantsTable).values(data).returning();
 
     if (!result[0]) {
       throw new Error("Failed to save tenant");

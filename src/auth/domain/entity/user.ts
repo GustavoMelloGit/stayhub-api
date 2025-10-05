@@ -10,7 +10,7 @@ export const userSchema = baseEntitySchema.extend({
   password: z.string().min(8),
 });
 
-type UserData = z.infer<typeof userSchema>;
+export type UserData = z.infer<typeof userSchema>;
 
 /**
  * @kind Entity

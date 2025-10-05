@@ -11,7 +11,7 @@ export const propertySchema = baseEntitySchema.extend({
   user_id: z.string().uuid(),
 });
 
-type PropertyData = z.infer<typeof propertySchema>;
+export type PropertyData = z.infer<typeof propertySchema>;
 
 /**
  * @kind Entity, Aggregate Root

@@ -12,7 +12,9 @@ export const externalBookingSourceSchema = baseEntitySchema.extend({
   sync_url: z.string().url(),
 });
 
-type ExternalBookingSourceData = z.infer<typeof externalBookingSourceSchema>;
+export type ExternalBookingSourceData = z.infer<
+  typeof externalBookingSourceSchema
+>;
 
 /**
  * @kind Entity

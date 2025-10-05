@@ -1,5 +1,5 @@
 import { and, eq, gte } from "drizzle-orm";
-import { Stay } from "../../../domain/entity/stay";
+import { Stay, type StayData } from "../../../domain/entity/stay";
 import type {
   StayRepository,
   StayWithTenant,
@@ -28,7 +28,20 @@ export class StayPostgresRepository implements StayRepository {
   }
 
   async saveStay(input: Stay): Promise<void> {
-    const result = await db.insert(staysTable).values(input).returning();
+    const data: StayData = {
+      id: input.id,
+      check_in: input.check_in,
+      check_out: input.check_out,
+      tenant_id: input.tenant_id,
+      property_id: input.property_id,
+      guests: input.guests,
+      entrance_code: input.entrance_code,
+      price: input.price,
+      created_at: input.created_at,
+      updated_at: input.updated_at,
+      deleted_at: input.deleted_at,
+    };
+    const result = await db.insert(staysTable).values(data).returning();
 
     if (!result[0]) throw new Error("Failed to save stay");
   }

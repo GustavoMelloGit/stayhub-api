@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { User } from "../../../domain/entity/user";
+import { User, type UserData } from "../../../domain/entity/user";
 import type { AuthRepository } from "../../../domain/repository/auth_repository";
 import { db } from "../../../../core/infra/database/drizzle/database";
 import { usersTable } from "../../../../core/infra/database/drizzle/schema";
@@ -14,7 +14,16 @@ export class AuthPostgresRepository implements AuthRepository {
   }
 
   async addUser(input: User): Promise<User> {
-    const result = await db.insert(usersTable).values(input).returning();
+    const data: UserData = {
+      id: input.id,
+      name: input.name,
+      email: input.email,
+      password: input.password,
+      created_at: input.created_at,
+      updated_at: input.updated_at,
+      deleted_at: input.deleted_at,
+    };
+    const result = await db.insert(usersTable).values(data).returning();
 
     const user = result[0];
 

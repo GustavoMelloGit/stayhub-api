@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { Property } from "../../../domain/entity/property";
+import { Property, type PropertyData } from "../../../domain/entity/property";
 import type { PropertyRepository } from "../../../domain/repository/property_repository";
 import { db } from "../../../../core/infra/database/drizzle/database";
 import { propertiesTable } from "../../../../core/infra/database/drizzle/schema";
@@ -17,7 +17,15 @@ export class PropertyPostgresRepository implements PropertyRepository {
   }
 
   async addProperty(input: Property): Promise<void> {
-    const result = await db.insert(propertiesTable).values(input).returning();
+    const data: PropertyData = {
+      id: input.id,
+      name: input.name,
+      user_id: input.user_id,
+      created_at: input.created_at,
+      updated_at: input.updated_at,
+      deleted_at: input.deleted_at,
+    };
+    const result = await db.insert(propertiesTable).values(data).returning();
 
     if (!result[0]) throw new Error("Failed to save property");
   }
