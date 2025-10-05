@@ -12,7 +12,7 @@ export const ledgerEntrySchema = baseEntitySchema.extend({
   property_id: z.uuidv4(),
 });
 
-type LedgerEntryData = z.infer<typeof ledgerEntrySchema>;
+export type LedgerEntryData = z.infer<typeof ledgerEntrySchema>;
 
 /**
  * @kind Entity, Aggregate Root
