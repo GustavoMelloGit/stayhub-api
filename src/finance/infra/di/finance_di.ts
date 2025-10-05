@@ -17,11 +17,12 @@ export class FinanceDi {
   constructor() {
     this.#logger = new ConsoleLogger();
     this.#eventDispatcher = inMemoryEventDispatcher;
+    this.#ledgerEntryRepository = new LedgerEntryPostgresRepository();
+
     this.#eventDispatcher.register(
       StayPaymentConfirmedEvent.NAME,
       this.makeRecordRevenueOnStayPaymentConfirmedHandler()
     );
-    this.#ledgerEntryRepository = new LedgerEntryPostgresRepository();
   }
 
   // Handlers
