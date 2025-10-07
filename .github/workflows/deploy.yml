@@ -1,0 +1,45 @@
+name: Deploy API na VPS
+
+on:
+  push:
+    branches:
+      - main # Dispara apenas quando há push na branch main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Código
+        uses: actions/checkout@v4
+
+      - name: Executar Deploy Remoto via SSH
+        uses: appleboy/ssh-action@v1.0.3 # Action popular para SSH
+        with:
+          # Detalhes da Conexão SSH
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          port: ${{ secrets.VPS_PORT }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+          # Comandos a serem executados na VPS, um após o outro
+          script: |
+            # 1. Troca para o usuário de baixa permissão para deploy
+            sudo -i -u ${{ secrets.VPS_RUNNER_USERNAME }} /bin/bash << EOF
+
+            # Navega para o diretório da aplicação
+            cd stayhub_api
+
+            # Puxa as últimas alterações
+            git pull
+
+            # Instala dependências
+            /home/${{ secrets.VPS_RUNNER_USERNAME }}/.bun/bin/bun install
+
+            # Roda migrações (Drizzle db:push)
+            /home/${{ secrets.VPS_RUNNER_USERNAME }}/.bun/bin/bun run db:push
+
+            # Finaliza a execução do usuário
+            EOF
+
+            # 2. Reinicia o serviço PM2 (PM2 está instalado globalmente/com sudo)
+            sudo /usr/local/bin/pm2 restart stayhub_api
