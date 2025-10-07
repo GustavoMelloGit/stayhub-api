@@ -8,6 +8,6 @@ export class HealthController implements Controller {
   method = HttpControllerMethod.GET;
 
   async handle() {
-    return { message: "TESTE" };
+    return { message: "System is healthy" };
   }
 }
