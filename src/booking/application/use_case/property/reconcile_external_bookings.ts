@@ -11,6 +11,7 @@ import type {
   ExternalBookingSource,
   ExternalBookingSourcePlatformName,
 } from "../../../domain/entity/external_booking_source";
+import type { Logger } from "../../../../core/application/logger/logger";
 
 type Input = {
   user: User;
@@ -33,18 +34,26 @@ export class ReconcileExternalBookingsUseCase
     private readonly externalBookingSourceRepository: ExternalBookingSourcesRepository,
     private readonly stayRepository: StayRepository,
     private readonly calendarAdapter: CalendarAdapter,
-    private readonly propertyRepository: PropertyRepository
+    private readonly propertyRepository: PropertyRepository,
+    private readonly logger: Logger
   ) {}
 
   async execute(input: Input) {
     const { user } = input;
 
+    this.logger.info("Reconciling external bookings", { user: user.id });
+
     const properties = await this.propertyRepository.allFromUser(user.id);
+    this.logger.info("Properties found", { properties: properties.length });
+
     if (!properties) throw new ResourceNotFoundError("Properties");
 
     const unreconciledBookings = await Promise.all(
       properties.map(async property => this.#reconcileForProperty(property))
     );
+    this.logger.info("Unreconciled bookings found", {
+      unreconciledBookings: unreconciledBookings.length,
+    });
 
     return unreconciledBookings
       .flat()
@@ -52,17 +61,27 @@ export class ReconcileExternalBookingsUseCase
   }
 
   async #reconcileForProperty(property: Property) {
+    this.logger.info("Reconciling for property", { property: property.id });
     const propertyId = property.id;
     const externalSources =
       await this.externalBookingSourceRepository.allFromProperty(propertyId);
     if (externalSources.length === 0) return [];
+    this.logger.info("External sources found", {
+      externalSources: externalSources.length,
+    });
 
     const externalBookings = await this.#getExternalBookings(externalSources);
+
+    this.logger.info("External bookings found", {
+      externalBookings: externalBookings.length,
+    });
 
     if (!externalBookings) return [];
 
     const nextStays =
       await this.stayRepository.allFutureFromProperty(propertyId);
+
+    this.logger.info("Next stays found", { nextStays: nextStays.length });
 
     const unreconciledBookings: Output[] = [];
 
@@ -76,6 +95,9 @@ export class ReconcileExternalBookingsUseCase
       });
 
       if (!isAlreadyRegistered) {
+        this.logger.info("Unreconciled booking", {
+          externalBooking: externalBooking.period.start,
+        });
         unreconciledBookings.push({
           start: externalBooking.period.start,
           end: externalBooking.period.end,
@@ -94,9 +116,13 @@ export class ReconcileExternalBookingsUseCase
   async #sourceToBookings(
     externalSource: ExternalBookingSource
   ): Promise<ExternalBooking[]> {
+    this.logger.info("Parsing external source", {
+      externalSource: externalSource.platform_name,
+    });
     const periods = await this.calendarAdapter.parseFrom(
       externalSource.sync_url
     );
+    this.logger.info("Periods found", { periods: periods.length });
     return periods.map(p => ({
       period: p,
       platform: externalSource.platform_name,
@@ -106,11 +132,18 @@ export class ReconcileExternalBookingsUseCase
   async #getExternalBookings(
     externalSources: ExternalBookingSource[]
   ): Promise<ExternalBooking[]> {
+    this.logger.info("Getting external bookings", {
+      externalSources: externalSources.length,
+    });
     const externalBookings = await Promise.all(
       externalSources.map(async source => {
         return this.#sourceToBookings(source);
       })
     );
+
+    this.logger.info("External bookings found", {
+      externalBookings: externalBookings.length,
+    });
 
     return externalBookings.flat();
   }

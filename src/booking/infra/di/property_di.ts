@@ -22,6 +22,8 @@ import { FindPropertyController } from "../../presentation/controller/property/f
 import { FindPropertyUseCase } from "../../application/use_case/property/find_property";
 import type { EventDispatcher } from "../../../core/application/event/event_dispatcher";
 import { inMemoryEventDispatcher } from "../../../core/infra/event/in_memory_event_dispatcher";
+import type { Logger } from "../../../core/application/logger/logger";
+import { ConsoleLogger } from "../../../core/infra/logger/console_logger";
 
 export class PropertyDi {
   #tenantRepository: TenantRepository;
@@ -31,8 +33,10 @@ export class PropertyDi {
   #externalBookingSourceRepository: ExternalBookingSourcesRepository;
   #calendarAdapter: CalendarAdapter;
   #eventDispatcher: EventDispatcher;
+  #logger: Logger;
 
   constructor() {
+    this.#logger = new ConsoleLogger();
     this.#tenantRepository = new TenantPostgresRepository();
     this.#propertyRepository = new PropertyPostgresRepository();
     this.#bookingPolicy = new PostgresBookingPolicy();
@@ -58,7 +62,8 @@ export class PropertyDi {
       this.#externalBookingSourceRepository,
       this.#stayRepository,
       this.#calendarAdapter,
-      this.#propertyRepository
+      this.#propertyRepository,
+      this.#logger
     );
   }
   makeCreateExternalBookingSourceUseCase() {
