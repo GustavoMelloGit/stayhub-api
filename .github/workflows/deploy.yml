@@ -38,8 +38,8 @@ jobs:
             # Roda migrações (Drizzle db:push)
             /home/${{ secrets.VPS_RUNNER_USERNAME }}/.bun/bin/bun run db:push
 
-            # Finaliza a execução do usuário
-            EOF
-
             # 2. Reinicia o serviço PM2 (PM2 está instalado globalmente/com sudo)
             pm2 restart stayhub_api
+
+            # Finaliza a execução do usuário
+            EOF
