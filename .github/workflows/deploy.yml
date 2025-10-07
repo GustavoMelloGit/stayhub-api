@@ -42,4 +42,4 @@ jobs:
             EOF
 
             # 2. Reinicia o serviço PM2 (PM2 está instalado globalmente/com sudo)
-            sudo /usr/local/bin/pm2 restart stayhub_api
+            /usr/local/bin/pm2 restart stayhub_api
