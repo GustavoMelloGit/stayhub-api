@@ -8,7 +8,7 @@ import { Stay } from "./stay";
 
 export const propertySchema = baseEntitySchema.extend({
   name: z.string().min(1),
-  user_id: z.string().uuid(),
+  user_id: z.uuidv4(),
 });
 
 export type PropertyData = z.infer<typeof propertySchema>;
