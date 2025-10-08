@@ -3,7 +3,7 @@ name: Deploy API na VPS
 on:
   push:
     branches:
-      - main # Dispara apenas quando há push na branch main
+      - main
 
 jobs:
   deploy:
@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Executar Deploy Remoto via SSH
-        uses: appleboy/ssh-action@v1.0.3 # Action popular para SSH
+        uses: appleboy/ssh-action@v1.0.3
         with:
           # Detalhes da Conexão SSH
           host: ${{ secrets.VPS_HOST }}
@@ -21,7 +21,7 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-          # Comandos a serem executados na VPS, um após o outro
+          # Comandos a serem executados na VPS
           script: |
             # 1. Troca para o usuário de baixa permissão para deploy
             sudo -i -u ${{ secrets.VPS_RUNNER_USERNAME }} /bin/bash << EOF
