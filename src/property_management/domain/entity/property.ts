@@ -155,4 +155,25 @@ export class Property {
   get deleted_at() {
     return this.#deleted_at;
   }
+
+  get data(): PropertyData {
+    return {
+      id: this.id,
+      name: this.name,
+      user_id: this.user_id,
+      address: this.address,
+      number: this.number,
+      neighborhood: this.neighborhood,
+      city: this.city,
+      state: this.state,
+      zip_code: this.zip_code,
+      country: this.country,
+      complement: this.complement,
+      images: this.images,
+      capacity: this.capacity,
+      created_at: this.created_at,
+      updated_at: this.updated_at,
+      deleted_at: this.deleted_at,
+    };
+  }
 }
