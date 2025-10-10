@@ -1,6 +1,5 @@
-import type { Property } from "../../../domain/entity/property";
+import type { BookingProperty } from "../../../domain/entity/booking_property";
 import type { User } from "../../../../auth/domain/entity/user";
-import type { PropertyRepository } from "../../../domain/repository/property_repository";
 import type { StayRepository } from "../../../domain/repository/stay_repository";
 import type { BookedPeriod } from "../../../domain/value_object/booked_period";
 import type { CalendarAdapter } from "../../adapter/calendar_adapter";
@@ -12,6 +11,7 @@ import type {
   ExternalBookingSourcePlatformName,
 } from "../../../domain/entity/external_booking_source";
 import type { Logger } from "../../../../core/application/logger/logger";
+import type { BookingPropertyRepository } from "../../../domain/repository/booking_property_repository";
 
 type Input = {
   user: User;
@@ -34,7 +34,7 @@ export class ReconcileExternalBookingsUseCase
     private readonly externalBookingSourceRepository: ExternalBookingSourcesRepository,
     private readonly stayRepository: StayRepository,
     private readonly calendarAdapter: CalendarAdapter,
-    private readonly propertyRepository: PropertyRepository,
+    private readonly propertyRepository: BookingPropertyRepository,
     private readonly logger: Logger
   ) {}
 
@@ -60,7 +60,7 @@ export class ReconcileExternalBookingsUseCase
       .sort((a, b) => a.start.getTime() - b.start.getTime());
   }
 
-  async #reconcileForProperty(property: Property) {
+  async #reconcileForProperty(property: BookingProperty) {
     this.logger.info("Reconciling for property", { property: property.id });
     const propertyId = property.id;
     const externalSources =

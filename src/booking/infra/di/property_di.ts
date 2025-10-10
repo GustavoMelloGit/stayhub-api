@@ -18,12 +18,12 @@ import type { EventDispatcher } from "../../../core/application/event/event_disp
 import { inMemoryEventDispatcher } from "../../../core/infra/event/in_memory_event_dispatcher";
 import type { Logger } from "../../../core/application/logger/logger";
 import { ConsoleLogger } from "../../../core/infra/logger/console_logger";
-import { PropertyPostgresRepository } from "../../../property_management/infra/database/postgres_repository/property_postgres_repository";
-import type { PropertyRepository } from "../../../property_management/domain/repository/property_repository";
+import { BookingPropertyPostgresRepository } from "../database/postgres_repository/booking_property_repository";
+import type { BookingPropertyRepository } from "../../domain/repository/booking_property_repository";
 
 export class PropertyDi {
   #tenantRepository: TenantRepository;
-  #propertyRepository: PropertyRepository;
+  #propertyRepository: BookingPropertyRepository;
   #bookingPolicy: BookingPolicy;
   #stayRepository: StayRepository;
   #externalBookingSourceRepository: ExternalBookingSourcesRepository;
@@ -34,7 +34,7 @@ export class PropertyDi {
   constructor() {
     this.#logger = new ConsoleLogger();
     this.#tenantRepository = new TenantPostgresRepository();
-    this.#propertyRepository = new PropertyPostgresRepository();
+    this.#propertyRepository = new BookingPropertyPostgresRepository();
     this.#bookingPolicy = new PostgresBookingPolicy();
     this.#stayRepository = new StayPostgresRepository();
     this.#externalBookingSourceRepository =
