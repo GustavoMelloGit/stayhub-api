@@ -10,6 +10,7 @@ import { StayDi } from "../../../../booking/infra/di/stay_di";
 import { TenantDi } from "../../../../booking/infra/di/tenant_di";
 import { BunHttpControllerAdapter } from "../adapters/http_controller_adapter";
 import { FinanceDi } from "../../../../finance/infra/di/finance_di";
+import { PropertyManagementDi } from "../../../../property_management/infra/di/property_management_di";
 
 const tenantDi = new TenantDi();
 const propertyDi = new PropertyDi();
@@ -17,6 +18,7 @@ const authDi = new AuthDi();
 const stayDi = new StayDi();
 const corsMiddleware = new CorsMiddleware();
 const financeDi = new FinanceDi();
+const propertyManagementDi = new PropertyManagementDi();
 
 type Route = {
   controller: Controller;
@@ -73,6 +75,13 @@ const financeControllers: Route[] = [
   },
 ];
 
+const propertyManagementControllers: Route[] = [
+  {
+    authenticated: true,
+    controller: propertyManagementDi.makeUpdatePropertyController(),
+  },
+];
+
 const stayControllers: Route[] = [
   {
     authenticated: true,
@@ -109,6 +118,7 @@ const controllers = [
   ...authControllers,
   ...stayControllers,
   ...financeControllers,
+  ...propertyManagementControllers,
   healthController,
 ];
 

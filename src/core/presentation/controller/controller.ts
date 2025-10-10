@@ -6,6 +6,7 @@ export enum HttpControllerMethod {
   PUT = "PUT",
   DELETE = "DELETE",
   OPTIONS = "OPTIONS",
+  PATCH = "PATCH",
 }
 
 export type ControllerRequest = {
