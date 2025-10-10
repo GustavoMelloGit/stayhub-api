@@ -3,25 +3,28 @@ import { ResourceNotFoundError } from "../../../core/application/error/resource_
 import type { UseCase } from "../../../core/application/use_case/use_case";
 import type { SafeUpdateEntity } from "../../../core/domain/entity/base_entity";
 import type { PropertyData } from "../../domain/entity/property";
+import type { DeepPartial } from "../../../core/application/types/deep_partial";
 
 type Input = {
   property_id: string;
   user_id: string;
-  update_data: SafeUpdateEntity<PropertyData>;
+  update_data: DeepPartial<SafeUpdateEntity<PropertyData>>;
 };
 
 type Output = {
   id: string;
   name: string;
   user_id: string;
-  address: string;
-  number: string;
-  neighborhood: string;
-  city: string;
-  state: string;
-  zip_code: string;
-  country: string;
-  complement: string;
+  address: {
+    street: string;
+    number: string;
+    neighborhood: string;
+    city: string;
+    state: string;
+    zip_code: string;
+    country: string;
+    complement: string;
+  };
   images: string[];
   capacity: number;
   created_at: Date;
@@ -50,14 +53,7 @@ export class UpdatePropertyUseCase implements UseCase<Input, Output> {
       id: property.id,
       name: property.name,
       user_id: property.user_id,
-      address: property.address,
-      number: property.number,
-      neighborhood: property.neighborhood,
-      city: property.city,
-      state: property.state,
-      zip_code: property.zip_code,
-      country: property.country,
-      complement: property.complement,
+      address: property.address.data,
       images: property.images,
       capacity: property.capacity,
       created_at: property.created_at,

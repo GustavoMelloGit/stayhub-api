@@ -4,18 +4,22 @@ import {
   type SafeUpdateEntity,
   type WithoutBaseEntity,
 } from "../../../core/domain/entity/base_entity";
+import { Address } from "../value_object/address";
+import type { DeepPartial } from "../../../core/application/types/deep_partial";
 
 export const propertySchema = baseEntitySchema.extend({
   name: z.string().min(1, "Name is required"),
   user_id: z.uuidv4("User ID is required and must be a valid UUID"),
-  address: z.string().min(1, "Address is required"),
-  number: z.string().min(1, "Number is required"),
-  neighborhood: z.string().min(1, "Neighborhood is required"),
-  city: z.string().min(1, "City is required"),
-  state: z.string().min(1, "State is required"),
-  zip_code: z.string().min(1, "Zip code is required"),
-  country: z.string().min(1, "Country is required"),
-  complement: z.string().min(1, "Complement is required"),
+  address: z.object({
+    street: z.string().min(1, "Street is required"),
+    number: z.string().min(1, "Number is required"),
+    neighborhood: z.string().min(1, "Neighborhood is required"),
+    city: z.string().min(1, "City is required"),
+    state: z.string().min(1, "State is required"),
+    zip_code: z.string().min(1, "Zip code is required"),
+    country: z.string().min(1, "Country is required"),
+    complement: z.string().default(""),
+  }),
   images: z.array(z.string()).min(1, "Images are required"),
   capacity: z.number().int().positive("Capacity must be greater than 0"),
 });
@@ -29,14 +33,7 @@ export class Property {
   readonly id: string;
   #name: string;
   #user_id: string;
-  #address: string;
-  #number: string;
-  #neighborhood: string;
-  #city: string;
-  #state: string;
-  #zip_code: string;
-  #country: string;
-  #complement: string;
+  #address: Address;
   #images: string[];
   #capacity: number;
   #created_at: Date;
@@ -47,14 +44,7 @@ export class Property {
     this.id = data.id;
     this.#name = data.name;
     this.#user_id = data.user_id;
-    this.#address = data.address;
-    this.#number = data.number;
-    this.#neighborhood = data.neighborhood;
-    this.#city = data.city;
-    this.#state = data.state;
-    this.#zip_code = data.zip_code;
-    this.#country = data.country;
-    this.#complement = data.complement;
+    this.#address = Address.create(data.address);
     this.#images = data.images;
     this.#capacity = data.capacity;
     this.#created_at = data.created_at;
@@ -79,20 +69,19 @@ export class Property {
     return new Property(data);
   }
 
-  public changeDetails(data: SafeUpdateEntity<PropertyData>): void {
+  public changeDetails(
+    data: DeepPartial<SafeUpdateEntity<PropertyData>>
+  ): void {
     const safeData = propertySchema.partial().parse(data);
 
     this.#name = safeData.name ?? this.#name;
-    this.#address = safeData.address ?? this.#address;
-    this.#number = safeData.number ?? this.#number;
-    this.#neighborhood = safeData.neighborhood ?? this.#neighborhood;
-    this.#city = safeData.city ?? this.#city;
-    this.#state = safeData.state ?? this.#state;
-    this.#zip_code = safeData.zip_code ?? this.#zip_code;
-    this.#country = safeData.country ?? this.#country;
-    this.#complement = safeData.complement ?? this.#complement;
     this.#images = safeData.images ?? this.#images;
     this.#capacity = safeData.capacity ?? this.#capacity;
+
+    if (safeData.address) {
+      this.#address = Address.create(safeData.address);
+    }
+
     this.#updated_at = new Date();
   }
 
@@ -106,34 +95,6 @@ export class Property {
 
   get address() {
     return this.#address;
-  }
-
-  get number() {
-    return this.#number;
-  }
-
-  get neighborhood() {
-    return this.#neighborhood;
-  }
-
-  get city() {
-    return this.#city;
-  }
-
-  get state() {
-    return this.#state;
-  }
-
-  get zip_code() {
-    return this.#zip_code;
-  }
-
-  get country() {
-    return this.#country;
-  }
-
-  get complement() {
-    return this.#complement;
   }
 
   get images() {
@@ -161,14 +122,7 @@ export class Property {
       id: this.id,
       name: this.name,
       user_id: this.user_id,
-      address: this.address,
-      number: this.number,
-      neighborhood: this.neighborhood,
-      city: this.city,
-      state: this.state,
-      zip_code: this.zip_code,
-      country: this.country,
-      complement: this.complement,
+      address: this.address.data,
       images: this.images,
       capacity: this.capacity,
       created_at: this.created_at,

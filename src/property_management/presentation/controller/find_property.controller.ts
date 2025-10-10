@@ -1,12 +1,12 @@
 import z from "zod";
-import type { FindPropertyUseCase } from "../../../application/use_case/property/find_property";
-import type { User } from "../../../../auth/domain/entity/user";
+import type { User } from "../../../auth/domain/entity/user";
 import {
   HttpControllerMethod,
   type Controller,
   type ControllerRequest,
-} from "../../../../core/presentation/controller/controller";
-import { ValidationError } from "../../../../core/application/error/validation_error";
+} from "../../../core/presentation/controller/controller";
+import { ValidationError } from "../../../core/application/error/validation_error";
+import type { FindPropertyUseCase } from "../../application/use_case/find_property";
 
 const inputSchema = z.object({
   property_id: z.uuid(),

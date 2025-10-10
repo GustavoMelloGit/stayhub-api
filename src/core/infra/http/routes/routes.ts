@@ -50,14 +50,6 @@ const propertyControllers: Route[] = [
     authenticated: true,
     controller: propertyDi.makeCreateExternalBookingSourceController(),
   },
-  {
-    authenticated: true,
-    controller: propertyDi.makeFindUserPropertiesController(),
-  },
-  {
-    authenticated: true,
-    controller: propertyDi.makeFindPropertyController(),
-  },
 ];
 
 const financeControllers: Route[] = [
@@ -79,6 +71,14 @@ const propertyManagementControllers: Route[] = [
   {
     authenticated: true,
     controller: propertyManagementDi.makeUpdatePropertyController(),
+  },
+  {
+    authenticated: true,
+    controller: propertyManagementDi.makeFindUserPropertiesController(),
+  },
+  {
+    authenticated: true,
+    controller: propertyManagementDi.makeFindPropertyController(),
   },
 ];
 

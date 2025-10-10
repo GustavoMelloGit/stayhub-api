@@ -1,10 +1,10 @@
-import type { FindUserPropertiesUseCase } from "../../../application/use_case/property/find_user_properties";
-import type { User } from "../../../../auth/domain/entity/user";
+import type { User } from "../../../auth/domain/entity/user";
 import {
   HttpControllerMethod,
   type Controller,
   type ControllerRequest,
-} from "../../../../core/presentation/controller/controller";
+} from "../../../core/presentation/controller/controller";
+import type { FindUserPropertiesUseCase } from "../../application/use_case/find_user_properties";
 
 export class FindUserPropertiesController implements Controller {
   path = "/property/user/all";

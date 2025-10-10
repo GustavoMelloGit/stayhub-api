@@ -1,6 +1,6 @@
-import type { PropertyRepository } from "../../../domain/repository/property_repository";
-import { ResourceNotFoundError } from "../../../../core/application/error/resource_not_found_error";
-import type { UseCase } from "../../../../core/application/use_case/use_case";
+import { ResourceNotFoundError } from "../../../core/application/error/resource_not_found_error";
+import type { UseCase } from "../../../core/application/use_case/use_case";
+import type { PropertyRepository } from "../../domain/repository/property_repository";
 
 type Input = {
   property_id: string;

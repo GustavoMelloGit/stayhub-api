@@ -11,14 +11,19 @@ import { ValidationError } from "../../../core/application/error/validation_erro
 const inputSchema = z.object({
   property_id: z.uuid(),
   name: z.string().min(1, "Name is required").optional(),
-  address: z.string().min(1, "Address is required").optional(),
-  number: z.string().min(1, "Number is required").optional(),
-  neighborhood: z.string().min(1, "Neighborhood is required").optional(),
-  city: z.string().min(1, "City is required").optional(),
-  state: z.string().min(1, "State is required").optional(),
-  zip_code: z.string().min(1, "Zip code is required").optional(),
-  country: z.string().min(1, "Country is required").optional(),
-  complement: z.string().min(1, "Complement is required").optional(),
+  address: z
+    .object({
+      street: z.string().min(1, "Street is required"),
+      number: z.string().min(1, "Number is required"),
+      neighborhood: z.string().min(1, "Neighborhood is required"),
+      city: z.string().min(1, "City is required"),
+      state: z.string().min(1, "State is required"),
+      zip_code: z.string().min(1, "Zip code is required"),
+      country: z.string().min(1, "Country is required"),
+      complement: z.string().default(""),
+    })
+    .partial()
+    .optional(),
   images: z.array(z.string()).min(1, "Images are required").optional(),
   capacity: z
     .number()
@@ -62,13 +67,6 @@ export class UpdatePropertyController implements Controller {
       update_data: {
         name: validationResponse.name,
         address: validationResponse.address,
-        number: validationResponse.number,
-        neighborhood: validationResponse.neighborhood,
-        city: validationResponse.city,
-        state: validationResponse.state,
-        zip_code: validationResponse.zip_code,
-        country: validationResponse.country,
-        complement: validationResponse.complement,
         images: validationResponse.images,
         capacity: validationResponse.capacity,
       },
