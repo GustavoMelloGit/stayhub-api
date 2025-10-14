@@ -50,7 +50,7 @@ export class StayPostgresRepository implements StayRepository {
     const stays = await db.query.staysTable.findMany({
       where: and(
         eq(staysTable.property_id, propertyId),
-        gte(staysTable.check_in, new Date())
+        gte(staysTable.check_out, new Date())
       ),
       with: {
         tenant: true,
