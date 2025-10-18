@@ -107,4 +107,8 @@ export class Stay {
   get deleted_at() {
     return this.#data.deleted_at;
   }
+
+  get data(): StayData {
+    return this.#data;
+  }
 }

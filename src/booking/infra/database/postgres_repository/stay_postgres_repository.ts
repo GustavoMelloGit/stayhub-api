@@ -1,5 +1,5 @@
 import { and, eq, gte } from "drizzle-orm";
-import { Stay, type StayData } from "../../../domain/entity/stay";
+import { Stay } from "../../../domain/entity/stay";
 import type {
   StayRepository,
   StayWithTenant,
@@ -28,38 +28,39 @@ export class StayPostgresRepository implements StayRepository {
   }
 
   async saveStay(input: Stay): Promise<void> {
-    const data: StayData = {
-      id: input.id,
-      check_in: input.check_in,
-      check_out: input.check_out,
-      tenant_id: input.tenant_id,
-      property_id: input.property_id,
-      guests: input.guests,
-      entrance_code: input.entrance_code,
-      price: input.price,
-      created_at: input.created_at,
-      updated_at: input.updated_at,
-      deleted_at: input.deleted_at,
-    };
+    const stayAlreadyExists = await this.stayOfId(input.id);
+    if (stayAlreadyExists) {
+      await this.#updateStay(input);
+    } else {
+      await this.#createStay(input);
+    }
+  }
+
+  async #createStay(stay: Stay): Promise<Stay> {
+    const result = await db.insert(staysTable).values(stay.data).returning();
+
+    if (!result[0]) throw new Error("Failed to create stay");
+
+    return Stay.reconstitute(result[0]);
+  }
+
+  async #updateStay(stay: Stay): Promise<Stay> {
     const result = await db
-      .insert(staysTable)
-      .values(data)
-      .onConflictDoUpdate({
-        target: [staysTable.id],
-        set: {
-          updated_at: new Date(),
-        },
-      })
+      .update(staysTable)
+      .set(stay.data)
+      .where(eq(staysTable.id, stay.id))
       .returning();
 
-    if (!result[0]) throw new Error("Failed to save stay");
+    if (!result[0]) throw new Error("Failed to update stay");
+
+    return Stay.reconstitute(result[0]);
   }
 
   async allFutureFromProperty(propertyId: string): Promise<StayWithTenant[]> {
     const stays = await db.query.staysTable.findMany({
       where: and(
         eq(staysTable.property_id, propertyId),
-        gte(staysTable.check_in, new Date())
+        gte(staysTable.check_out, new Date())
       ),
       with: {
         tenant: true,

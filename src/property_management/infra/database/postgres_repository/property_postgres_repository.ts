@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { Property, type PropertyData } from "../../../domain/entity/property";
+import { Property } from "../../../domain/entity/property";
 import type { PropertyRepository } from "../../../domain/repository/property_repository";
 import { db } from "../../../../core/infra/database/drizzle/database";
 import {
@@ -19,29 +19,7 @@ export class PropertyPostgresRepository implements PropertyRepository {
 
     if (!property) return null;
 
-    // Reconstrói a propriedade com o endereço como objeto
-    const propertyData: PropertyData = {
-      id: property.id,
-      name: property.name,
-      user_id: property.user_id,
-      address: {
-        street: property.address.street,
-        number: property.address.number,
-        neighborhood: property.address.neighborhood,
-        city: property.address.city,
-        state: property.address.state,
-        zip_code: property.address.zip_code,
-        country: property.address.country,
-        complement: property.address.complement,
-      },
-      images: property.images,
-      capacity: property.capacity,
-      created_at: property.created_at,
-      updated_at: property.updated_at,
-      deleted_at: property.deleted_at,
-    };
-
-    return Property.reconstitute(propertyData);
+    return Property.reconstitute(property);
   }
 
   async save(input: Property): Promise<void> {
