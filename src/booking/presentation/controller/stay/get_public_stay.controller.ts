@@ -14,7 +14,7 @@ const inputSchema = z.object({
 type Input = z.infer<typeof inputSchema>;
 
 export class GetPublicStayController implements Controller {
-  path = "/public/stay/:stay_id";
+  path = "/public/booking/stay/:stay_id";
   method = HttpControllerMethod.GET;
 
   constructor(private readonly useCase: GetPublicStayUseCase) {}

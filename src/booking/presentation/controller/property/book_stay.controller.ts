@@ -30,7 +30,7 @@ const inputSchema = z.object({
 type Input = z.infer<typeof inputSchema>;
 
 export class BookStayController implements Controller {
-  path = "/property/:property_id/book";
+  path = "/booking/property/:property_id/book";
   method = HttpControllerMethod.POST;
 
   constructor(private readonly useCase: BookStayUseCase) {}

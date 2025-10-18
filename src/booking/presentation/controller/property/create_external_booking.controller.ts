@@ -17,7 +17,7 @@ const inputSchema = z.object({
 type Input = z.infer<typeof inputSchema>;
 
 export class CreateExternalBookingSourceController implements Controller {
-  path = "/property/:property_id/external-booking";
+  path = "/booking/property/:property_id/external-booking";
   method = HttpControllerMethod.POST;
 
   constructor(private readonly useCase: CreateExternalBookingSourceUseCase) {}
