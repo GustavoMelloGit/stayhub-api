@@ -12,16 +12,20 @@ import type { TenantRepository } from "../../domain/repository/tenant_repository
 import { TenantPostgresRepository } from "../database/postgres_repository/tenant_postgres_repository";
 import type { PropertyRepository } from "../../../property_management/domain/repository/property_repository";
 import { PropertyPostgresRepository } from "../../../property_management/infra/database/postgres_repository/property_postgres_repository";
+import type { EventDispatcher } from "../../../core/application/event/event_dispatcher";
+import { inMemoryEventDispatcher } from "../../../core/infra/event/in_memory_event_dispatcher";
 
 export class StayDi {
   #propertyRepository: PropertyRepository;
   #stayRepository: StayRepository;
   #tenantRepository: TenantRepository;
+  #eventDispatcher: EventDispatcher;
 
   constructor() {
     this.#propertyRepository = new PropertyPostgresRepository();
     this.#stayRepository = new StayPostgresRepository();
     this.#tenantRepository = new TenantPostgresRepository();
+    this.#eventDispatcher = inMemoryEventDispatcher;
   }
 
   // Use Cases
@@ -47,7 +51,8 @@ export class StayDi {
   makeCancelStayUseCase() {
     return new CancelStayUseCase(
       this.#stayRepository,
-      this.#propertyRepository
+      this.#propertyRepository,
+      this.#eventDispatcher
     );
   }
 

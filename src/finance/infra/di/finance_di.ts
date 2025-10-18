@@ -12,6 +12,8 @@ import { RecordExpenseController } from "../../presentation/controller/record_ex
 import { RecordRevenueController } from "../../presentation/controller/record_revenue.controller";
 import { FindPropertyFinancialMovementsController } from "../../presentation/controller/find_property_financial_movements.controller";
 import { LedgerEntryPostgresRepository } from "../database/postgres_repository/ledger_entry_postgres_repository";
+import { RevertRevenueOnStayCancel } from "../../application/handler/revert_revenue_on_stay_cancel";
+import { StayCanceledEvent } from "../../../booking/domain/event/stay_canceled_event";
 
 export class FinanceDi {
   #logger: Logger;
@@ -27,11 +29,21 @@ export class FinanceDi {
       StayPaymentConfirmedEvent.NAME,
       this.makeRecordRevenueOnStayPaymentConfirmedHandler()
     );
+    this.#eventDispatcher.register(
+      StayCanceledEvent.NAME,
+      this.makeRevertRevenueOnStayCancelHandler()
+    );
   }
 
   // Handlers
   makeRecordRevenueOnStayPaymentConfirmedHandler() {
     return new RecordRevenueOnStayPaymentConfirmed(
+      this.#logger,
+      this.#ledgerEntryRepository
+    );
+  }
+  makeRevertRevenueOnStayCancelHandler() {
+    return new RevertRevenueOnStayCancel(
       this.#logger,
       this.#ledgerEntryRepository
     );
