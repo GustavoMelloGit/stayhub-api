@@ -1,4 +1,4 @@
-import { and, between, eq, or } from "drizzle-orm";
+import { and, between, eq, isNull, or } from "drizzle-orm";
 import { ConflictError } from "../../../../core/application/error/conflict_error";
 import type { BookingPolicy } from "../../../domain/policy/booking_policy";
 import { db } from "../../../../core/infra/database/drizzle/database";
@@ -26,7 +26,8 @@ export class PostgresBookingPolicy implements BookingPolicy {
         and(
           eq(staysTable.property_id, property_id),
           between(staysTable.check_out, check_in, check_out)
-        )
+        ),
+        isNull(staysTable.deleted_at)
       ),
     });
 
