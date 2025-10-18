@@ -4,7 +4,6 @@ import { BookStayUseCase } from "../../application/use_case/property/book_stay";
 import { CreateExternalBookingSourceUseCase } from "../../application/use_case/property/create_external_booking_source";
 import { ReconcileExternalBookingsUseCase } from "../../application/use_case/property/reconcile_external_bookings";
 import type { BookingPolicy } from "../../domain/policy/booking_policy";
-import type { PropertyRepository } from "../../domain/repository/property_repository";
 import type { StayRepository } from "../../domain/repository/stay_repository";
 import type { TenantRepository } from "../../domain/repository/tenant_repository";
 import { BookStayController } from "../../presentation/controller/property/book_stay.controller";
@@ -13,21 +12,18 @@ import { ReconcileExternalBookingController } from "../../presentation/controlle
 import { ICalendarAdapter } from "../adapter/i_calendar_adapter";
 import { PostgresBookingPolicy } from "../database/postgres_policies/postgres_booking_policy";
 import { ExternalBookingSourcePostgresRepository } from "../database/postgres_repository/external_booking_source_postgres_repository";
-import { PropertyPostgresRepository } from "../database/postgres_repository/property_postgres_repository";
 import { StayPostgresRepository } from "../database/postgres_repository/stay_postgres_repository";
 import { TenantPostgresRepository } from "../database/postgres_repository/tenant_postgres_repository";
-import { FindUserPropertiesController } from "../../presentation/controller/property/find_user_properties.controller";
-import { FindUserPropertiesUseCase } from "../../application/use_case/property/find_user_properties";
-import { FindPropertyController } from "../../presentation/controller/property/find_property.controller";
-import { FindPropertyUseCase } from "../../application/use_case/property/find_property";
 import type { EventDispatcher } from "../../../core/application/event/event_dispatcher";
 import { inMemoryEventDispatcher } from "../../../core/infra/event/in_memory_event_dispatcher";
 import type { Logger } from "../../../core/application/logger/logger";
 import { ConsoleLogger } from "../../../core/infra/logger/console_logger";
+import { BookingPropertyPostgresRepository } from "../database/postgres_repository/booking_property_repository";
+import type { BookingPropertyRepository } from "../../domain/repository/booking_property_repository";
 
 export class PropertyDi {
   #tenantRepository: TenantRepository;
-  #propertyRepository: PropertyRepository;
+  #propertyRepository: BookingPropertyRepository;
   #bookingPolicy: BookingPolicy;
   #stayRepository: StayRepository;
   #externalBookingSourceRepository: ExternalBookingSourcesRepository;
@@ -38,7 +34,7 @@ export class PropertyDi {
   constructor() {
     this.#logger = new ConsoleLogger();
     this.#tenantRepository = new TenantPostgresRepository();
-    this.#propertyRepository = new PropertyPostgresRepository();
+    this.#propertyRepository = new BookingPropertyPostgresRepository();
     this.#bookingPolicy = new PostgresBookingPolicy();
     this.#stayRepository = new StayPostgresRepository();
     this.#externalBookingSourceRepository =
@@ -72,12 +68,7 @@ export class PropertyDi {
       this.#propertyRepository
     );
   }
-  makeFindUserPropertiesUseCase() {
-    return new FindUserPropertiesUseCase(this.#propertyRepository);
-  }
-  makeFindPropertyUseCase() {
-    return new FindPropertyUseCase(this.#propertyRepository);
-  }
+
   // Controllers
   makeBookStayController() {
     return new BookStayController(this.makeBookStayUseCase());
@@ -91,13 +82,5 @@ export class PropertyDi {
     return new CreateExternalBookingSourceController(
       this.makeCreateExternalBookingSourceUseCase()
     );
-  }
-  makeFindUserPropertiesController() {
-    return new FindUserPropertiesController(
-      this.makeFindUserPropertiesUseCase()
-    );
-  }
-  makeFindPropertyController() {
-    return new FindPropertyController(this.makeFindPropertyUseCase());
   }
 }

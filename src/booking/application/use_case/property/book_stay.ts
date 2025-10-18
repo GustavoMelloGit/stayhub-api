@@ -1,13 +1,13 @@
 import type { User } from "../../../../auth/domain/entity/user";
 import { Tenant } from "../../../domain/entity/tenant";
 import type { BookingPolicy } from "../../../domain/policy/booking_policy";
-import type { PropertyRepository } from "../../../domain/repository/property_repository";
 import type { StayRepository } from "../../../domain/repository/stay_repository";
 import type { TenantRepository } from "../../../domain/repository/tenant_repository";
 import { ResourceNotFoundError } from "../../../../core/application/error/resource_not_found_error";
 import type { UseCase } from "../../../../core/application/use_case/use_case";
 import type { EventDispatcher } from "../../../../core/application/event/event_dispatcher";
 import { StayPaymentConfirmedEvent } from "../../../domain/event/stay_payment_confirmed_event";
+import type { BookingPropertyRepository } from "../../../domain/repository/booking_property_repository";
 
 type Input = {
   guests: number;
@@ -36,7 +36,7 @@ type Output = {
 export class BookStayUseCase implements UseCase<Input, Output> {
   constructor(
     private readonly tenantRepository: TenantRepository,
-    private readonly propertyRepository: PropertyRepository,
+    private readonly propertyRepository: BookingPropertyRepository,
     private readonly stayRepository: StayRepository,
     private readonly bookingPolicy: BookingPolicy,
     private readonly eventDispatcher: EventDispatcher

@@ -2,7 +2,6 @@ import { ResourceNotFoundError } from "../../../../core/application/error/resour
 import type { UseCase } from "../../../../core/application/use_case/use_case";
 import type { User } from "../../../../auth/domain/entity/user";
 import type { StayRepository } from "../../../domain/repository/stay_repository";
-import type { TenantRepository } from "../../../domain/repository/tenant_repository";
 import type { PropertyRepository } from "../../../../property_management/domain/repository/property_repository";
 
 type Input = {
@@ -10,24 +9,14 @@ type Input = {
 };
 
 type Output = {
-  check_in: Date;
-  check_out: Date;
-  guests: number;
   id: string;
-  entrance_code: string;
-  price: number;
-  tenant: {
-    id: string;
-    name: string;
-    phone: string;
-  };
+  cancelled_at: Date;
 };
 
-export class GetStayUseCase implements UseCase<Input, Output> {
+export class CancelStayUseCase implements UseCase<Input, Output> {
   constructor(
-    private readonly propertyRepository: PropertyRepository,
     private readonly stayRepository: StayRepository,
-    private readonly tenantRepository: TenantRepository
+    private readonly propertyRepository: PropertyRepository
   ) {}
 
   async execute(input: Input, user: User): Promise<Output> {
@@ -37,37 +26,24 @@ export class GetStayUseCase implements UseCase<Input, Output> {
       throw new ResourceNotFoundError("Stay");
     }
 
+    // Verificar se o usuário é o proprietário da propriedade
     const property = await this.propertyRepository.propertyOfId(
       stay.property_id
     );
-
     if (!property) {
+      throw new ResourceNotFoundError("Property");
+    }
+
+    if (property.user_id !== user.id) {
       throw new ResourceNotFoundError("Stay");
     }
 
-    const userOwnsProperty = property.user_id === user.id;
-    if (!userOwnsProperty) {
-      throw new ResourceNotFoundError("Stay");
-    }
-
-    const tenant = await this.tenantRepository.tenantOfId(stay.tenant_id);
-
-    if (!tenant) {
-      throw new ResourceNotFoundError("Tenant");
-    }
+    stay.cancel();
+    await this.stayRepository.saveStay(stay);
 
     return {
       id: stay.id,
-      check_in: stay.check_in,
-      check_out: stay.check_out,
-      guests: stay.guests,
-      entrance_code: stay.entrance_code,
-      price: stay.price,
-      tenant: {
-        id: tenant.id,
-        name: tenant.name,
-        phone: tenant.phone,
-      },
+      cancelled_at: stay.deleted_at!,
     };
   }
 }
