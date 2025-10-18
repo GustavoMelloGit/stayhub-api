@@ -35,7 +35,7 @@ export const propertiesTable = pgTable("properties", {
     .references(() => addressesTable.id, {
       onDelete: "cascade",
     })
-    .notNull(),
+    .notNull().defaultRandom(),
   images: text().array().notNull().default([]),
   capacity: integer().notNull().default(1),
 });
