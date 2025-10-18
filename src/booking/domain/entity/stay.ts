@@ -1,3 +1,4 @@
+import { IllegalStateError } from "../../../core/application/error/illegal_state_error";
 import { ValidationError } from "../../../core/application/error/validation_error";
 import {
   baseEntitySchema,
@@ -46,6 +47,21 @@ export class Stay {
 
   public static reconstitute(data: StayData): Stay {
     return new Stay(data);
+  }
+
+  public cancel(): void {
+    if (this.deleted_at) {
+      throw new IllegalStateError("Stay has already been cancelled");
+    }
+
+    if (this.check_in <= new Date()) {
+      throw new IllegalStateError(
+        "Cannot cancel a stay that has already started"
+      );
+    }
+
+    this.#data.deleted_at = new Date();
+    this.#data.updated_at = new Date();
   }
 
   get id() {

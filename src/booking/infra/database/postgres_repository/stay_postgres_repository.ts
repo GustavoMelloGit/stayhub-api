@@ -41,7 +41,16 @@ export class StayPostgresRepository implements StayRepository {
       updated_at: input.updated_at,
       deleted_at: input.deleted_at,
     };
-    const result = await db.insert(staysTable).values(data).returning();
+    const result = await db
+      .insert(staysTable)
+      .values(data)
+      .onConflictDoUpdate({
+        target: [staysTable.id],
+        set: {
+          updated_at: new Date(),
+        },
+      })
+      .returning();
 
     if (!result[0]) throw new Error("Failed to save stay");
   }

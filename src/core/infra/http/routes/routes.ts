@@ -95,6 +95,10 @@ const stayControllers: Route[] = [
     authenticated: true,
     controller: stayDi.makeFindPropertyStaysController(),
   },
+  {
+    authenticated: true,
+    controller: stayDi.makeCancelStayController(),
+  },
 ];
 
 const authControllers: Route[] = [
