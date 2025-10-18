@@ -16,6 +16,12 @@ export const addressesTable = pgTable("addresses", {
   complement: varchar({ length: 255 }).notNull().default(""),
 });
 
+export const addressesRelations = relations(
+  addressesTable,
+  ({ many }) => ({
+    properties: many(propertiesTable),
+  }),
+);
 
 export const propertiesTable = pgTable("properties", {
   ...baseSchema,
@@ -28,7 +34,8 @@ export const propertiesTable = pgTable("properties", {
   address_id: uuid()
     .references(() => addressesTable.id, {
       onDelete: "cascade",
-    }),
+    })
+    .notNull(),
   images: text().array().notNull().default([]),
   capacity: integer().notNull().default(1),
 });
@@ -39,6 +46,10 @@ export const propertiesRelations = relations(
     user: one(usersTable, {
       fields: [propertiesTable.user_id],
       references: [usersTable.id],
+    }),
+    address: one(addressesTable, {
+      fields: [propertiesTable.address_id],
+      references: [addressesTable.id],
     }),
     stays: many(staysTable),
   }),
