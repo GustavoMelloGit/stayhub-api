@@ -10,6 +10,18 @@ type Input = {
 type Output = {
   id: string;
   name: string;
+  capacity: number;
+  images: string[];
+  address: {
+    street: string;
+    number: string;
+    neighborhood: string;
+    city: string;
+    state: string;
+    zip_code: string;
+    country: string;
+    complement: string;
+  };
   user_id: string;
   created_at: Date;
   updated_at: Date;
@@ -30,6 +42,9 @@ export class FindPropertyUseCase implements UseCase<Input, Output> {
     return {
       id: property.id,
       name: property.name,
+      capacity: property.capacity,
+      images: property.images,
+      address: property.address.data,
       user_id: property.user_id,
       created_at: property.created_at,
       updated_at: property.updated_at,
