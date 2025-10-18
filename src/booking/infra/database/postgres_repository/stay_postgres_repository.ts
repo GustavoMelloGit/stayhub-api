@@ -1,4 +1,4 @@
-import { and, eq, gte } from "drizzle-orm";
+import { and, eq, gte, isNull } from "drizzle-orm";
 import { Stay } from "../../../domain/entity/stay";
 import type {
   StayRepository,
@@ -14,7 +14,7 @@ import { Tenant } from "../../../domain/entity/tenant";
 export class StayPostgresRepository implements StayRepository {
   async stayOfId(id: string): Promise<Stay | null> {
     const stay = await db.query.staysTable.findFirst({
-      where: and(eq(staysTable.id, id)),
+      where: and(eq(staysTable.id, id), isNull(staysTable.deleted_at)),
       with: {
         tenant: true,
       },
@@ -60,7 +60,8 @@ export class StayPostgresRepository implements StayRepository {
     const stays = await db.query.staysTable.findMany({
       where: and(
         eq(staysTable.property_id, propertyId),
-        gte(staysTable.check_out, new Date())
+        gte(staysTable.check_out, new Date()),
+        isNull(staysTable.deleted_at)
       ),
       with: {
         tenant: true,
@@ -76,7 +77,10 @@ export class StayPostgresRepository implements StayRepository {
 
   async allFromProperty(propertyId: string): Promise<StayWithTenant[]> {
     const stays = await db.query.staysTable.findMany({
-      where: eq(staysTable.property_id, propertyId),
+      where: and(
+        eq(staysTable.property_id, propertyId),
+        isNull(staysTable.deleted_at)
+      ),
       with: {
         tenant: true,
       },
