@@ -19,7 +19,7 @@ type Input = z.infer<typeof inputSchema>;
  * Controller para buscar todas as estadias de uma propriedade específica
  */
 export class FindPropertyStaysController implements Controller {
-  path = "/property/:property_id/stays";
+  path = "/booking/property/:property_id/stays";
   method = HttpControllerMethod.GET;
 
   constructor(private readonly useCase: FindPropertyStaysUseCase) {}

@@ -7,7 +7,7 @@ import {
 } from "../../../../core/presentation/controller/controller";
 
 export class ReconcileExternalBookingController implements Controller {
-  path = "/property/reconcile-external-booking";
+  path = "/booking/reconcile-external-booking";
   method = HttpControllerMethod.GET;
 
   constructor(private readonly useCase: ReconcileExternalBookingsUseCase) {}
