@@ -70,6 +70,10 @@ const financeControllers: Route[] = [
 const propertyManagementControllers: Route[] = [
   {
     authenticated: true,
+    controller: propertyManagementDi.makeCreatePropertyController(),
+  },
+  {
+    authenticated: true,
     controller: propertyManagementDi.makeUpdatePropertyController(),
   },
   {
