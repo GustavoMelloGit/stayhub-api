@@ -18,16 +18,13 @@ export class PostgresBookingPolicy implements BookingPolicy {
      * - O check-out estiver entre o check-in e check-out de uma estadia
      */
     const isOccupied = await db.query.staysTable.findFirst({
-      where: or(
-        and(
-          eq(staysTable.property_id, property_id),
-          between(staysTable.check_in, check_in, check_out)
-        ),
-        and(
-          eq(staysTable.property_id, property_id),
+      where: and(
+        isNull(staysTable.deleted_at),
+        eq(staysTable.property_id, property_id),
+        or(
+          between(staysTable.check_in, check_in, check_out),
           between(staysTable.check_out, check_in, check_out)
-        ),
-        isNull(staysTable.deleted_at)
+        )
       ),
     });
 
