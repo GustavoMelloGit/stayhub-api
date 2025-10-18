@@ -5,6 +5,7 @@ import {
 } from "../../../core/domain/entity/base_entity";
 import { z } from "zod";
 import { Stay } from "./stay";
+import { ValidationError } from "../../../core/application/error/validation_error";
 
 export const bookingPropertySchema = baseEntitySchema.extend({
   name: z.string().min(1, "Name is required"),
@@ -63,7 +64,20 @@ export class BookingProperty {
   ): Promise<Stay> {
     const { check_in, check_out, guests } = args;
 
-    await bookingPolicy.isBookingAllowed(this.id, check_in, check_out, guests);
+    const invalidNumberOfGuests = guests < 1 || !Number.isInteger(guests);
+
+    if (invalidNumberOfGuests) {
+      throw new ValidationError("Invalid guests");
+    }
+
+    if (guests > this.capacity) {
+      throw new ValidationError("Property capacity exceeded");
+    }
+    if (check_in >= check_out) {
+      throw new ValidationError("Check-in date must be before check-out date");
+    }
+
+    await bookingPolicy.isBookingAllowed(this.id, check_in, check_out);
 
     const stay = Stay.create({
       ...args,
