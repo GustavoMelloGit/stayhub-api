@@ -6,6 +6,8 @@ import { FindUserPropertiesUseCase } from "../../application/use_case/find_user_
 import { FindUserPropertiesController } from "../../presentation/controller/find_user_properties.controller";
 import { FindPropertyUseCase } from "../../application/use_case/find_property";
 import { FindPropertyController } from "../../presentation/controller/find_property.controller";
+import { CreatePropertyUseCase } from "../../application/use_case/create_property";
+import { CreatePropertyController } from "../../presentation/controller/create_property.controller";
 
 export class PropertyManagementDi {
   #propertyRepository: PropertyRepository;
@@ -15,6 +17,9 @@ export class PropertyManagementDi {
   }
 
   // Use Cases
+  makeCreatePropertyUseCase() {
+    return new CreatePropertyUseCase(this.#propertyRepository);
+  }
   makeUpdatePropertyUseCase() {
     return new UpdatePropertyUseCase(this.#propertyRepository);
   }
@@ -26,6 +31,9 @@ export class PropertyManagementDi {
   }
 
   // Controllers
+  makeCreatePropertyController() {
+    return new CreatePropertyController(this.makeCreatePropertyUseCase());
+  }
   makeUpdatePropertyController() {
     return new UpdatePropertyController(this.makeUpdatePropertyUseCase());
   }
