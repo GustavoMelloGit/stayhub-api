@@ -16,12 +16,6 @@ export const addressesTable = pgTable("addresses", {
   complement: varchar({ length: 255 }).notNull().default(""),
 });
 
-export const addressesRelations = relations(
-  addressesTable,
-  ({ many }) => ({
-    properties: many(propertiesTable),
-  }),
-);
 
 export const propertiesTable = pgTable("properties", {
   ...baseSchema,
