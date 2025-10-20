@@ -14,16 +14,20 @@ import { FindPropertyFinancialMovementsController } from "../../presentation/con
 import { LedgerEntryPostgresRepository } from "../database/postgres_repository/ledger_entry_postgres_repository";
 import { RevertRevenueOnStayCancel } from "../../application/handler/revert_revenue_on_stay_cancel";
 import { StayCanceledEvent } from "../../../booking/domain/event/stay_canceled_event";
+import type { PropertyRepository } from "../../../property_management/domain/repository/property_repository";
+import { PropertyPostgresRepository } from "../../../property_management/infra/database/postgres_repository/property_postgres_repository";
 
 export class FinanceDi {
   #logger: Logger;
   #eventDispatcher: EventDispatcher;
   #ledgerEntryRepository: LedgerEntryRepository;
+  #propertyRepository: PropertyRepository;
 
   constructor() {
     this.#logger = new ConsoleLogger();
     this.#eventDispatcher = inMemoryEventDispatcher;
     this.#ledgerEntryRepository = new LedgerEntryPostgresRepository();
+    this.#propertyRepository = new PropertyPostgresRepository();
 
     this.#eventDispatcher.register(
       StayPaymentConfirmedEvent.NAME,
@@ -51,11 +55,17 @@ export class FinanceDi {
 
   // Use Cases
   makeRecordExpenseUseCase() {
-    return new RecordExpenseUseCase(this.#ledgerEntryRepository);
+    return new RecordExpenseUseCase(
+      this.#ledgerEntryRepository,
+      this.#propertyRepository
+    );
   }
 
   makeRecordRevenueUseCase() {
-    return new RecordRevenueUseCase(this.#ledgerEntryRepository);
+    return new RecordRevenueUseCase(
+      this.#ledgerEntryRepository,
+      this.#propertyRepository
+    );
   }
 
   makeFindPropertyFinancialMovementsUseCase() {
