@@ -18,9 +18,6 @@ const inputSchema = z.object({
 
 type Input = z.infer<typeof inputSchema>;
 
-/**
- * Controller para atualizar uma stay existente
- */
 export class UpdateStayController implements Controller {
   path = "/booking/stay/:stay_id";
   method = HttpControllerMethod.PATCH;
