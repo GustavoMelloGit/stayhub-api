@@ -64,6 +64,21 @@ export class Stay {
     this.#data.updated_at = new Date();
   }
 
+  public update(data: Partial<WithoutBaseEntity<StayData>>): void {
+    if (this.deleted_at) {
+      throw new IllegalStateError("Cannot update a cancelled stay");
+    }
+
+    const updatedData = { ...this.#data, ...data };
+
+    if (updatedData.check_in >= updatedData.check_out) {
+      throw new ValidationError("Check-in date must be before check-out date");
+    }
+
+    Object.assign(this.#data, updatedData);
+    this.#data.updated_at = new Date();
+  }
+
   get id() {
     return this.#data.id;
   }

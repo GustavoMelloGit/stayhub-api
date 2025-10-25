@@ -103,6 +103,10 @@ const stayControllers: Route[] = [
     authenticated: true,
     controller: stayDi.makeCancelStayController(),
   },
+  {
+    authenticated: true,
+    controller: stayDi.makeUpdateStayController(),
+  },
 ];
 
 const authControllers: Route[] = [
