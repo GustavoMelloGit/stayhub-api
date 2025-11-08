@@ -46,17 +46,15 @@ export class LedgerEntryPostgresRepository implements LedgerEntryRepository {
     propertyId: string,
     pagination: PaginationInput
   ): Promise<PaginatedResult<LedgerEntry>> {
+    const whereClause = eq(ledgerEntriesTable.property_id, propertyId);
     const offset = (pagination.page - 1) * pagination.limit;
 
     const [totalResult, entries] = await Promise.all([
-      db
-        .select({ count: count() })
-        .from(ledgerEntriesTable)
-        .where(eq(ledgerEntriesTable.property_id, propertyId)),
+      db.select({ count: count() }).from(ledgerEntriesTable).where(whereClause),
       db
         .select()
         .from(ledgerEntriesTable)
-        .where(eq(ledgerEntriesTable.property_id, propertyId))
+        .where(whereClause)
         .orderBy(desc(ledgerEntriesTable.created_at))
         .limit(pagination.limit)
         .offset(offset),

@@ -7,10 +7,12 @@ import {
   type ControllerRequest,
 } from "../../../../core/presentation/controller/controller";
 import { ValidationError } from "../../../../core/application/error/validation_error";
+import { paginationInputSchema } from "../../../../core/application/dto/pagination";
 
 const inputSchema = z.object({
   property_id: z.uuid(),
   onlyIncomingStays: z.boolean().optional(),
+  pagination: paginationInputSchema,
 });
 
 type Input = z.infer<typeof inputSchema>;
@@ -28,10 +30,16 @@ export class FindPropertyStaysController implements Controller {
     const { property_id } = request.params;
     const url = new URL(request.url);
     const onlyIncomingStays = url.searchParams.get("onlyIncomingStays");
+    const page = url.searchParams.get("page");
+    const limit = url.searchParams.get("limit");
 
     const data: Record<string, unknown> = {
       property_id,
       onlyIncomingStays: onlyIncomingStays === "true",
+      pagination: {
+        page: page ? Number(page) : 1,
+        limit: limit ? Number(limit) : 20,
+      },
     };
 
     const parsedInput = inputSchema.safeParse(data);
@@ -50,7 +58,10 @@ export class FindPropertyStaysController implements Controller {
     const output = await this.useCase.execute({
       property_id: validationResponse.property_id,
       user_id: user.id,
-      onlyIncomingStays: validationResponse.onlyIncomingStays,
+      pagination: validationResponse.pagination,
+      filters: {
+        onlyIncomingStays: validationResponse.onlyIncomingStays ?? false,
+      },
     });
 
     return output;

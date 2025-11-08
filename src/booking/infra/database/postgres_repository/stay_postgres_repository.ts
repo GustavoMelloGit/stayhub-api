@@ -1,6 +1,7 @@
-import { and, eq, gte, isNull } from "drizzle-orm";
+import { and, count, eq, gte, isNull } from "drizzle-orm";
 import { Stay } from "../../../domain/entity/stay";
 import type {
+  AllFromPropertyFilters,
   StayRepository,
   StayWithTenant,
 } from "../../../domain/repository/stay_repository";
@@ -10,6 +11,11 @@ import {
   tenantsTable,
 } from "../../../../core/infra/database/drizzle/schema";
 import { Tenant } from "../../../domain/entity/tenant";
+import {
+  calculatePaginationMetadata,
+  type PaginatedResult,
+  type PaginationInput,
+} from "../../../../core/application/dto/pagination";
 
 export class StayPostgresRepository implements StayRepository {
   async stayOfId(id: string): Promise<Stay | null> {
@@ -75,22 +81,45 @@ export class StayPostgresRepository implements StayRepository {
     }));
   }
 
-  async allFromProperty(propertyId: string): Promise<StayWithTenant[]> {
-    const stays = await db.query.staysTable.findMany({
-      where: and(
-        eq(staysTable.property_id, propertyId),
-        isNull(staysTable.deleted_at)
-      ),
-      with: {
-        tenant: true,
-      },
-      orderBy: (staysTable, { asc }) => [asc(staysTable.check_in)],
-    });
+  async allFromProperty(
+    propertyId: string,
+    pagination: PaginationInput,
+    filters?: AllFromPropertyFilters
+  ): Promise<PaginatedResult<StayWithTenant>> {
+    const whereClause = and(
+      eq(staysTable.property_id, propertyId),
+      isNull(staysTable.deleted_at),
+      filters?.onlyIncomingStays
+        ? gte(staysTable.check_in, new Date())
+        : undefined
+    );
 
-    return stays.map(stay => ({
-      stay: Stay.reconstitute(stay),
-      tenant: Tenant.reconstitute(stay.tenant),
-    }));
+    const [totalResult, stays] = await Promise.all([
+      db.select({ count: count() }).from(staysTable).where(whereClause),
+      db.query.staysTable.findMany({
+        where: whereClause,
+        with: {
+          tenant: true,
+        },
+        orderBy: (staysTable, { asc }) => [asc(staysTable.check_in)],
+        limit: pagination.limit,
+        offset: (pagination.page - 1) * pagination.limit,
+      }),
+    ]);
+
+    const total = totalResult[0]?.count ? Number(totalResult[0].count) : 0;
+
+    return {
+      data: stays.map(stay => ({
+        stay: Stay.reconstitute(stay),
+        tenant: Tenant.reconstitute(stay.tenant),
+      })),
+      pagination: calculatePaginationMetadata(
+        pagination.page,
+        pagination.limit,
+        total
+      ),
+    };
   }
 
   async tenantWithPhone(phone: string): Promise<Tenant | null> {

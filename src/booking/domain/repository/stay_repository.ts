@@ -1,3 +1,7 @@
+import type {
+  PaginatedResult,
+  PaginationInput,
+} from "../../../core/application/dto/pagination";
 import type { Stay } from "../entity/stay";
 import type { Tenant } from "../entity/tenant";
 
@@ -6,10 +10,18 @@ export type StayWithTenant = {
   tenant: Tenant;
 };
 
+export type AllFromPropertyFilters = {
+  onlyIncomingStays: boolean;
+};
+
 export interface StayRepository {
   stayOfId(id: string): Promise<Stay | null>;
   saveStay(stay: Stay): Promise<void>;
   allFutureFromProperty(propertyId: string): Promise<Array<StayWithTenant>>;
-  allFromProperty(propertyId: string): Promise<Array<StayWithTenant>>;
+  allFromProperty(
+    propertyId: string,
+    pagination: PaginationInput,
+    filters?: AllFromPropertyFilters
+  ): Promise<PaginatedResult<StayWithTenant>>;
   tenantWithPhone(phone: string): Promise<Tenant | null>;
 }

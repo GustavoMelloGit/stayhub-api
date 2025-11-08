@@ -1,11 +1,15 @@
 import { z } from "zod";
 
+export const DEFAULT_PAGE = 1;
+export const DEFAULT_LIMIT = 20;
+export const MAX_LIMIT = 100;
+
 /**
  * Parâmetros de entrada para paginação
  */
 export const paginationInputSchema = z.object({
-  page: z.int().positive().default(1),
-  limit: z.int().positive().max(100).default(20),
+  page: z.int().positive().default(DEFAULT_PAGE),
+  limit: z.int().positive().max(MAX_LIMIT).default(DEFAULT_LIMIT),
 });
 
 export type PaginationInput = z.infer<typeof paginationInputSchema>;
@@ -19,9 +23,9 @@ export type PaginatedResult<T> = {
     page: number;
     limit: number;
     total: number;
-    totalPages: number;
-    hasNext: boolean;
-    hasPrevious: boolean;
+    total_pages: number;
+    has_next: boolean;
+    has_previous: boolean;
   };
 };
 
@@ -39,8 +43,8 @@ export function calculatePaginationMetadata(
     page,
     limit,
     total,
-    totalPages,
-    hasNext: page < totalPages,
-    hasPrevious: page > 1,
+    total_pages: totalPages,
+    has_next: page < totalPages,
+    has_previous: page > 1,
   };
 }
