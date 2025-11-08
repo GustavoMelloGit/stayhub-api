@@ -4,6 +4,7 @@ import type { User } from "../../../../auth/domain/entity/user";
 import type { StayRepository } from "../../../domain/repository/stay_repository";
 import type { TenantRepository } from "../../../domain/repository/tenant_repository";
 import type { PropertyRepository } from "../../../../property_management/domain/repository/property_repository";
+import type { TenantSex } from "../../../domain/entity/tenant";
 
 type Input = {
   stay_id: string;
@@ -16,10 +17,15 @@ type Output = {
   id: string;
   entrance_code: string;
   price: number;
+  created_at: Date;
+  updated_at: Date;
   tenant: {
     id: string;
     name: string;
     phone: string;
+    sex: TenantSex;
+    created_at: Date;
+    updated_at: Date;
   };
 };
 
@@ -63,10 +69,15 @@ export class GetStayUseCase implements UseCase<Input, Output> {
       guests: stay.guests,
       entrance_code: stay.entrance_code,
       price: stay.price,
+      created_at: stay.created_at,
+      updated_at: stay.updated_at,
       tenant: {
         id: tenant.id,
         name: tenant.name,
         phone: tenant.phone,
+        sex: tenant.sex,
+        created_at: tenant.created_at,
+        updated_at: tenant.updated_at,
       },
     };
   }
