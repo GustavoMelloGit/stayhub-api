@@ -1,4 +1,4 @@
-import { and, between, eq, isNull, or } from "drizzle-orm";
+import { and, between, eq, isNull, ne, or } from "drizzle-orm";
 import { ConflictError } from "../../../../core/application/error/conflict_error";
 import type { BookingPolicy } from "../../../domain/policy/booking_policy";
 import { db } from "../../../../core/infra/database/drizzle/database";
@@ -10,8 +10,9 @@ export class PostgresBookingPolicy implements BookingPolicy {
   async isBookingAllowed(
     property_id: string,
     check_in: Date,
-    check_out: Date
-  ): Promise<boolean> {
+    check_out: Date,
+    stay_id?: string
+  ): Promise<void> {
     /**
      * Uma propriedade está ocupada se:
      * - O check-in estiver entre o check-in e check-out de uma estadia
@@ -24,14 +25,13 @@ export class PostgresBookingPolicy implements BookingPolicy {
         or(
           between(staysTable.check_in, check_in, check_out),
           between(staysTable.check_out, check_in, check_out)
-        )
+        ),
+        stay_id ? ne(staysTable.id, stay_id) : undefined
       ),
     });
 
     if (isOccupied) {
       throw new ConflictError("Property is occupied");
     }
-
-    return true;
   }
 }

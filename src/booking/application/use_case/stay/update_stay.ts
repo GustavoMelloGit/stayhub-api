@@ -55,7 +55,8 @@ export class UpdateStayUseCase implements UseCase<Input, Output> {
     await this.bookingPolicy.isBookingAllowed(
       property.id,
       stay.check_in,
-      stay.check_out
+      stay.check_out,
+      stay.id
     );
 
     await this.stayRepository.saveStay(stay);
