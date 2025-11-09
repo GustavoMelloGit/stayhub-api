@@ -32,6 +32,7 @@ export class RecordExpenseUseCase implements UseCase<Input, Output> {
     const ledgerEntry = LedgerEntry.newExpense({
       ...input,
       amount: negativeAmount,
+      stay_id: null,
     });
 
     await this.ledgerEntryRepository.save(ledgerEntry);

@@ -27,7 +27,10 @@ export class RecordRevenueUseCase implements UseCase<Input, Output> {
       throw new ResourceNotFoundError("Property");
     }
 
-    const ledgerEntry = LedgerEntry.newRevenue(input);
+    const ledgerEntry = LedgerEntry.newRevenue({
+      ...input,
+      stay_id: null,
+    });
     await this.ledgerEntryRepository.save(ledgerEntry);
   }
 }
