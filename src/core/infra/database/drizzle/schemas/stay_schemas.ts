@@ -2,26 +2,14 @@ import { baseSchema } from "./base_schema";
 import { relations } from "drizzle-orm";
 import { propertiesTable } from "./property_schemas";
 import {
-  pgTable,
-  pgEnum,
-  varchar,
+  pgTable, varchar,
   uuid,
   timestamp,
-  integer,
+  integer
 } from "drizzle-orm/pg-core";
+import { tenantsTable } from "./tenant_schemas";
 
-export const sexEnum = pgEnum("sex", ["MALE", "FEMALE", "OTHER"]);
 
-export const tenantsTable = pgTable("tenants", {
-  ...baseSchema,
-  name: varchar({ length: 255 }).notNull(),
-  phone: varchar({ length: 15 }).notNull().unique(),
-  sex: sexEnum("sex").notNull(),
-});
-
-export const tenantsRelations = relations(tenantsTable, ({ many }) => ({
-  stays: many(staysTable),
-}));
 
 export const staysTable = pgTable("stays", {
   ...baseSchema,
