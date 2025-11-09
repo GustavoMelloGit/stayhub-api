@@ -10,6 +10,7 @@ export const ledgerEntrySchema = baseEntitySchema.extend({
   description: z.string().nullable(),
   category: z.string(),
   property_id: z.uuidv4(),
+  stay_id: z.uuidv4().nullable(),
 });
 
 export type LedgerEntryData = z.infer<typeof ledgerEntrySchema>;
@@ -84,6 +85,10 @@ export class LedgerEntry {
 
   get property_id() {
     return this.#data.property_id;
+  }
+
+  get stay_id() {
+    return this.#data.stay_id;
   }
 
   get created_at() {
