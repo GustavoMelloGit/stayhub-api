@@ -20,6 +20,7 @@ export class LedgerEntryPostgresRepository implements LedgerEntryRepository {
       category: entry.category,
       property_id: entry.property_id,
       description: entry.description,
+      stay_id: entry.stay_id,
       created_at: entry.created_at,
       updated_at: entry.updated_at,
       deleted_at: entry.deleted_at,
