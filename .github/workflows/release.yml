@@ -22,16 +22,16 @@ jobs:
           # Necessário para que o semantic-release leia todo o histórico de commits
           fetch-depth: 0
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: "24"
+          bun-version: latest
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install
 
       - name: Run Semantic Release
-        run: npx semantic-release
+        run: bunx semantic-release
         env:
           # Token gerado automaticamente pelo GitHub, usado pelo semantic-release para escrever tags e releases
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
