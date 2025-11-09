@@ -19,9 +19,10 @@ export class RevertRevenueOnStayCancel
     });
     const ledgerEntry = LedgerEntry.newExpense({
       amount: event.price * -1,
-      description: `Estadia cancelada: ${event.stay_id}`,
+      description: `Estadia cancelada`,
       category: "ESTADIA",
       property_id: event.property_id,
+      stay_id: event.stay_id,
     });
     await this.ledgerEntryRepository.save(ledgerEntry);
   }
