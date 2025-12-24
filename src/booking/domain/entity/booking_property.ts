@@ -131,4 +131,5 @@ type BookStayArgs = {
   guests: number;
   entrance_code: string;
   price: number;
+  source: string;
 };
