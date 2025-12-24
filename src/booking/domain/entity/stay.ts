@@ -14,6 +14,7 @@ export const staySchema = baseEntitySchema.extend({
   guests: z.number().int().positive(),
   entrance_code: z.string().length(7),
   price: z.number().int().nonnegative(),
+  source: z.string().max(100),
 });
 
 export type StayData = z.infer<typeof staySchema>;
@@ -109,6 +110,10 @@ export class Stay {
 
   get price() {
     return this.#data.price;
+  }
+
+  get source() {
+    return this.#data.source;
   }
 
   get created_at() {

@@ -40,23 +40,24 @@ export class FindPropertyStaysUseCase implements UseCase<Input, Output> {
     };
   }
 
-  #mapStayWithTenant(stay: StayWithTenant): Output["data"][number] {
+  #mapStayWithTenant({ stay, tenant }: StayWithTenant): Output["data"][number] {
     return {
-      id: stay.stay.id,
-      check_in: stay.stay.check_in,
-      check_out: stay.stay.check_out,
-      entrance_code: stay.stay.entrance_code,
-      guests: stay.stay.guests,
-      price: stay.stay.price,
-      created_at: stay.stay.created_at,
-      updated_at: stay.stay.updated_at,
+      id: stay.id,
+      check_in: stay.check_in,
+      check_out: stay.check_out,
+      entrance_code: stay.entrance_code,
+      guests: stay.guests,
+      price: stay.price,
+      source: stay.source,
+      created_at: stay.created_at,
+      updated_at: stay.updated_at,
       tenant: {
-        id: stay.tenant.id,
-        name: stay.tenant.name,
-        phone: stay.tenant.phone,
-        sex: stay.tenant.sex,
-        created_at: stay.tenant.created_at,
-        updated_at: stay.tenant.updated_at,
+        id: tenant.id,
+        name: tenant.name,
+        phone: tenant.phone,
+        sex: tenant.sex,
+        created_at: tenant.created_at,
+        updated_at: tenant.updated_at,
       },
     };
   }
@@ -80,6 +81,7 @@ type Output = PaginatedResult<{
   entrance_code: string;
   guests: number;
   price: number;
+  source: string;
   created_at: Date;
   updated_at: Date;
   tenant: {

@@ -25,6 +25,7 @@ const inputSchema = z.object({
     phone: z.string().length(13),
     sex: z.enum(["MALE", "FEMALE", "OTHER"]),
   }),
+  source: z.string().max(100),
 });
 
 type Input = z.infer<typeof inputSchema>;

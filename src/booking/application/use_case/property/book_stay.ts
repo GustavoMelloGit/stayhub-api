@@ -16,6 +16,7 @@ type Input = {
   check_in: Date;
   check_out: Date;
   price: number;
+  source: string;
   tenant: {
     name: string;
     phone: string;
@@ -27,6 +28,7 @@ type Output = {
   id: string;
   guests: number;
   entrance_code: string;
+  source: string;
   tenant_id: string;
   check_in: Date;
   check_out: Date;
@@ -72,6 +74,7 @@ export class BookStayUseCase implements UseCase<Input, Output> {
       check_in: input.check_in,
       check_out: input.check_out,
       price: input.price,
+      source: input.source,
     };
 
     const stay = await property.bookStay(stayInput, this.bookingPolicy);
@@ -93,6 +96,7 @@ export class BookStayUseCase implements UseCase<Input, Output> {
       check_in: stay.check_in,
       check_out: stay.check_out,
       price: stay.price,
+      source: stay.source,
     };
   }
 }

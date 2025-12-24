@@ -40,6 +40,7 @@ export const staysTable = pgTable("stays", {
   guests: integer().notNull(),
   entrance_code: varchar({ length: 255 }).notNull(),
   price: integer().notNull(),
+  source: varchar({ length: 100 }).notNull().default('INTERNAL'),
 });
 
 export const staysRelations = relations(staysTable, ({ one }) => ({
