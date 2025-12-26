@@ -17,6 +17,7 @@ type Output = {
   id: string;
   entrance_code: string;
   price: number;
+  source: string;
   created_at: Date;
   updated_at: Date;
   tenant: {
@@ -69,6 +70,7 @@ export class GetStayUseCase implements UseCase<Input, Output> {
       guests: stay.guests,
       entrance_code: stay.entrance_code,
       price: stay.price,
+      source: stay.source,
       created_at: stay.created_at,
       updated_at: stay.updated_at,
       tenant: {
