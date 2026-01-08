@@ -90,7 +90,7 @@ export class StayPostgresRepository implements StayRepository {
       eq(staysTable.property_id, propertyId),
       isNull(staysTable.deleted_at),
       filters?.onlyIncomingStays
-        ? gte(staysTable.check_in, new Date())
+        ? gte(staysTable.check_out, new Date())
         : undefined
     );
 
