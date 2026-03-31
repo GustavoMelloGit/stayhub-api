@@ -79,10 +79,11 @@ export class BookStayUseCase implements UseCase<Input, Output> {
 
     const stay = await property.bookStay(stayInput, this.bookingPolicy);
 
-    await this.stayRepository.saveStay(stay);
+    // await this.stayRepository.saveStay(stay);
 
     const event = new StayBookedEvent(
       stay.id,
+      tenant.name,
       property.id,
       stay.price,
       stay.entrance_code,

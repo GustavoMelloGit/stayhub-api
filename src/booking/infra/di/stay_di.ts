@@ -18,20 +18,39 @@ import type { EventDispatcher } from "../../../core/application/event/event_disp
 import { inMemoryEventDispatcher } from "../../../core/infra/event/in_memory_event_dispatcher";
 import type { BookingPolicy } from "../../domain/policy/booking_policy";
 import { PostgresBookingPolicy } from "../database/postgres_policies/postgres_booking_policy";
+import { StayBookedEvent } from "../../domain/event/stay_booked_event";
+import { CreateTempPasswordOnBook } from "../../application/handler/create_temp_password_on_book";
+import type { Logger } from "../../../core/application/logger/logger";
+import { ConsoleLogger } from "../../../core/infra/logger/console_logger";
+import type { DeviceManagementService } from "../../domain/service/device_management";
+import { TuyaDeviceManagementService } from "../service/tuya_device_management";
+import { tuyaContext } from "../../../core/infra/config/tuya";
 
 export class StayDi {
+  #logger: Logger;
   #propertyRepository: PropertyRepository;
   #stayRepository: StayRepository;
   #tenantRepository: TenantRepository;
   #eventDispatcher: EventDispatcher;
   #bookingPolicy: BookingPolicy;
+  #deviceManagementService: DeviceManagementService;
 
   constructor() {
+    this.#logger = new ConsoleLogger();
     this.#propertyRepository = new PropertyPostgresRepository();
     this.#stayRepository = new StayPostgresRepository();
     this.#tenantRepository = new TenantPostgresRepository();
     this.#bookingPolicy = new PostgresBookingPolicy();
+    this.#deviceManagementService = new TuyaDeviceManagementService(
+      tuyaContext,
+      this.#logger
+    );
     this.#eventDispatcher = inMemoryEventDispatcher;
+
+    this.#eventDispatcher.register(
+      StayBookedEvent.NAME,
+      this.makeCreateTempPasswordOnBookHandler()
+    );
   }
 
   // Use Cases
@@ -84,5 +103,13 @@ export class StayDi {
   }
   makeUpdateStayController() {
     return new UpdateStayController(this.makeUpdateStayUseCase());
+  }
+
+  // Handlers
+  makeCreateTempPasswordOnBookHandler() {
+    return new CreateTempPasswordOnBook(
+      this.#logger,
+      this.#deviceManagementService
+    );
   }
 }

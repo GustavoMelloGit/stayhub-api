@@ -7,6 +7,7 @@ export class StayBookedEvent implements DomainEvent {
 
   constructor(
     public readonly stay_id: string,
+    public readonly tenant_name: string,
     public readonly property_id: string,
     public readonly paid_amount: number,
     public readonly entrance_code: string,
