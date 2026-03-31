@@ -6,7 +6,7 @@ import type { TenantRepository } from "../../../domain/repository/tenant_reposit
 import { ResourceNotFoundError } from "../../../../core/application/error/resource_not_found_error";
 import type { UseCase } from "../../../../core/application/use_case/use_case";
 import type { EventDispatcher } from "../../../../core/application/event/event_dispatcher";
-import { StayPaymentConfirmedEvent } from "../../../domain/event/stay_payment_confirmed_event";
+import { StayBookedEvent } from "../../../domain/event/stay_booked_event";
 import type { BookingPropertyRepository } from "../../../domain/repository/booking_property_repository";
 
 type Input = {
@@ -81,10 +81,13 @@ export class BookStayUseCase implements UseCase<Input, Output> {
 
     await this.stayRepository.saveStay(stay);
 
-    const event = new StayPaymentConfirmedEvent(
+    const event = new StayBookedEvent(
       stay.id,
       property.id,
-      stay.price
+      stay.price,
+      stay.entrance_code,
+      stay.check_in,
+      stay.check_out
     );
     await this.eventDispatcher.dispatch(event);
 

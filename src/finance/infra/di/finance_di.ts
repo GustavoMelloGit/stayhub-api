@@ -1,4 +1,4 @@
-import { StayPaymentConfirmedEvent } from "../../../booking/domain/event/stay_payment_confirmed_event";
+import { StayBookedEvent } from "../../../booking/domain/event/stay_booked_event";
 import type { EventDispatcher } from "../../../core/application/event/event_dispatcher";
 import type { Logger } from "../../../core/application/logger/logger";
 import { inMemoryEventDispatcher } from "../../../core/infra/event/in_memory_event_dispatcher";
@@ -30,7 +30,7 @@ export class FinanceDi {
     this.#propertyRepository = new PropertyPostgresRepository();
 
     this.#eventDispatcher.register(
-      StayPaymentConfirmedEvent.NAME,
+      StayBookedEvent.NAME,
       this.makeRecordRevenueOnStayPaymentConfirmedHandler()
     );
     this.#eventDispatcher.register(
