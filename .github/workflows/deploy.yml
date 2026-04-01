@@ -54,10 +54,10 @@ jobs:
             set -euo pipefail
             RUNNER_USER="${{ secrets.VPS_RUNNER_USERNAME }}"
             APP_DIR="/home/${RUNNER_USER}/stayhub_api"
-            umask 077
-            echo "${DOTENV_B64}" | base64 -d > "${APP_DIR}/.env"
-            chown "${RUNNER_USER}:${RUNNER_USER}" "${APP_DIR}/.env"
-            chmod 600 "${APP_DIR}/.env"
+            # VPS_USERNAME pode ser outro user (ex.: root) sem escrita na home do RUNNER_USER.
+            echo "${DOTENV_B64}" | base64 -d | sudo tee "${APP_DIR}/.env" > /dev/null
+            sudo chown "${RUNNER_USER}:${RUNNER_USER}" "${APP_DIR}/.env"
+            sudo chmod 600 "${APP_DIR}/.env"
             sudo -i -u "${RUNNER_USER}" /bin/bash << 'EOF'
             cd stayhub_api
             git pull
