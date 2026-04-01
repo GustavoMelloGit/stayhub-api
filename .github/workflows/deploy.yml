@@ -5,11 +5,6 @@ on:
     branches:
       - main
 
-# Required GitHub repository secrets (Settings → Secrets and variables → Actions):
-#   VPS_HOST, VPS_USERNAME, VPS_PORT, SSH_PRIVATE_KEY, VPS_RUNNER_USERNAME
-#   PORT, DATABASE_URL, NODE_ENV, JWT_SECRET
-#   TUYA_DEVICE_ID, TUYA_CLIENT_ID, TUYA_CLIENT_SECRET
-#
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -17,51 +12,48 @@ jobs:
       - name: Checkout Código
         uses: actions/checkout@v4
 
-      - name: Montar .env a partir dos Secrets
-        run: |
-          set -euo pipefail
-          NODE_ENV="${NODE_ENV:-production}"
-          {
-            printf "PORT=%s\n" "${PORT}"
-            printf "DATABASE_URL=%s\n" "${DATABASE_URL}"
-            printf "NODE_ENV=%s\n" "${NODE_ENV}"
-            printf "JWT_SECRET=%s\n" "${JWT_SECRET}"
-            printf "TUYA_DEVICE_ID=%s\n" "${TUYA_DEVICE_ID}"
-            printf "TUYA_CLIENT_ID=%s\n" "${TUYA_CLIENT_ID}"
-            printf "TUYA_CLIENT_SECRET=%s\n" "${TUYA_CLIENT_SECRET}"
-          } > .env.deploy
-          echo "DOTENV_B64=$(base64 -w0 < .env.deploy)" >> "${GITHUB_ENV}"
-        env:
-          PORT: ${{ secrets.PORT }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          NODE_ENV: ${{ secrets.NODE_ENV }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          TUYA_DEVICE_ID: ${{ secrets.TUYA_DEVICE_ID }}
-          TUYA_CLIENT_ID: ${{ secrets.TUYA_CLIENT_ID }}
-          TUYA_CLIENT_SECRET: ${{ secrets.TUYA_CLIENT_SECRET }}
-
       - name: Executar Deploy Remoto via SSH
         uses: appleboy/ssh-action@v1.0.3
         env:
-          DOTENV_B64: ${{ env.DOTENV_B64 }}
+          APP_PORT: ${{ secrets.PORT }}
+          APP_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          APP_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          APP_NODE_ENV: ${{ vars.NODE_ENV }}
+          APP_TUYA_CLIENT_ID: ${{ secrets.TUYA_CLIENT_ID }}
+          APP_TUYA_CLIENT_SECRET: ${{ secrets.TUYA_CLIENT_SECRET }}
+          APP_TUYA_DEVICE_ID: ${{ secrets.TUYA_DEVICE_ID }}
         with:
+          # Detalhes da Conexão SSH
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           port: ${{ secrets.VPS_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: DOTENV_B64
+          envs: APP_PORT,APP_DATABASE_URL,APP_JWT_SECRET,APP_NODE_ENV,APP_TUYA_CLIENT_ID,APP_TUYA_CLIENT_SECRET,APP_TUYA_DEVICE_ID
+
+          # Comandos a serem executados na VPS
           script: |
-            set -euo pipefail
-            RUNNER_USER="${{ secrets.VPS_RUNNER_USERNAME }}"
-            APP_DIR="/home/${RUNNER_USER}/stayhub_api"
-            # VPS_USERNAME pode ser outro user (ex.: root) sem escrita na home do RUNNER_USER.
-            echo "${DOTENV_B64}" | base64 -d | sudo tee "${APP_DIR}/.env" > /dev/null
-            sudo chown "${RUNNER_USER}:${RUNNER_USER}" "${APP_DIR}/.env"
-            sudo chmod 600 "${APP_DIR}/.env"
-            sudo -i -u "${RUNNER_USER}" /bin/bash << 'EOF'
+            # 1. Troca para o usuário de baixa permissão para deploy
+            # Nota: o heredoc sem aspas (<<EOF) expande as variáveis no shell atual (SSH),
+            # então os valores dos secrets são injetados antes de serem enviados ao sudo.
+            sudo -i -u ${{ secrets.VPS_RUNNER_USERNAME }} /bin/bash << EOF
+
+            # Navega para o diretório da aplicação
             cd stayhub_api
+
+            # Puxa as últimas alterações
             git pull
+
+            # Recria o arquivo .env com os valores do GitHub (expandidos pelo shell SSH)
+            printf 'PORT=$APP_PORT\nDATABASE_URL=$APP_DATABASE_URL\nJWT_SECRET=$APP_JWT_SECRET\nNODE_ENV=$APP_NODE_ENV\nTUYA_CLIENT_ID=$APP_TUYA_CLIENT_ID\nTUYA_CLIENT_SECRET=$APP_TUYA_CLIENT_SECRET\nTUYA_DEVICE_ID=$APP_TUYA_DEVICE_ID\n' > .env
+
+            # Instala dependências
             /home/${{ secrets.VPS_RUNNER_USERNAME }}/.bun/bin/bun install
+
+            # Roda migrações (Drizzle db:push)
             /home/${{ secrets.VPS_RUNNER_USERNAME }}/.bun/bin/bun run db:push
+
+            # 2. Reinicia o serviço PM2 (PM2 está instalado globalmente/com sudo)
             pm2 restart stayhub_api
+
+            # Finaliza a execução do usuário
             EOF
