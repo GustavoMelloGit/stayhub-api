@@ -1,4 +1,4 @@
-import { and, count, eq, gte, isNull } from "drizzle-orm";
+import { and, count, eq, gte, isNull, lte } from "drizzle-orm";
 import { Stay } from "../../../domain/entity/stay";
 import type {
   AllFromPropertyFilters,
@@ -84,14 +84,13 @@ export class StayPostgresRepository implements StayRepository {
   async allFromProperty(
     propertyId: string,
     pagination: PaginationInput,
-    filters?: AllFromPropertyFilters
+    filters: AllFromPropertyFilters
   ): Promise<PaginatedResult<StayWithTenant>> {
     const whereClause = and(
       eq(staysTable.property_id, propertyId),
       isNull(staysTable.deleted_at),
-      filters?.onlyIncomingStays
-        ? gte(staysTable.check_out, new Date())
-        : undefined
+      lte(staysTable.check_in, filters.to),
+      gte(staysTable.check_out, filters.from)
     );
 
     const [totalResult, stays] = await Promise.all([

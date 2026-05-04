@@ -22,7 +22,7 @@ export interface StayRepository {
   allFromProperty(
     propertyId: string,
     pagination: PaginationInput,
-    filters?: AllFromPropertyFilters
+    filters: AllFromPropertyFilters
   ): Promise<PaginatedResult<StayWithTenant>>;
   tenantWithPhone(phone: string): Promise<Tenant | null>;
 }

@@ -11,15 +11,13 @@ import { paginationInputSchema } from "../../../../core/application/dto/paginati
 
 const inputSchema = z.object({
   property_id: z.uuid(),
-  onlyIncomingStays: z.boolean().optional(),
+  from: z.coerce.date(),
+  to: z.coerce.date(),
   pagination: paginationInputSchema,
 });
 
 type Input = z.infer<typeof inputSchema>;
 
-/**
- * Controller para buscar todas as estadias de uma propriedade específica
- */
 export class FindPropertyStaysController implements Controller {
   path = "/booking/property/:property_id/stays";
   method = HttpControllerMethod.GET;
@@ -29,13 +27,15 @@ export class FindPropertyStaysController implements Controller {
   #validate(request: ControllerRequest): Input {
     const { property_id } = request.params;
     const url = new URL(request.url);
-    const onlyIncomingStays = url.searchParams.get("onlyIncomingStays");
+    const from = url.searchParams.get("from");
+    const to = url.searchParams.get("to");
     const page = url.searchParams.get("page");
     const limit = url.searchParams.get("limit");
 
     const data: Record<string, unknown> = {
       property_id,
-      onlyIncomingStays: onlyIncomingStays === "true",
+      from,
+      to,
       pagination: {
         page: page ? Number(page) : 1,
         limit: limit ? Number(limit) : 20,
@@ -60,7 +60,8 @@ export class FindPropertyStaysController implements Controller {
       user_id: user.id,
       pagination: validationResponse.pagination,
       filters: {
-        onlyIncomingStays: validationResponse.onlyIncomingStays ?? false,
+        from: validationResponse.from,
+        to: validationResponse.to,
       },
     });
 
