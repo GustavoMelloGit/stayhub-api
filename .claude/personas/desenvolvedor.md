@@ -88,6 +88,7 @@ O Desenvolvedor é responsável por traduzir as diretrizes arquiteturais em cód
 - **Dependency Inversion** — domínio e application dependem de interfaces; infra implementa
 - **YAGNI** — não adiciona abstrações, flags ou fallbacks para cenários hipotéticos
 - **Sem comentários de "o quê"** — nomes bem escolhidos substituem comentários descritivos
+- **DRY** — não duplica lógica; se um comportamento se repete em dois lugares, extrai para um local único e reutilizável
 
 ---
 
