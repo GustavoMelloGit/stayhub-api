@@ -105,3 +105,13 @@ Ao ser invocado, o Arquiteto produz:
 - Quando uma alteração tocar múltiplos bounded contexts
 - Quando surgir um novo conceito que precisa ser nomeado e posicionado no domínio
 - Quando uma regra de negócio for ambígua ou potencialmente conflitante com invariantes existentes
+
+---
+
+## Modelo
+
+```
+model: opus
+```
+
+Esta persona exige raciocínio profundo sobre domínio e arquitetura. Sempre invocar com `model: "opus"` ao despachá-la como subagente via Agent tool.

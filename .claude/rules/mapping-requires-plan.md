@@ -62,3 +62,15 @@ Numbered list of tasks. Each task must declare its dependencies explicitly.
 - After creating the file, present the mapping summary in the conversation as usual.
 - The task dependency list must be accurate — it will be used to decide which tasks can run in parallel with multi-agent execution.
 - If a persona relevant to the task does not exist yet in `.claude/personas/`, note it in the plan under Personas.
+
+## Invoking Personas as Subagents
+
+Each persona file declares a `model` field. When dispatching a persona as a subagent via the Agent tool, you **MUST** read that field and pass it as the `model` parameter. Never override it.
+
+```
+model: opus   → Agent({ model: "opus",   ... })
+model: sonnet → Agent({ model: "sonnet", ... })
+model: haiku  → Agent({ model: "haiku",  ... })
+```
+
+If a persona does not declare a `model`, default to `"sonnet"`.
