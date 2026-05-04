@@ -11,8 +11,8 @@ export type StayWithTenant = {
 };
 
 export type AllFromPropertyFilters = {
-  from: Date;
-  to: Date;
+  from?: Date;
+  to?: Date;
 };
 
 export interface StayRepository {
@@ -22,7 +22,7 @@ export interface StayRepository {
   allFromProperty(
     propertyId: string,
     pagination: PaginationInput,
-    filters: AllFromPropertyFilters
+    filters?: AllFromPropertyFilters
   ): Promise<PaginatedResult<StayWithTenant>>;
   tenantWithPhone(phone: string): Promise<Tenant | null>;
 }

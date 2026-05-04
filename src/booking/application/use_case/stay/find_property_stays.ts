@@ -65,8 +65,8 @@ export class FindPropertyStaysUseCase implements UseCase<Input, Output> {
 }
 
 type InputFilters = {
-  from: Date;
-  to: Date;
+  from?: Date;
+  to?: Date;
 };
 
 type Input = {

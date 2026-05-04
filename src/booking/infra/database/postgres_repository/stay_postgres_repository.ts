@@ -84,13 +84,13 @@ export class StayPostgresRepository implements StayRepository {
   async allFromProperty(
     propertyId: string,
     pagination: PaginationInput,
-    filters: AllFromPropertyFilters
+    filters?: AllFromPropertyFilters
   ): Promise<PaginatedResult<StayWithTenant>> {
     const whereClause = and(
       eq(staysTable.property_id, propertyId),
       isNull(staysTable.deleted_at),
-      lte(staysTable.check_in, filters.to),
-      gte(staysTable.check_out, filters.from)
+      filters?.from ? gte(staysTable.check_out, filters.from) : undefined,
+      filters?.to ? lte(staysTable.check_in, filters.to) : undefined
     );
 
     const [totalResult, stays] = await Promise.all([

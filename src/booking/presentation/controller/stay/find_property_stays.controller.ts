@@ -12,11 +12,11 @@ import { paginationInputSchema } from "../../../../core/application/dto/paginati
 const inputSchema = z
   .object({
     property_id: z.uuid(),
-    from: z.coerce.date(),
-    to: z.coerce.date(),
+    from: z.coerce.date().optional(),
+    to: z.coerce.date().optional(),
     pagination: paginationInputSchema,
   })
-  .refine(data => data.from <= data.to, {
+  .refine(data => !data.from || !data.to || data.from <= data.to, {
     message: "'from' must be less than or equal to 'to'",
     path: ["from"],
   });
