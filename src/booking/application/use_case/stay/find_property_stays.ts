@@ -30,7 +30,8 @@ export class FindPropertyStaysUseCase implements UseCase<Input, Output> {
       input.property_id,
       input.pagination,
       {
-        onlyIncomingStays: input.filters.onlyIncomingStays ?? false,
+        from: input.filters.from,
+        to: input.filters.to,
       }
     );
 
@@ -64,7 +65,8 @@ export class FindPropertyStaysUseCase implements UseCase<Input, Output> {
 }
 
 type InputFilters = {
-  onlyIncomingStays: boolean;
+  from: Date;
+  to: Date;
 };
 
 type Input = {
