@@ -11,7 +11,8 @@ export type StayWithTenant = {
 };
 
 export type AllFromPropertyFilters = {
-  onlyIncomingStays: boolean;
+  from: Date;
+  to: Date;
 };
 
 export interface StayRepository {
