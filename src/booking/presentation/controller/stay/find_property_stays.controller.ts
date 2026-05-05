@@ -39,8 +39,8 @@ export class FindPropertyStaysController implements Controller {
 
     const data: Record<string, unknown> = {
       property_id,
-      from,
-      to,
+      from: from ?? undefined,
+      to: to ?? undefined,
       pagination: {
         page: page ? Number(page) : 1,
         limit: limit ? Number(limit) : 20,
