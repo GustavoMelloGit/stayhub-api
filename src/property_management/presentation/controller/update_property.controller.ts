@@ -6,23 +6,29 @@ import {
   type Controller,
   type ControllerRequest,
 } from "../../../core/presentation/controller/controller";
+import type { OpenApiOperation } from "../../../core/presentation/open_api/open_api_types";
+import {
+  bodyFromZod,
+  errorResponse,
+  responseFromZod,
+  validationErrorResponse,
+} from "../../../core/infra/http/swagger/schema_helpers";
+
+const addressSchema = z.object({
+  street: z.string().min(1),
+  number: z.string().min(1),
+  neighborhood: z.string().min(1),
+  city: z.string().min(1),
+  state: z.string().min(1),
+  zip_code: z.string().min(1),
+  country: z.string().min(1),
+  complement: z.string().default(""),
+});
 
 const inputSchema = z.object({
   property_id: z.uuid(),
   name: z.string().min(1, "Name is required").optional(),
-  address: z
-    .object({
-      street: z.string().min(1, "Street is required"),
-      number: z.string().min(1, "Number is required"),
-      neighborhood: z.string().min(1, "Neighborhood is required"),
-      city: z.string().min(1, "City is required"),
-      state: z.string().min(1, "State is required"),
-      zip_code: z.string().min(1, "Zip code is required"),
-      country: z.string().min(1, "Country is required"),
-      complement: z.string().default(""),
-    })
-    .partial()
-    .optional(),
+  address: addressSchema.partial().optional(),
   images: z.array(z.string()).min(1, "Images are required").optional(),
   capacity: z
     .number()
@@ -31,12 +37,44 @@ const inputSchema = z.object({
     .optional(),
 });
 
+const outputSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  user_id: z.string().uuid(),
+  address: addressSchema,
+  images: z.array(z.string()),
+  capacity: z.number().int(),
+  created_at: z.string().datetime(),
+  updated_at: z.string().datetime(),
+});
+
 type Input = z.infer<typeof inputSchema>;
 
 export class UpdatePropertyController implements Controller {
   path = "/property/:property_id";
   method = HttpControllerMethod.PATCH;
   inputSchema = inputSchema;
+
+  openApiSpec: OpenApiOperation = {
+    summary: "Update property",
+    description: "Updates name, address, images or capacity of a property.",
+    tags: ["Properties"],
+    parameters: [
+      {
+        name: "property_id",
+        in: "path",
+        required: true,
+        schema: { type: "string", format: "uuid" },
+      },
+    ],
+    requestBody: bodyFromZod(inputSchema.omit({ property_id: true })),
+    responses: {
+      "200": responseFromZod("Updated property", outputSchema),
+      "401": errorResponse("Unauthorized"),
+      "404": errorResponse("Property not found"),
+      "422": validationErrorResponse(),
+    },
+  };
 
   constructor(private readonly useCase: UpdatePropertyUseCase) {}
 

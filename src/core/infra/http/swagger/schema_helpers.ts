@@ -65,3 +65,7 @@ export function errorResponse(description: string): OpenApiResponse {
 export function validationErrorResponse(): OpenApiResponse {
   return errorResponse("Validation error — invalid request body");
 }
+
+export function noContentResponse(description: string): OpenApiResponse {
+  return { description };
+}

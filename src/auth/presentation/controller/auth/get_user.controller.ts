@@ -1,25 +1,41 @@
+import z from "zod";
 import {
   HttpControllerMethod,
   type Controller,
   type ControllerRequest,
 } from "../../../../core/presentation/controller/controller";
 import type { User } from "../../../domain/entity/user";
+import type { OpenApiOperation } from "../../../../core/presentation/open_api/open_api_types";
+import {
+  errorResponse,
+  responseFromZod,
+} from "../../../../core/infra/http/swagger/schema_helpers";
 
-type Output = {
-  id: string;
-  name: string;
-  email: string;
-  created_at: Date;
-  updated_at: Date;
-};
+const outputSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  email: z.string().email(),
+  created_at: z.string().datetime(),
+  updated_at: z.string().datetime(),
+});
 
 export class GetUserController implements Controller {
   path = "/auth/me";
   method = HttpControllerMethod.GET;
 
+  openApiSpec: OpenApiOperation = {
+    summary: "Get current user",
+    description: "Returns the profile of the authenticated user.",
+    tags: ["Auth"],
+    responses: {
+      "200": responseFromZod("Current user profile", outputSchema),
+      "401": errorResponse("Unauthorized"),
+    },
+  };
+
   constructor() {}
 
-  async handle(_request: ControllerRequest, user: User): Promise<Output> {
+  async handle(_request: ControllerRequest, user: User) {
     return {
       id: user.id,
       name: user.name,

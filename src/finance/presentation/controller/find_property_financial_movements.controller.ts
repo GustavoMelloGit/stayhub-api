@@ -10,6 +10,11 @@ import {
   DEFAULT_PAGE,
   MAX_LIMIT,
 } from "../../../core/application/dto/pagination";
+import type { OpenApiOperation } from "../../../core/presentation/open_api/open_api_types";
+import {
+  errorResponse,
+  responseFromZod,
+} from "../../../core/infra/http/swagger/schema_helpers";
 
 const inputSchema = z.object({
   property_id: z.uuidv4("Property ID must be a valid UUID"),
@@ -22,12 +27,66 @@ const inputSchema = z.object({
     .default(DEFAULT_LIMIT),
 });
 
+const outputSchema = z.object({
+  data: z.array(
+    z.object({
+      id: z.string().uuid(),
+      amount: z.number().int().describe("Amount in cents (negative = expense)"),
+      description: z.string().nullable(),
+      category: z.string(),
+      property_id: z.string().uuid(),
+      created_at: z.string().datetime(),
+      updated_at: z.string().datetime(),
+    })
+  ),
+  pagination: z.object({
+    page: z.number().int(),
+    limit: z.number().int(),
+    total: z.number().int(),
+    total_pages: z.number().int(),
+    has_next: z.boolean(),
+    has_previous: z.boolean(),
+  }),
+});
+
 type Input = z.infer<typeof inputSchema>;
 
 export class FindPropertyFinancialMovementsController implements Controller {
   path = "/finance/properties/:property_id/movements";
   method = HttpControllerMethod.GET;
   inputSchema = inputSchema;
+
+  openApiSpec: OpenApiOperation = {
+    summary: "Find property financial movements",
+    description:
+      "Returns a paginated ledger of income and expense entries for a property.",
+    tags: ["Finance"],
+    parameters: [
+      {
+        name: "property_id",
+        in: "path",
+        required: true,
+        schema: { type: "string", format: "uuid" },
+      },
+      {
+        name: "page",
+        in: "query",
+        required: false,
+        schema: { type: "integer", default: DEFAULT_PAGE },
+      },
+      {
+        name: "limit",
+        in: "query",
+        required: false,
+        schema: { type: "integer", default: DEFAULT_LIMIT },
+      },
+    ],
+    responses: {
+      "200": responseFromZod("Paginated financial movements", outputSchema),
+      "401": errorResponse("Unauthorized"),
+      "404": errorResponse("Property not found"),
+    },
+  };
 
   constructor(
     private readonly useCase: FindPropertyFinancialMovementsUseCase

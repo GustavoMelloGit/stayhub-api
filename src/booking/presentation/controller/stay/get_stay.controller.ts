@@ -6,9 +6,34 @@ import {
   type ControllerRequest,
 } from "../../../../core/presentation/controller/controller";
 import type { User } from "../../../../auth/domain/entity/user";
+import type { OpenApiOperation } from "../../../../core/presentation/open_api/open_api_types";
+import {
+  errorResponse,
+  responseFromZod,
+} from "../../../../core/infra/http/swagger/schema_helpers";
 
 const inputSchema = z.object({
   stay_id: z.uuid(),
+});
+
+const outputSchema = z.object({
+  id: z.string().uuid(),
+  check_in: z.string().datetime(),
+  check_out: z.string().datetime(),
+  guests: z.number().int(),
+  entrance_code: z.string(),
+  price: z.number().int().describe("Price in cents"),
+  source: z.string(),
+  created_at: z.string().datetime(),
+  updated_at: z.string().datetime(),
+  tenant: z.object({
+    id: z.string().uuid(),
+    name: z.string(),
+    phone: z.string(),
+    sex: z.enum(["MALE", "FEMALE", "OTHER"]),
+    created_at: z.string().datetime(),
+    updated_at: z.string().datetime(),
+  }),
 });
 
 type Input = z.infer<typeof inputSchema>;
@@ -17,6 +42,25 @@ export class GetStayController implements Controller {
   path = "/booking/stay/:stay_id";
   method = HttpControllerMethod.GET;
   inputSchema = inputSchema;
+
+  openApiSpec: OpenApiOperation = {
+    summary: "Get stay",
+    description: "Returns full stay details including tenant information.",
+    tags: ["Stays"],
+    parameters: [
+      {
+        name: "stay_id",
+        in: "path",
+        required: true,
+        schema: { type: "string", format: "uuid" },
+      },
+    ],
+    responses: {
+      "200": responseFromZod("Stay details", outputSchema),
+      "401": errorResponse("Unauthorized"),
+      "404": errorResponse("Stay not found"),
+    },
+  };
 
   constructor(private readonly useCase: GetStayUseCase) {}
 
