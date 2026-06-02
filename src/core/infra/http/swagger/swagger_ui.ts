@@ -1,4 +1,18 @@
-export function swaggerUiHtml(specUrl: string): string {
+export function swaggerUiHtml(
+  specUrl: string,
+  opts?: { signInPath?: string }
+): string {
+  const autoAuthScript = opts?.signInPath
+    ? `
+        responseInterceptor: (response) => {
+          if (response.url.endsWith('${opts.signInPath}') && response.status === 200) {
+            const token = response.body?.token;
+            if (token) ui.preauthorizeApiKey('bearerAuth', token);
+          }
+          return response;
+        },`
+    : "";
+
   return `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -17,7 +31,8 @@ export function swaggerUiHtml(specUrl: string): string {
     <div id="swagger-ui"></div>
     <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
     <script>
-      SwaggerUIBundle({
+      let ui;
+      ui = SwaggerUIBundle({
         url: '${specUrl}',
         dom_id: '#swagger-ui',
         presets: [
@@ -26,7 +41,7 @@ export function swaggerUiHtml(specUrl: string): string {
         ],
         layout: 'BaseLayout',
         deepLinking: true,
-        tryItOutEnabled: true,
+        tryItOutEnabled: true,${autoAuthScript}
       });
     </script>
   </body>

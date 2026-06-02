@@ -171,7 +171,7 @@ routeMap.set("/docs/spec", {
 
 routeMap.set("/docs", {
   [HttpControllerMethod.GET]: async () =>
-    new Response(swaggerUiHtml("/docs/spec"), {
+    new Response(swaggerUiHtml("/docs/spec", { signInPath: "/auth/sign-in" }), {
       headers: { "Content-Type": "text/html" },
     }),
 });
