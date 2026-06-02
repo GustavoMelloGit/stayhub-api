@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { ConflictError } from "../../../application/error/conflict_error";
 import { IllegalStateError } from "../../../application/error/illegal_state_error";
 import { ResourceNotFoundError } from "../../../application/error/resource_not_found_error";
@@ -117,6 +118,19 @@ export function BunHttpControllerAdapter(
         controller
       );
       const controllerRequest = await controllerRequestParser.parse();
+
+      if (controller.inputSchema) {
+        const merged = {
+          ...controllerRequest.query,
+          ...controllerRequest.body,
+          ...controllerRequest.params,
+        };
+        const result = controller.inputSchema.safeParse(merged);
+        if (!result.success) {
+          throw new ValidationError(z.prettifyError(result.error));
+        }
+        controllerRequest.body = result.data as Record<string, unknown>;
+      }
 
       let user: User | undefined;
       if (authenticated) {

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { ValidationError } from "../../../../core/application/error/validation_error";
 import { CancelStayUseCase } from "../../../application/use_case/stay/cancel_stay";
 import {
   HttpControllerMethod,
@@ -17,25 +16,12 @@ type Input = z.infer<typeof inputSchema>;
 export class CancelStayController implements Controller {
   path = "/booking/stay/:stay_id";
   method = HttpControllerMethod.DELETE;
+  inputSchema = inputSchema;
 
   constructor(private readonly useCase: CancelStayUseCase) {}
 
-  #validate(request: ControllerRequest): Input {
-    const parsedInput = inputSchema.safeParse(request.params);
-
-    if (!parsedInput.success) {
-      const errors = z.prettifyError(parsedInput.error);
-      throw new ValidationError(`Validation errors: ${JSON.stringify(errors)}`);
-    }
-
-    return parsedInput.data;
-  }
-
   async handle(request: ControllerRequest, user: User) {
-    const validationResponse = this.#validate(request);
-
-    const output = await this.useCase.execute(validationResponse, user);
-
+    const output = await this.useCase.execute(request.body as Input, user);
     return output;
   }
 }

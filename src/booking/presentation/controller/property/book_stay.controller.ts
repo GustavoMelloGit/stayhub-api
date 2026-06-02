@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { ValidationError } from "../../../../core/application/error/validation_error";
 import { BookStayUseCase } from "../../../application/use_case/property/book_stay";
 import {
   HttpControllerMethod,
@@ -54,6 +53,7 @@ type Input = z.infer<typeof inputSchema>;
 export class BookStayController implements Controller {
   path = "/booking/property/:property_id/book";
   method = HttpControllerMethod.POST;
+  inputSchema = inputSchema;
 
   openApiSpec: OpenApiOperation = {
     summary: "Book a stay",
@@ -92,29 +92,8 @@ export class BookStayController implements Controller {
 
   constructor(private readonly useCase: BookStayUseCase) {}
 
-  #validate(request: ControllerRequest): Input {
-    const { property_id } = request.params;
-    const data: Record<string, unknown> = request.body;
-    data.property_id = property_id;
-
-    const parsedInput = inputSchema.safeParse(data);
-
-    if (!parsedInput.success) {
-      const errors = z.prettifyError(parsedInput.error);
-      throw new ValidationError(`Validation errors: ${JSON.stringify(errors)}`);
-    }
-
-    return parsedInput.data;
-  }
-
   async handle(request: ControllerRequest, user: User) {
-    const validationResponse = this.#validate(request);
-
-    const output = await this.useCase.execute(validationResponse, user);
-
-    return {
-      message: "Stay created successfully",
-      data: output,
-    };
+    const output = await this.useCase.execute(request.body as Input, user);
+    return { message: "Stay created successfully", data: output };
   }
 }

@@ -5,7 +5,6 @@ import {
   type Controller,
   type ControllerRequest,
 } from "../../../../core/presentation/controller/controller";
-import { ValidationError } from "../../../../core/application/error/validation_error";
 
 const inputSchema = z.object({
   stay_id: z.uuid(),
@@ -16,25 +15,12 @@ type Input = z.infer<typeof inputSchema>;
 export class GetPublicStayController implements Controller {
   path = "/public/booking/stay/:stay_id";
   method = HttpControllerMethod.GET;
+  inputSchema = inputSchema;
 
   constructor(private readonly useCase: GetPublicStayUseCase) {}
 
-  #validate(request: ControllerRequest): Input {
-    const parsedInput = inputSchema.safeParse(request.params);
-
-    if (!parsedInput.success) {
-      const errors = z.prettifyError(parsedInput.error);
-      throw new ValidationError(`Validation errors: ${JSON.stringify(errors)}`);
-    }
-
-    return parsedInput.data;
-  }
-
   async handle(request: ControllerRequest) {
-    const validationResponse = this.#validate(request);
-
-    const output = await this.useCase.execute(validationResponse);
-
+    const output = await this.useCase.execute(request.body as Input);
     return output;
   }
 }

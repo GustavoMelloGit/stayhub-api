@@ -1,5 +1,4 @@
 import z from "zod";
-import { ValidationError } from "../../../../core/application/error/validation_error";
 import type { SignInUseCase } from "../../../../auth/application/use_case/sign_in";
 import {
   HttpControllerMethod,
@@ -35,6 +34,7 @@ type Input = z.infer<typeof inputSchema>;
 export class SignInController implements Controller {
   path = "/auth/sign-in";
   method = HttpControllerMethod.POST;
+  inputSchema = inputSchema;
 
   openApiSpec: OpenApiOperation = {
     summary: "Sign in",
@@ -51,21 +51,8 @@ export class SignInController implements Controller {
 
   constructor(private readonly useCase: SignInUseCase) {}
 
-  #validate(request: ControllerRequest): Input {
-    const parsedInput = inputSchema.safeParse(request.body);
-
-    if (!parsedInput.success) {
-      throw new ValidationError(parsedInput.error.message);
-    }
-
-    return parsedInput.data;
-  }
-
   async handle(request: ControllerRequest) {
-    const validationResponse = this.#validate(request);
-
-    const output = await this.useCase.execute(validationResponse);
-
+    const output = await this.useCase.execute(request.body as Input);
     return output;
   }
 }

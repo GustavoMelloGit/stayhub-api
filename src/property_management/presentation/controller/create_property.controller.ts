@@ -6,7 +6,6 @@ import {
   type Controller,
   type ControllerRequest,
 } from "../../../core/presentation/controller/controller";
-import { ValidationError } from "../../../core/application/error/validation_error";
 
 const inputSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -26,37 +25,22 @@ const inputSchema = z.object({
 
 type Input = z.infer<typeof inputSchema>;
 
-/**
- * Controller para criar uma nova propriedade
- */
 export class CreatePropertyController implements Controller {
   path = "/property";
   method = HttpControllerMethod.POST;
+  inputSchema = inputSchema;
 
   constructor(private readonly useCase: CreatePropertyUseCase) {}
 
-  #validate(request: ControllerRequest): Input {
-    const data: Record<string, unknown> = request.body;
-
-    const parsedInput = inputSchema.safeParse(data);
-
-    if (!parsedInput.success) {
-      const errors = z.prettifyError(parsedInput.error);
-      throw new ValidationError(`Validation errors: ${JSON.stringify(errors)}`);
-    }
-
-    return parsedInput.data;
-  }
-
   async handle(request: ControllerRequest, user: User) {
-    const validationResponse = this.#validate(request);
+    const input = request.body as Input;
 
     const output = await this.useCase.execute({
-      name: validationResponse.name,
+      name: input.name,
       user_id: user.id,
-      address: validationResponse.address,
-      images: validationResponse.images,
-      capacity: validationResponse.capacity,
+      address: input.address,
+      images: input.images,
+      capacity: input.capacity,
     });
 
     return output;

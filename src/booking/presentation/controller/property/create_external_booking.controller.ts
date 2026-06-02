@@ -6,7 +6,6 @@ import {
   type Controller,
   type ControllerRequest,
 } from "../../../../core/presentation/controller/controller";
-import { ValidationError } from "../../../../core/application/error/validation_error";
 
 const inputSchema = z.object({
   platform_name: z.enum(["AIRBNB", "BOOKING"]),
@@ -19,31 +18,17 @@ type Input = z.infer<typeof inputSchema>;
 export class CreateExternalBookingSourceController implements Controller {
   path = "/booking/property/:property_id/external-booking";
   method = HttpControllerMethod.POST;
+  inputSchema = inputSchema;
 
   constructor(private readonly useCase: CreateExternalBookingSourceUseCase) {}
 
-  #validate(request: ControllerRequest): Input {
-    const { property_id } = request.params;
-    const data: Record<string, unknown> = request.body;
-    data.property_id = property_id;
-
-    const parsedInput = inputSchema.safeParse(data);
-
-    if (!parsedInput.success) {
-      const errors = z.prettifyError(parsedInput.error);
-      throw new ValidationError(`Validation errors: ${JSON.stringify(errors)}`);
-    }
-
-    return parsedInput.data;
-  }
-
   async handle(request: ControllerRequest, user: User) {
-    const validationResponse = this.#validate(request);
+    const input = request.body as Input;
 
     const output = await this.useCase.execute({
-      platform_name: validationResponse.platform_name,
-      sync_url: validationResponse.sync_url,
-      property_id: validationResponse.property_id,
+      platform_name: input.platform_name,
+      sync_url: input.sync_url,
+      property_id: input.property_id,
       user_id: user.id,
     });
 

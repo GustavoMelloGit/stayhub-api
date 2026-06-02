@@ -6,7 +6,6 @@ import {
   type Controller,
   type ControllerRequest,
 } from "../../../core/presentation/controller/controller";
-import { ValidationError } from "../../../core/application/error/validation_error";
 
 const inputSchema = z.object({
   property_id: z.uuid(),
@@ -34,43 +33,27 @@ const inputSchema = z.object({
 
 type Input = z.infer<typeof inputSchema>;
 
-/**
- * Controller para atualizar dados de uma propriedade
- */
 export class UpdatePropertyController implements Controller {
   path = "/property/:property_id";
   method = HttpControllerMethod.PATCH;
+  inputSchema = inputSchema;
 
   constructor(private readonly useCase: UpdatePropertyUseCase) {}
 
-  #validate(request: ControllerRequest): Input {
-    const { property_id } = request.params;
-    const data: Record<string, unknown> = request.body;
-    data.property_id = property_id;
-
-    const parsedInput = inputSchema.safeParse(data);
-
-    if (!parsedInput.success) {
-      const errors = z.prettifyError(parsedInput.error);
-      throw new ValidationError(`Validation errors: ${JSON.stringify(errors)}`);
-    }
-
-    return parsedInput.data;
-  }
-
   async handle(request: ControllerRequest, user: User) {
-    const validationResponse = this.#validate(request);
+    const input = request.body as Input;
 
     const output = await this.useCase.execute({
-      property_id: validationResponse.property_id,
+      property_id: input.property_id,
       user_id: user.id,
       update_data: {
-        name: validationResponse.name,
-        address: validationResponse.address,
-        images: validationResponse.images,
-        capacity: validationResponse.capacity,
+        name: input.name,
+        address: input.address,
+        images: input.images,
+        capacity: input.capacity,
       },
     });
+
     return output;
   }
 }
