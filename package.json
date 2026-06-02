@@ -42,7 +42,8 @@
     "jsonwebtoken": "^9.0.3",
     "node-ical": "^0.20.1",
     "pg": "^8.21.0",
-    "zod": "^4.4.3"
+    "zod": "^4.4.3",
+    "zod-to-json-schema": "^3.25.2"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

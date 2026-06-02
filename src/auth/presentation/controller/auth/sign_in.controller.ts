@@ -7,10 +7,27 @@ import {
   type ControllerRequest,
 } from "../../../../core/presentation/controller/controller";
 import type { OpenApiOperation } from "../../../../core/presentation/open_api/open_api_types";
+import {
+  bodyFromZod,
+  errorResponse,
+  responseFromZod,
+  validationErrorResponse,
+} from "../../../../core/infra/http/swagger/schema_helpers";
 
 const inputSchema = z.object({
   email: z.email(),
   password: z.string(),
+});
+
+const outputSchema = z.object({
+  token: z.string().describe("JWT bearer token"),
+  user: z.object({
+    id: z.string().uuid(),
+    name: z.string(),
+    email: z.string().email(),
+    created_at: z.string().datetime(),
+    updated_at: z.string().datetime(),
+  }),
 });
 
 type Input = z.infer<typeof inputSchema>;
@@ -24,85 +41,11 @@ export class SignInController implements Controller {
     description:
       "Authenticates a user with email and password, returning a JWT token.",
     tags: ["Auth"],
-    requestBody: {
-      required: true,
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            required: ["email", "password"],
-            properties: {
-              email: {
-                type: "string",
-                format: "email",
-                example: "user@example.com",
-              },
-              password: {
-                type: "string",
-                format: "password",
-                example: "password123",
-              },
-            },
-          },
-        },
-      },
-    },
+    requestBody: bodyFromZod(inputSchema),
     responses: {
-      "200": {
-        description: "Successfully authenticated",
-        content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: {
-                token: {
-                  type: "string",
-                  description: "JWT bearer token",
-                },
-                user: {
-                  type: "object",
-                  properties: {
-                    id: { type: "string", format: "uuid" },
-                    name: { type: "string" },
-                    email: { type: "string", format: "email" },
-                    created_at: { type: "string", format: "date-time" },
-                    updated_at: { type: "string", format: "date-time" },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      "401": {
-        description: "Invalid credentials",
-        content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: {
-                message: {
-                  type: "string",
-                  example: "Incorrect e-mail or password",
-                },
-              },
-            },
-          },
-        },
-      },
-      "422": {
-        description: "Validation error — invalid request body",
-        content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: {
-                message: { type: "string" },
-              },
-            },
-          },
-        },
-      },
+      "200": responseFromZod("Successfully authenticated", outputSchema),
+      "401": errorResponse("Invalid credentials"),
+      "422": validationErrorResponse(),
     },
   };
 
