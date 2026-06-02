@@ -7,7 +7,11 @@ import type {
 
 export function bodyFromZod(
   schema: ZodTypeAny,
-  opts?: { description?: string; required?: boolean }
+  opts?: {
+    description?: string;
+    required?: boolean;
+    example?: Record<string, unknown>;
+  }
 ): OpenApiRequestBody {
   return {
     description: opts?.description,
@@ -17,6 +21,7 @@ export function bodyFromZod(
         schema: zodToJsonSchema(schema, {
           target: "openApi3",
         }) as Record<string, unknown>,
+        example: opts?.example,
       },
     },
   };

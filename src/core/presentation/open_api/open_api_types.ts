@@ -12,6 +12,7 @@ export type OpenApiRequestBody = {
   content: {
     "application/json": {
       schema: Record<string, unknown>;
+      example?: Record<string, unknown>;
     };
   };
 };
