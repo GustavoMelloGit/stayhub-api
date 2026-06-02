@@ -11,6 +11,8 @@ import { TenantDi } from "../../../../booking/infra/di/tenant_di";
 import { BunHttpControllerAdapter } from "../adapters/http_controller_adapter";
 import { FinanceDi } from "../../../../finance/infra/di/finance_di";
 import { PropertyManagementDi } from "../../../../property_management/infra/di/property_management_di";
+import { OpenApiBuilder } from "../swagger/open_api_builder";
+import { swaggerUiHtml } from "../swagger/swagger_ui";
 
 const tenantDi = new TenantDi();
 const propertyDi = new PropertyDi();
@@ -157,6 +159,21 @@ controllers.forEach(({ authenticated, controller }) => {
         corsMiddleware.handlePreflightRequest(request),
     });
   }
+});
+
+const openApiSpec = new OpenApiBuilder(controllers).build();
+
+routeMap.set("/docs/spec", {
+  [HttpControllerMethod.GET]: async () => Response.json(openApiSpec),
+  [HttpControllerMethod.OPTIONS]: async (request: Request) =>
+    corsMiddleware.handlePreflightRequest(request),
+});
+
+routeMap.set("/docs", {
+  [HttpControllerMethod.GET]: async () =>
+    new Response(swaggerUiHtml("/docs/spec"), {
+      headers: { "Content-Type": "text/html" },
+    }),
 });
 
 export const bunRoutes = Object.fromEntries(routeMap.entries());
