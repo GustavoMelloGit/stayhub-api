@@ -8,14 +8,17 @@ export class ICalendarAdapter implements CalendarAdapter {
     const bookedPeriods: BookedPeriod[] = [];
 
     for (const event of Object.values(events)) {
-      if (event.type === "VEVENT" && event.start && event.end) {
-        bookedPeriods.push(
-          new BookedPeriod({
-            start: new Date(event.start),
-            end: new Date(event.end),
-          })
-        );
-      }
+      if (event.type !== "VEVENT" || !event.start || !event.end) continue;
+
+      const isAirbnb = event.uid?.includes("@airbnb.com");
+      if (isAirbnb && event.summary !== "Reserved") continue;
+
+      bookedPeriods.push(
+        new BookedPeriod({
+          start: new Date(event.start),
+          end: new Date(event.end),
+        })
+      );
     }
     return bookedPeriods;
   }
