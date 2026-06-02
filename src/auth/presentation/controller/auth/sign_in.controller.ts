@@ -1,15 +1,32 @@
 import z from "zod";
-import { ValidationError } from "../../../../core/application/error/validation_error";
 import type { SignInUseCase } from "../../../../auth/application/use_case/sign_in";
 import {
   HttpControllerMethod,
   type Controller,
   type ControllerRequest,
 } from "../../../../core/presentation/controller/controller";
+import type { OpenApiOperation } from "../../../../core/presentation/open_api/open_api_types";
+import {
+  bodyFromZod,
+  errorResponse,
+  responseFromZod,
+  validationErrorResponse,
+} from "../../../../core/infra/http/swagger/schema_helpers";
 
 const inputSchema = z.object({
   email: z.email(),
   password: z.string(),
+});
+
+const outputSchema = z.object({
+  token: z.string().describe("JWT bearer token"),
+  user: z.object({
+    id: z.string().uuid(),
+    name: z.string(),
+    email: z.string().email(),
+    created_at: z.string().datetime(),
+    updated_at: z.string().datetime(),
+  }),
 });
 
 type Input = z.infer<typeof inputSchema>;
@@ -17,24 +34,25 @@ type Input = z.infer<typeof inputSchema>;
 export class SignInController implements Controller {
   path = "/auth/sign-in";
   method = HttpControllerMethod.POST;
+  inputSchema = inputSchema;
+
+  openApiSpec: OpenApiOperation = {
+    summary: "Sign in",
+    description:
+      "Authenticates a user with email and password, returning a JWT token.",
+    tags: ["Auth"],
+    requestBody: bodyFromZod(inputSchema),
+    responses: {
+      "200": responseFromZod("Successfully authenticated", outputSchema),
+      "401": errorResponse("Invalid credentials"),
+      "422": validationErrorResponse(),
+    },
+  };
 
   constructor(private readonly useCase: SignInUseCase) {}
 
-  #validate(request: ControllerRequest): Input {
-    const parsedInput = inputSchema.safeParse(request.body);
-
-    if (!parsedInput.success) {
-      throw new ValidationError(parsedInput.error.message);
-    }
-
-    return parsedInput.data;
-  }
-
   async handle(request: ControllerRequest) {
-    const validationResponse = this.#validate(request);
-
-    const output = await this.useCase.execute(validationResponse);
-
+    const output = await this.useCase.execute(request.body as Input);
     return output;
   }
 }

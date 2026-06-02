@@ -4,13 +4,49 @@ import {
   type Controller,
   type ControllerRequest,
 } from "../../../core/presentation/controller/controller";
-import { ValidationError } from "../../../core/application/error/validation_error";
 import type { FindPropertyFinancialMovementsUseCase } from "../../application/use_case/find_property_financial_movements";
+import {
+  DEFAULT_LIMIT,
+  DEFAULT_PAGE,
+  MAX_LIMIT,
+} from "../../../core/application/dto/pagination";
+import type { OpenApiOperation } from "../../../core/presentation/open_api/open_api_types";
+import {
+  errorResponse,
+  responseFromZod,
+} from "../../../core/infra/http/swagger/schema_helpers";
 
 const inputSchema = z.object({
   property_id: z.uuidv4("Property ID must be a valid UUID"),
-  page: z.coerce.number().int().positive().default(1),
-  limit: z.coerce.number().int().positive().max(100).default(20),
+  page: z.coerce.number().int().positive().default(DEFAULT_PAGE),
+  limit: z.coerce
+    .number()
+    .int()
+    .positive()
+    .max(MAX_LIMIT)
+    .default(DEFAULT_LIMIT),
+});
+
+const outputSchema = z.object({
+  data: z.array(
+    z.object({
+      id: z.string().uuid(),
+      amount: z.number().int().describe("Amount in cents (negative = expense)"),
+      description: z.string().nullable(),
+      category: z.string(),
+      property_id: z.string().uuid(),
+      created_at: z.string().datetime(),
+      updated_at: z.string().datetime(),
+    })
+  ),
+  pagination: z.object({
+    page: z.number().int(),
+    limit: z.number().int(),
+    total: z.number().int(),
+    total_pages: z.number().int(),
+    has_next: z.boolean(),
+    has_previous: z.boolean(),
+  }),
 });
 
 type Input = z.infer<typeof inputSchema>;
@@ -18,42 +54,50 @@ type Input = z.infer<typeof inputSchema>;
 export class FindPropertyFinancialMovementsController implements Controller {
   path = "/finance/properties/:property_id/movements";
   method = HttpControllerMethod.GET;
+  inputSchema = inputSchema;
+
+  openApiSpec: OpenApiOperation = {
+    summary: "Find property financial movements",
+    description:
+      "Returns a paginated ledger of income and expense entries for a property.",
+    tags: ["Finance"],
+    parameters: [
+      {
+        name: "property_id",
+        in: "path",
+        required: true,
+        schema: { type: "string", format: "uuid" },
+      },
+      {
+        name: "page",
+        in: "query",
+        required: false,
+        schema: { type: "integer", default: DEFAULT_PAGE },
+      },
+      {
+        name: "limit",
+        in: "query",
+        required: false,
+        schema: { type: "integer", default: DEFAULT_LIMIT },
+      },
+    ],
+    responses: {
+      "200": responseFromZod("Paginated financial movements", outputSchema),
+      "401": errorResponse("Unauthorized"),
+      "404": errorResponse("Property not found"),
+    },
+  };
 
   constructor(
     private readonly useCase: FindPropertyFinancialMovementsUseCase
   ) {}
 
-  #validate(request: ControllerRequest): Input {
-    const { property_id } = request.params;
-    const queryParams = request.query as Record<string, unknown>;
-
-    const data = {
-      property_id,
-      page: queryParams.page,
-      limit: queryParams.limit,
-    };
-
-    const parsedInput = inputSchema.safeParse(data);
-
-    if (!parsedInput.success) {
-      const errors = z.prettifyError(parsedInput.error);
-      throw new ValidationError(`Validation errors: ${JSON.stringify(errors)}`);
-    }
-
-    return parsedInput.data;
-  }
-
   async handle(request: ControllerRequest): Promise<unknown> {
-    const validationResponse = this.#validate(request);
+    const input = request.body as Input;
 
-    const result = await this.useCase.execute({
-      propertyId: validationResponse.property_id,
-      pagination: {
-        page: validationResponse.page,
-        limit: validationResponse.limit,
-      },
+    return this.useCase.execute({
+      propertyId: input.property_id,
+      pagination: { page: input.page, limit: input.limit },
     });
-
-    return result;
   }
 }

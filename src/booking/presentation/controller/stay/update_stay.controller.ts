@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { ValidationError } from "../../../../core/application/error/validation_error";
 import { UpdateStayUseCase } from "../../../application/use_case/stay/update_stay";
 import {
   HttpControllerMethod,
@@ -7,6 +6,13 @@ import {
   type ControllerRequest,
 } from "../../../../core/presentation/controller/controller";
 import type { User } from "../../../../auth/domain/entity/user";
+import type { OpenApiOperation } from "../../../../core/presentation/open_api/open_api_types";
+import {
+  bodyFromZod,
+  errorResponse,
+  responseFromZod,
+  validationErrorResponse,
+} from "../../../../core/infra/http/swagger/schema_helpers";
 
 const inputSchema = z.object({
   stay_id: z.uuid(),
@@ -16,33 +22,48 @@ const inputSchema = z.object({
   price: z.int().positive().optional(),
 });
 
+const outputSchema = z.object({
+  id: z.string().uuid(),
+  check_in: z.string().datetime(),
+  check_out: z.string().datetime(),
+  guests: z.number().int(),
+  entrance_code: z.string(),
+  price: z.number().int().describe("Price in cents"),
+  updated_at: z.string().datetime(),
+});
+
 type Input = z.infer<typeof inputSchema>;
 
 export class UpdateStayController implements Controller {
   path = "/booking/stay/:stay_id";
   method = HttpControllerMethod.PATCH;
+  inputSchema = inputSchema;
+
+  openApiSpec: OpenApiOperation = {
+    summary: "Update stay",
+    description: "Updates check-in/check-out dates, guests or price of a stay.",
+    tags: ["Stays"],
+    parameters: [
+      {
+        name: "stay_id",
+        in: "path",
+        required: true,
+        schema: { type: "string", format: "uuid" },
+      },
+    ],
+    requestBody: bodyFromZod(inputSchema.omit({ stay_id: true })),
+    responses: {
+      "200": responseFromZod("Updated stay", outputSchema),
+      "401": errorResponse("Unauthorized"),
+      "404": errorResponse("Stay not found"),
+      "422": validationErrorResponse(),
+    },
+  };
 
   constructor(private readonly useCase: UpdateStayUseCase) {}
 
-  #validate(request: ControllerRequest): Input {
-    const parsedInput = inputSchema.safeParse({
-      ...request.params,
-      ...request.body,
-    });
-
-    if (!parsedInput.success) {
-      const errors = z.prettifyError(parsedInput.error);
-      throw new ValidationError(`Validation errors: ${JSON.stringify(errors)}`);
-    }
-
-    return parsedInput.data;
-  }
-
   async handle(request: ControllerRequest, user: User) {
-    const validationResponse = this.#validate(request);
-
-    const output = await this.useCase.execute(validationResponse, user);
-
+    const output = await this.useCase.execute(request.body as Input, user);
     return output;
   }
 }

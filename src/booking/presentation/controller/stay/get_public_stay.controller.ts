@@ -5,10 +5,23 @@ import {
   type Controller,
   type ControllerRequest,
 } from "../../../../core/presentation/controller/controller";
-import { ValidationError } from "../../../../core/application/error/validation_error";
+import type { OpenApiOperation } from "../../../../core/presentation/open_api/open_api_types";
+import {
+  errorResponse,
+  responseFromZod,
+} from "../../../../core/infra/http/swagger/schema_helpers";
 
 const inputSchema = z.object({
   stay_id: z.uuid(),
+});
+
+const outputSchema = z.object({
+  check_in: z.string().datetime(),
+  check_out: z.string().datetime(),
+  entrance_code: z.string(),
+  tenant: z.object({
+    name: z.string(),
+  }),
 });
 
 type Input = z.infer<typeof inputSchema>;
@@ -16,25 +29,30 @@ type Input = z.infer<typeof inputSchema>;
 export class GetPublicStayController implements Controller {
   path = "/public/booking/stay/:stay_id";
   method = HttpControllerMethod.GET;
+  inputSchema = inputSchema;
+
+  openApiSpec: OpenApiOperation = {
+    summary: "Get public stay",
+    description: "Returns publicly accessible stay information by ID.",
+    tags: ["Stays"],
+    parameters: [
+      {
+        name: "stay_id",
+        in: "path",
+        required: true,
+        schema: { type: "string", format: "uuid" },
+      },
+    ],
+    responses: {
+      "200": responseFromZod("Stay public details", outputSchema),
+      "404": errorResponse("Stay not found"),
+    },
+  };
 
   constructor(private readonly useCase: GetPublicStayUseCase) {}
 
-  #validate(request: ControllerRequest): Input {
-    const parsedInput = inputSchema.safeParse(request.params);
-
-    if (!parsedInput.success) {
-      const errors = z.prettifyError(parsedInput.error);
-      throw new ValidationError(`Validation errors: ${JSON.stringify(errors)}`);
-    }
-
-    return parsedInput.data;
-  }
-
   async handle(request: ControllerRequest) {
-    const validationResponse = this.#validate(request);
-
-    const output = await this.useCase.execute(validationResponse);
-
+    const output = await this.useCase.execute(request.body as Input);
     return output;
   }
 }

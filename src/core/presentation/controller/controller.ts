@@ -1,4 +1,6 @@
 import type { User } from "../../../auth/domain/entity/user";
+import type { ZodTypeAny } from "zod";
+import type { OpenApiOperation } from "../open_api/open_api_types";
 
 export enum HttpControllerMethod {
   GET = "GET",
@@ -26,4 +28,6 @@ export interface Controller {
   path: string;
   method: HttpControllerMethod;
   handle(request: ControllerRequest, user?: User): Promise<unknown>;
+  openApiSpec?: OpenApiOperation;
+  inputSchema?: ZodTypeAny;
 }
