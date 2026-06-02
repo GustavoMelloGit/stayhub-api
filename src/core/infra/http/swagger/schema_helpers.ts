@@ -1,12 +1,19 @@
-import { zodToJsonSchema } from "zod-to-json-schema";
-import type { ZodTypeAny } from "zod";
+import { z } from "zod";
 import type {
   OpenApiRequestBody,
   OpenApiResponse,
 } from "../../../presentation/open_api/open_api_types";
 
+function toSchema(schema: z.ZodTypeAny): Record<string, unknown> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { $schema, ...rest } = z.toJSONSchema(schema, {
+    unrepresentable: "any",
+  }) as Record<string, unknown>;
+  return rest;
+}
+
 export function bodyFromZod(
-  schema: ZodTypeAny,
+  schema: z.ZodTypeAny,
   opts?: {
     description?: string;
     required?: boolean;
@@ -18,9 +25,7 @@ export function bodyFromZod(
     required: opts?.required ?? true,
     content: {
       "application/json": {
-        schema: zodToJsonSchema(schema, {
-          target: "openApi3",
-        }) as Record<string, unknown>,
+        schema: toSchema(schema),
         example: opts?.example,
       },
     },
@@ -29,15 +34,13 @@ export function bodyFromZod(
 
 export function responseFromZod(
   description: string,
-  schema: ZodTypeAny
+  schema: z.ZodTypeAny
 ): OpenApiResponse {
   return {
     description,
     content: {
       "application/json": {
-        schema: zodToJsonSchema(schema, {
-          target: "openApi3",
-        }) as Record<string, unknown>,
+        schema: toSchema(schema),
       },
     },
   };
