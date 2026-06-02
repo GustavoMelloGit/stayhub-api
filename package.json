@@ -29,20 +29,20 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "prettier": "3.6.2",
-    "tsx": "^4.21.0",
-    "typescript-eslint": "^8.58.0"
+    "tsx": "^4.22.4",
+    "typescript-eslint": "^8.60.1"
   },
   "peerDependencies": {
     "typescript": "^5.8.3"
   },
   "dependencies": {
     "@tuya/tuya-connector-nodejs": "^2.1.2",
-    "date-fns": "^4.1.0",
+    "date-fns": "^4.4.0",
     "drizzle-orm": "^0.44.7",
     "jsonwebtoken": "^9.0.3",
     "node-ical": "^0.20.1",
-    "pg": "^8.20.0",
-    "zod": "^4.3.6"
+    "pg": "^8.21.0",
+    "zod": "^4.4.3"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
