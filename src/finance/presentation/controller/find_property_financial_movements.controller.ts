@@ -25,6 +25,8 @@ const inputSchema = z.object({
     .positive()
     .max(MAX_LIMIT)
     .default(DEFAULT_LIMIT),
+  start_date: z.coerce.date().optional(),
+  end_date: z.coerce.date().optional(),
 });
 
 const outputSchema = z.object({
@@ -80,6 +82,20 @@ export class FindPropertyFinancialMovementsController implements Controller {
         required: false,
         schema: { type: "integer", default: DEFAULT_LIMIT },
       },
+      {
+        name: "start_date",
+        in: "query",
+        required: false,
+        schema: { type: "string", format: "date-time" },
+        description: "Filter entries on or after this date (ISO 8601)",
+      },
+      {
+        name: "end_date",
+        in: "query",
+        required: false,
+        schema: { type: "string", format: "date-time" },
+        description: "Filter entries on or before this date (ISO 8601)",
+      },
     ],
     responses: {
       "200": responseFromZod("Paginated financial movements", outputSchema),
@@ -98,6 +114,10 @@ export class FindPropertyFinancialMovementsController implements Controller {
     return this.useCase.execute({
       propertyId: input.property_id,
       pagination: { page: input.page, limit: input.limit },
+      dateFilter: {
+        start_date: input.start_date,
+        end_date: input.end_date,
+      },
     });
   }
 }

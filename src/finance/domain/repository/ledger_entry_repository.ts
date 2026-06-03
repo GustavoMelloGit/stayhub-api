@@ -4,11 +4,17 @@ import type {
   PaginationInput,
 } from "../../../core/application/dto/pagination";
 
+export type DateFilter = {
+  start_date?: Date;
+  end_date?: Date;
+};
+
 export interface LedgerEntryRepository {
   save(entry: LedgerEntry): Promise<void>;
   propertyBalance(propertyId: string): Promise<number>;
   findByPropertyId(
     propertyId: string,
-    pagination: PaginationInput
+    pagination: PaginationInput,
+    dateFilter?: DateFilter
   ): Promise<PaginatedResult<LedgerEntry>>;
 }

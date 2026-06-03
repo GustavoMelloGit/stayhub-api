@@ -1,5 +1,8 @@
 import type { UseCase } from "../../../core/application/use_case/use_case";
-import type { LedgerEntryRepository } from "../../domain/repository/ledger_entry_repository";
+import type {
+  DateFilter,
+  LedgerEntryRepository,
+} from "../../domain/repository/ledger_entry_repository";
 import type {
   PaginatedResult,
   PaginationInput,
@@ -8,6 +11,7 @@ import type {
 type Input = {
   propertyId: string;
   pagination: PaginationInput;
+  dateFilter?: DateFilter;
 };
 
 type Output = PaginatedResult<{
@@ -31,7 +35,8 @@ export class FindPropertyFinancialMovementsUseCase
   async execute(input: Input): Promise<Output> {
     const movements = await this.ledgerEntryRepository.findByPropertyId(
       input.propertyId,
-      input.pagination
+      input.pagination,
+      input.dateFilter
     );
 
     return {

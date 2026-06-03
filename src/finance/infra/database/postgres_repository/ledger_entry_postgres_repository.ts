@@ -1,9 +1,12 @@
-import { eq, sum, count, desc } from "drizzle-orm";
+import { and, eq, gte, lte, sum, count, desc } from "drizzle-orm";
 import {
   LedgerEntry,
   type LedgerEntryData,
 } from "../../../domain/entity/ledger_entry";
-import type { LedgerEntryRepository } from "../../../domain/repository/ledger_entry_repository";
+import type {
+  DateFilter,
+  LedgerEntryRepository,
+} from "../../../domain/repository/ledger_entry_repository";
 import { db } from "../../../../core/infra/database/drizzle/database";
 import { ledgerEntriesTable } from "../../../../core/infra/database/drizzle/schema";
 import type {
@@ -44,9 +47,18 @@ export class LedgerEntryPostgresRepository implements LedgerEntryRepository {
 
   async findByPropertyId(
     propertyId: string,
-    pagination: PaginationInput
+    pagination: PaginationInput,
+    dateFilter?: DateFilter
   ): Promise<PaginatedResult<LedgerEntry>> {
-    const whereClause = eq(ledgerEntriesTable.property_id, propertyId);
+    const whereClause = and(
+      eq(ledgerEntriesTable.property_id, propertyId),
+      dateFilter?.start_date
+        ? gte(ledgerEntriesTable.created_at, dateFilter.start_date)
+        : undefined,
+      dateFilter?.end_date
+        ? lte(ledgerEntriesTable.created_at, dateFilter.end_date)
+        : undefined
+    );
     const offset = (pagination.page - 1) * pagination.limit;
 
     const [totalResult, entries] = await Promise.all([
