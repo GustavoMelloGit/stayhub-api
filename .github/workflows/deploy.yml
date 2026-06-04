@@ -6,9 +6,25 @@ on:
       - main
 
 jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Código
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Instalar Dependências
+        run: bun install
+
+      - name: Type Check
+        run: bun run typecheck
+
   deploy:
     runs-on: ubuntu-latest
     environment: production
+    needs: typecheck
     steps:
       - name: Checkout Código
         uses: actions/checkout@v4
@@ -50,7 +66,7 @@ jobs:
 
             /home/${{ secrets.VPS_RUNNER_USERNAME }}/.bun/bin/bun run db:push
 
-            /home/${{ secrets.VPS_RUNNER_USERNAME }}/.bun/bin/bun run build
+            /home/${{ secrets.VPS_RUNNER_USERNAME }}/.bun/bin/bun run build:server
 
             pm2 restart stayhub_api
 
