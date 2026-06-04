@@ -33,28 +33,24 @@ jobs:
 
           # Comandos a serem executados na VPS
           script: |
-            # 1. Troca para o usuário de baixa permissão para deploy
+            # Troca para o usuário de baixa permissão para deploy
             # Nota: o heredoc sem aspas (<<EOF) expande as variáveis no shell atual (SSH),
             # então os valores dos secrets são injetados antes de serem enviados ao sudo.
             sudo -i -u ${{ secrets.VPS_RUNNER_USERNAME }} /bin/bash << EOF
+            set -e
 
-            # Navega para o diretório da aplicação
             cd stayhub_api
 
-            # Puxa as últimas alterações
             git pull
 
-            # Recria o arquivo .env com os valores do GitHub (expandidos pelo shell SSH)
             printf 'PORT=$APP_PORT\nDATABASE_URL=$APP_DATABASE_URL\nJWT_SECRET=$APP_JWT_SECRET\nNODE_ENV=$APP_NODE_ENV\nTUYA_CLIENT_ID=$APP_TUYA_CLIENT_ID\nTUYA_CLIENT_SECRET=$APP_TUYA_CLIENT_SECRET\nTUYA_DEVICE_ID=$APP_TUYA_DEVICE_ID\n' > .env
 
-            # Instala dependências
             /home/${{ secrets.VPS_RUNNER_USERNAME }}/.bun/bin/bun install
 
-            # Roda migrações (Drizzle db:push)
             /home/${{ secrets.VPS_RUNNER_USERNAME }}/.bun/bin/bun run db:push
 
-            # 2. Reinicia o serviço PM2 (PM2 está instalado globalmente/com sudo)
+            /home/${{ secrets.VPS_RUNNER_USERNAME }}/.bun/bin/bun run build
+
             pm2 restart stayhub_api
 
-            # Finaliza a execução do usuário
             EOF
