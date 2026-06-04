@@ -54,6 +54,7 @@ jobs:
             # então os valores dos secrets são injetados antes de serem enviados ao sudo.
             sudo -i -u ${{ secrets.VPS_RUNNER_USERNAME }} /bin/bash << EOF
             set -e
+            export PATH="/home/${{ secrets.VPS_RUNNER_USERNAME }}/.bun/bin:\$PATH"
 
             cd stayhub_api
 
@@ -62,11 +63,11 @@ jobs:
 
             printf 'PORT=$APP_PORT\nDATABASE_URL=$APP_DATABASE_URL\nJWT_SECRET=$APP_JWT_SECRET\nNODE_ENV=$APP_NODE_ENV\nTUYA_CLIENT_ID=$APP_TUYA_CLIENT_ID\nTUYA_CLIENT_SECRET=$APP_TUYA_CLIENT_SECRET\nTUYA_DEVICE_ID=$APP_TUYA_DEVICE_ID\n' > .env
 
-            /home/${{ secrets.VPS_RUNNER_USERNAME }}/.bun/bin/bun install
+            bun install
 
-            /home/${{ secrets.VPS_RUNNER_USERNAME }}/.bun/bin/bun run db:push
+            bun run db:push
 
-            /home/${{ secrets.VPS_RUNNER_USERNAME }}/.bun/bin/bun run build:server
+            bun run build:server
 
             pm2 restart stayhub_api
 
