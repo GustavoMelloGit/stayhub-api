@@ -5,9 +5,11 @@ import {
 } from "../../application/service/session_manager";
 import { RegisterUserUseCase } from "../../application/use_case/register_user";
 import { SignInUseCase } from "../../application/use_case/sign_in";
+import { PurgeUserDataUseCase } from "../../application/use_case/purge_user_data";
 import { GetUserController } from "../../presentation/controller/auth/get_user.controller";
 import { RegisterUserController } from "../../presentation/controller/auth/register_user.controller";
 import { SignInController } from "../../presentation/controller/auth/sign_in.controller";
+import { PurgeUserDataController } from "../../presentation/controller/auth/purge_user_data.controller";
 import { BunHasher } from "../service/bun_hasher";
 import type { AuthRepository } from "../../domain/repository/auth_repository";
 import { AuthPostgresRepository } from "../database/postgres_repository/auth_postgres_repository";
@@ -49,5 +51,13 @@ export class AuthDi {
   }
   makeGetUserController() {
     return new GetUserController();
+  }
+
+  makePurgeUserDataUseCase() {
+    return new PurgeUserDataUseCase(this.#authRepository);
+  }
+
+  makePurgeUserDataController() {
+    return new PurgeUserDataController(this.makePurgeUserDataUseCase());
   }
 }

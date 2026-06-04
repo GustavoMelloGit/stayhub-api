@@ -124,6 +124,10 @@ const authControllers: Route[] = [
     authenticated: true,
     controller: authDi.makeGetUserController(),
   },
+  {
+    authenticated: true,
+    controller: authDi.makePurgeUserDataController(),
+  },
 ];
 
 const controllers = [
