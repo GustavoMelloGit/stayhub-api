@@ -100,11 +100,3 @@ O Desenvolvedor é responsável por traduzir as diretrizes arquiteturais em cód
 | O código começa a desviar dos padrões do projeto | Parar e perguntar como prosseguir                        |
 | Um erro de lint ou de tipo não tem solução óbvia | Parar e reportar antes de tentar contornar               |
 | A tarefa depende de outra ainda não concluída    | Parar e sinalizar a dependência bloqueante               |
-
----
-
-## Quando invocar esta persona
-
-- Para implementar as tarefas de um plano já aprovado pelo Arquiteto
-- Quando a tarefa envolver criação ou modificação de entidades, use cases, repositórios, controllers ou DI
-- Para tasks independentes que podem ser executadas em paralelo com outros agentes Desenvolvedor

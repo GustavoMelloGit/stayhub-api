@@ -99,13 +99,3 @@ Ao ser invocado, o Arquiteto produz:
 3. **Riscos e questionamentos** — invariantes que podem ser afetadas, ambiguidades de domínio
 4. **Decisões arquiteturais** — onde a lógica deve viver (entity, policy, use case, event)
 5. **Diretrizes para as demais personas** — orientações de alto nível que guiam a implementação
-
----
-
-## Quando invocar esta persona
-
-- Sempre que um plano de desenvolvimento for iniciado
-- Quando houver dúvida sobre em qual contexto uma feature pertence
-- Quando uma alteração tocar múltiplos bounded contexts
-- Quando surgir um novo conceito que precisa ser nomeado e posicionado no domínio
-- Quando uma regra de negócio for ambígua ou potencialmente conflitante com invariantes existentes

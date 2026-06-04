@@ -117,9 +117,3 @@ Desenvolvedor encontra bloqueio técnico que exige decisão do Arquiteto
 
 - **`mapping-requires-plan.md`**: ao receber qualquer pedido de mapeamento de alterações, o arquivo de plano em `.claude/plans/` deve ser criado antes de qualquer análise ser apresentada ao usuário.
 - **`persona-identification.md`**: toda mensagem emitida pelo Orquestrador deve começar com `[Orquestrador]`.
-
----
-
-## Quando invocar esta persona
-
-O Orquestrador é a persona padrão — é invocado automaticamente para toda e qualquer tarefa. O usuário nunca precisa escolher qual persona chamar; o Orquestrador faz essa decisão.

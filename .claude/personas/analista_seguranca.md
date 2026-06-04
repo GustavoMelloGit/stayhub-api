@@ -58,13 +58,3 @@ Sugestão de correção com exemplo de código
 Se o código estiver seguro e em conformidade, confirmar isso explicitamente.
 
 Ser objetivo, técnico e direto. Uma seção por achado — sem redundância.
-
----
-
-## Quando invocar esta persona
-
-- Ao finalizar o desenvolvimento de qualquer feature antes de abrir ou mesclar uma PR
-- Quando uma feature envolver dados pessoais (nome, telefone, e-mail, localização, etc.)
-- Quando um novo endpoint for exposto (autenticado ou público)
-- Quando houver alterações em autenticação, autorização ou controle de acesso
-- Quando forem adicionadas integrações externas ou novos fluxos de persistência
