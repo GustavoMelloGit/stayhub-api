@@ -1,101 +1,118 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Este arquivo fornece orientações ao Claude Code (claude.ai/code) ao trabalhar com este repositório.
 
-## Commands
+## Personas e Orquestração
+
+Este projeto utiliza um sistema de personas especialistas. **O Orquestrador é o ponto de entrada obrigatório para toda e qualquer tarefa.** Leia o arquivo abaixo antes de qualquer planejamento, desenvolvimento ou revisão:
+
+```
+.claude/personas/orquestrador.md
+```
+
+O Orquestrador decide quais personas invocar, em que ordem e quando. Nunca invoque o Arquiteto, o Desenvolvedor ou o Analista de Segurança diretamente — tudo passa pelo Orquestrador primeiro.
+
+| Persona                   | Arquivo                                  |
+| ------------------------- | ---------------------------------------- |
+| **Orquestrador**          | `.claude/personas/orquestrador.md`       |
+| **Arquiteto**             | `.claude/personas/arquiteto.md`          |
+| **Desenvolvedor**         | `.claude/personas/desenvolvedor.md`      |
+| **Analista de Segurança** | `.claude/personas/analista_seguranca.md` |
+
+## Comandos
 
 ```bash
-# Development
-bun run dev          # Start dev server with hot reload
-bun run start        # Start production server
+# Desenvolvimento
+bun run dev          # Inicia o servidor de desenvolvimento com hot reload
+bun run start        # Inicia o servidor de produção
 
 # Build
-bun run build        # TypeScript compile + Bun build to executable (./out)
+bun run build        # Compila TypeScript + Bun build para executável (./out)
 
-# Code Quality
-bun run lint         # ESLint with auto-fix
-bun run lint:check   # ESLint without fix (CI)
-bun run format       # Prettier format
-bun run format:check # Prettier check (CI)
+# Qualidade de Código
+bun run lint         # ESLint com auto-fix
+bun run lint:check   # ESLint sem fix (CI)
+bun run format       # Formatação com Prettier
+bun run format:check # Verificação do Prettier (CI)
 
-# Database (Drizzle ORM)
-bun run db:push       # Push schema to database
-bun run db:migration  # Generate migration files
-bun run db:migrate    # Run pending migrations
+# Banco de Dados (Drizzle ORM)
+bun run db:push       # Envia o schema para o banco
+bun run db:migration  # Gera arquivos de migration
+bun run db:migrate    # Executa migrations pendentes
 ```
 
-There is no test runner configured in this project.
+Não há test runner configurado neste projeto.
 
-## Architecture
+## Arquitetura
 
-**StayHub API** is a property rental management backend using Bun + TypeScript + PostgreSQL (Drizzle ORM). It follows **Clean Architecture** with strict layer separation.
+**StayHub API** é um backend de gestão de aluguel de imóveis construído com Bun + TypeScript + PostgreSQL (Drizzle ORM). Segue **Clean Architecture** com separação estrita de camadas.
 
-### Layer Structure
+### Estrutura de Camadas
 
-Every business module (`auth`, `booking`, `property_management`, `finance`) has four layers:
+Cada módulo de negócio (`auth`, `booking`, `property_management`, `finance`) possui quatro camadas:
 
 ```
-src/[module]/
-├── domain/         # Entities, repository interfaces, value objects, events, policies
-├── application/    # Use cases, services, DTOs, event handlers
-├── infra/          # Drizzle repositories, DI container, external integrations
-└── presentation/   # HTTP controllers
+src/[modulo]/
+├── domain/         # Entidades, interfaces de repositório, value objects, eventos, policies
+├── application/    # Use cases, serviços, DTOs, event handlers
+├── infra/          # Repositórios Drizzle, container DI, integrações externas
+└── presentation/   # Controllers HTTP
 ```
 
-The `src/core/` module provides shared infrastructure: base entity type, custom errors, `UseCase` interface, HTTP routing, DI wiring, and database setup.
+O módulo `src/core/` provê infraestrutura compartilhada: tipo base de entidade, erros customizados, interface `UseCase`, roteamento HTTP, configuração do DI e setup do banco.
 
-### Key Patterns
+### Padrões Principais
 
-**Entities** use a private `#data` field with a Zod schema. Two static factories: `create()` for new objects, `reconstitute()` for loading from DB. Getters expose read-only data. All entities extend `BaseEntity` with `id`, `created_at`, `updated_at`, `deleted_at`.
+**Entidades** usam um campo privado `#data` com schema Zod. Dois factories estáticos: `create()` para objetos novos, `reconstitute()` para carregar do banco. Getters expõem dados como read-only. Toda entidade estende `BaseEntity` com `id`, `created_at`, `updated_at`, `deleted_at`.
 
-**Use Cases** implement `UseCase<Input, Output>`. Dependencies injected via constructor. `execute(input, user)` returns a DTO (never a raw entity). Throw domain-specific errors (e.g., `ConflictError`, `ResourceNotFoundError`).
+**Use Cases** implementam `UseCase<Input, Output>`. Dependências injetadas via construtor. `execute(input, user)` retorna um DTO (nunca uma entidade bruta). Lançam erros tipados (`ConflictError`, `ResourceNotFoundError`, etc.).
 
-**Controllers** implement `Controller` (`path`, `method`, `handle()`). Validate input with Zod (throw `ValidationError` on failure). Call the use case. Return a DTO — the HTTP adapter serializes it to JSON.
+**Controllers** implementam `Controller` (`path`, `method`, `handle()`). Validam input com Zod (lançam `ValidationError` em caso de falha). Retornam um DTO — o adaptador HTTP serializa para JSON.
 
-**DI Containers** — each module has a `[Module]Di` class (`AuthDi`, `StayDi`, `PropertyDi`, `FinanceDi`). Factory methods named `make[Component]` wire dependencies. DI instances are created once in `routes.ts`.
+**Containers DI** — cada módulo tem uma classe `[Module]Di` (`AuthDi`, `StayDi`, `PropertyDi`, `FinanceDi`). Factory methods nomeados `make[Componente]` montam as dependências. Instâncias criadas uma única vez em `routes.ts`.
 
-**Error Handling** — use cases throw typed errors; the HTTP adapter maps error names to status codes: `ValidationError` → 422, `ConflictError` → 409, `ResourceNotFoundError` → 404, `UnauthorizedError` → 401, `IllegalStateError` → 500.
+**Tratamento de Erros** — use cases lançam erros tipados; o adaptador HTTP mapeia os nomes de erro para status codes: `ValidationError` → 422, `ConflictError` → 409, `ResourceNotFoundError` → 404, `UnauthorizedError` → 401, `IllegalStateError` → 500.
 
-**Authentication** — JWT Bearer tokens. `SessionManager` creates/validates tokens. Auth middleware extracts the user and passes it to the controller. Routes declare `authenticated: boolean` in `routes.ts`.
+**Autenticação** — JWT Bearer tokens. `SessionManager` cria/valida tokens. O middleware de auth extrai o usuário e o repassa ao controller. Rotas declaram `authenticated: boolean` em `routes.ts`.
 
-### Database
+### Banco de Dados
 
-Drizzle ORM schemas live in `src/core/infra/database/drizzle/schemas/`. Repositories use `db.query` and Drizzle DML. Records are mapped to entities via `reconstitute()`.
+Os schemas do Drizzle ORM ficam em `src/core/infra/database/drizzle/schemas/`. Repositórios usam `db.query` e DML do Drizzle. Registros são mapeados para entidades via `reconstitute()`.
 
-### Environment Variables
+### Variáveis de Ambiente
 
-Defined in `src/core/infra/config/environments.ts`:
+Definidas em `src/core/infra/config/environments.ts`:
 
-- `PORT` — server port
-- `DATABASE_URL` — PostgreSQL connection string
+- `PORT` — porta do servidor
+- `DATABASE_URL` — string de conexão PostgreSQL
 - `NODE_ENV` — `development | test | sandbox | production`
-- `JWT_SECRET` — token signing key
+- `JWT_SECRET` — chave de assinatura dos tokens
 
-### Code Style
+### Estilo de Código
 
-Prettier config: 2-space indent, 80-char line width, double quotes, trailing commas (ES5), semicolons required. ESLint enforces TypeScript strict rules. Husky runs lint + format on pre-commit via lint-staged.
+Configuração do Prettier: indentação de 2 espaços, largura de linha de 80 caracteres, aspas duplas, trailing commas (ES5), ponto e vírgula obrigatório. ESLint aplica regras TypeScript strict. Husky executa lint + format no pre-commit via lint-staged.
 
-File naming: `snake_case.ts`. Classes: `PascalCase`. Private fields: `#fieldName` (TypeScript private class fields).
+Nomenclatura de arquivos: `snake_case.ts`. Classes: `PascalCase`. Campos privados: `#fieldName` (private class fields do TypeScript).
 
-## Commit Conventions
+## Convenções de Commit
 
-Follow **Conventional Commits** format:
+Seguir o formato **Conventional Commits**:
 
 ```
-<type>: <short description in English>
+<tipo>: <descrição curta em inglês>
 ```
 
-Types used in this project:
+Tipos usados neste projeto:
 
-- `feat` — new feature or behavior
-- `fix` — bug fix
-- `refactor` — code restructuring without behavior change
-- `chore` — tooling, deps, CI/CD, config, non-functional changes
+- `feat` — nova funcionalidade ou comportamento
+- `fix` — correção de bug
+- `refactor` — reestruturação de código sem mudança de comportamento
+- `chore` — tooling, deps, CI/CD, config, mudanças não funcionais
 
-Rules:
+Regras:
 
-- Lowercase type and description
-- No period at the end
-- Description summarizes the _what_, body (if needed) explains the _why_
-- Commits in English
-- **After every code modification, create a commit before moving on**
+- Tipo e descrição em letras minúsculas
+- Sem ponto final
+- Descrição resume o _o quê_, corpo (se necessário) explica o _por quê_
+- Commits em inglês
+- **Após cada modificação de código, criar um commit antes de continuar**
