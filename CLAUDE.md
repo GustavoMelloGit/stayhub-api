@@ -10,14 +10,9 @@ Este projeto utiliza um sistema de personas especialistas. **O Orquestrador é o
 .claude/personas/orquestrador.md
 ```
 
-O Orquestrador decide quais personas invocar, em que ordem e quando. Nunca invoque o Arquiteto, o Desenvolvedor ou o Analista de Segurança diretamente — tudo passa pelo Orquestrador primeiro.
+O Orquestrador decide quais personas invocar, em que ordem e quando. Nunca invoque outra persona diretamente — tudo passa pelo Orquestrador primeiro.
 
-| Persona                   | Arquivo                                  |
-| ------------------------- | ---------------------------------------- |
-| **Orquestrador**          | `.claude/personas/orquestrador.md`       |
-| **Arquiteto**             | `.claude/personas/arquiteto.md`          |
-| **Desenvolvedor**         | `.claude/personas/desenvolvedor.md`      |
-| **Analista de Segurança** | `.claude/personas/analista_seguranca.md` |
+Todas as personas disponíveis estão em `.claude/personas/*.md`.
 
 ## Comandos
 
