@@ -6,7 +6,6 @@
   "main": "src/index.ts",
   "scripts": {
     "build": "tsc && bun build ./src/index.ts --compile --outfile out",
-    "build:server": "bun build ./src/index.ts --compile --outfile out",
     "typecheck": "tsc --noEmit",
     "dev": "bun --hot run src/index.ts",
     "start": "bun run ./src/index.ts",

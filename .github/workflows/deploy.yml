@@ -67,8 +67,6 @@ jobs:
 
             bun run db:push
 
-            bun run build:server
-
             pm2 restart stayhub_api
 
             EOF
