@@ -3,12 +3,14 @@ import { ListTenantsUseCase } from "../../../application/use_case/tenant/list_te
 import {
   HttpControllerMethod,
   type Controller,
+  type ControllerRequest,
 } from "../../../../core/presentation/controller/controller";
 import type { OpenApiOperation } from "../../../../core/presentation/open_api/open_api_types";
 import {
   errorResponse,
   responseFromZod,
 } from "../../../../core/infra/http/swagger/schema_helpers";
+import type { User } from "../../../../auth/domain/entity/user";
 
 const outputSchema = z.array(
   z.object({
@@ -24,7 +26,8 @@ export class ListTenantsController implements Controller {
 
   openApiSpec: OpenApiOperation = {
     summary: "List tenants",
-    description: "Returns all tenants registered in the system.",
+    description:
+      "Returns tenants who have stays in properties owned by the authenticated user.",
     tags: ["Tenants"],
     responses: {
       "200": responseFromZod("List of tenants", outputSchema),
@@ -34,8 +37,8 @@ export class ListTenantsController implements Controller {
 
   constructor(private readonly useCase: ListTenantsUseCase) {}
 
-  async handle() {
-    const tenants = await this.useCase.execute();
+  async handle(_request: ControllerRequest, user: User) {
+    const tenants = await this.useCase.execute(undefined, user);
     return tenants;
   }
 }

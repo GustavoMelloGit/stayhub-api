@@ -1,8 +1,12 @@
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { Tenant, type TenantData } from "../../../domain/entity/tenant";
 import type { TenantRepository } from "../../../domain/repository/tenant_repository";
 import { db } from "../../../../core/infra/database/drizzle/database";
-import { tenantsTable } from "../../../../core/infra/database/drizzle/schema";
+import {
+  tenantsTable,
+  staysTable,
+  propertiesTable,
+} from "../../../../core/infra/database/drizzle/schema";
 
 export class TenantPostgresRepository implements TenantRepository {
   async findByPhone(phone: string): Promise<Tenant | null> {
@@ -44,5 +48,31 @@ export class TenantPostgresRepository implements TenantRepository {
     });
 
     return tenant ? Tenant.reconstitute(tenant) : null;
+  }
+
+  async findByOwnerProperties(
+    ownerId: string
+  ): Promise<{ id: string; name: string; phone: string }[]> {
+    const rows = await db
+      .selectDistinct({
+        id: tenantsTable.id,
+        name: tenantsTable.name,
+        phone: tenantsTable.phone,
+      })
+      .from(tenantsTable)
+      .innerJoin(staysTable, eq(staysTable.tenant_id, tenantsTable.id))
+      .innerJoin(
+        propertiesTable,
+        eq(propertiesTable.id, staysTable.property_id)
+      )
+      .where(
+        and(
+          eq(propertiesTable.user_id, ownerId),
+          isNull(tenantsTable.deleted_at),
+          isNull(staysTable.deleted_at)
+        )
+      );
+
+    return rows;
   }
 }
