@@ -3,12 +3,14 @@ import { GetStayUseCase } from "../../application/use_case/stay/get_stay";
 import { FindPropertyStaysUseCase } from "../../application/use_case/stay/find_property_stays";
 import { CancelStayUseCase } from "../../application/use_case/stay/cancel_stay";
 import { UpdateStayUseCase } from "../../application/use_case/stay/update_stay";
+import { GetDashboardOverviewUseCase } from "../../application/use_case/dashboard/get_dashboard_overview";
 import type { StayRepository } from "../../domain/repository/stay_repository";
 import { GetPublicStayController } from "../../presentation/controller/stay/get_public_stay.controller";
 import { GetStayController } from "../../presentation/controller/stay/get_stay.controller";
 import { FindPropertyStaysController } from "../../presentation/controller/stay/find_property_stays.controller";
 import { CancelStayController } from "../../presentation/controller/stay/cancel_stay.controller";
 import { UpdateStayController } from "../../presentation/controller/stay/update_stay.controller";
+import { GetDashboardOverviewController } from "../../presentation/controller/dashboard/get_dashboard_overview.controller";
 import { StayPostgresRepository } from "../database/postgres_repository/stay_postgres_repository";
 import type { TenantRepository } from "../../domain/repository/tenant_repository";
 import { TenantPostgresRepository } from "../database/postgres_repository/tenant_postgres_repository";
@@ -25,6 +27,8 @@ import { ConsoleLogger } from "../../../core/infra/logger/console_logger";
 import type { DeviceManagementService } from "../../domain/service/device_management";
 import { TuyaDeviceManagementService } from "../service/tuya_device_management";
 import { tuyaContext } from "../../../core/infra/config/tuya";
+import { LedgerEntryPostgresRepository } from "../../../finance/infra/database/postgres_repository/ledger_entry_postgres_repository";
+import type { LedgerEntryRepository } from "../../../finance/domain/repository/ledger_entry_repository";
 
 export class StayDi {
   #logger: Logger;
@@ -34,6 +38,7 @@ export class StayDi {
   #eventDispatcher: EventDispatcher;
   #bookingPolicy: BookingPolicy;
   #deviceManagementService: DeviceManagementService;
+  #ledgerEntryRepository: LedgerEntryRepository;
 
   constructor() {
     this.#logger = new ConsoleLogger();
@@ -41,6 +46,7 @@ export class StayDi {
     this.#stayRepository = new StayPostgresRepository();
     this.#tenantRepository = new TenantPostgresRepository();
     this.#bookingPolicy = new PostgresBookingPolicy();
+    this.#ledgerEntryRepository = new LedgerEntryPostgresRepository();
     this.#deviceManagementService = new TuyaDeviceManagementService(
       tuyaContext,
       this.#logger
@@ -87,6 +93,13 @@ export class StayDi {
       this.#bookingPolicy
     );
   }
+  makeGetDashboardOverviewUseCase() {
+    return new GetDashboardOverviewUseCase(
+      this.#propertyRepository,
+      this.#stayRepository,
+      this.#ledgerEntryRepository
+    );
+  }
 
   // Controllers
   makeGetStayController() {
@@ -103,6 +116,11 @@ export class StayDi {
   }
   makeUpdateStayController() {
     return new UpdateStayController(this.makeUpdateStayUseCase());
+  }
+  makeGetDashboardOverviewController() {
+    return new GetDashboardOverviewController(
+      this.makeGetDashboardOverviewUseCase()
+    );
   }
 
   // Handlers
