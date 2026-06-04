@@ -41,6 +41,7 @@ jobs:
 
             cd stayhub_api
 
+            git restore bun.lock
             git pull
 
             printf 'PORT=$APP_PORT\nDATABASE_URL=$APP_DATABASE_URL\nJWT_SECRET=$APP_JWT_SECRET\nNODE_ENV=$APP_NODE_ENV\nTUYA_CLIENT_ID=$APP_TUYA_CLIENT_ID\nTUYA_CLIENT_SECRET=$APP_TUYA_CLIENT_SECRET\nTUYA_DEVICE_ID=$APP_TUYA_DEVICE_ID\n' > .env
