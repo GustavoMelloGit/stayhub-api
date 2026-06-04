@@ -1,8 +1,13 @@
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { User, type UserData } from "../../../domain/entity/user";
 import type { AuthRepository } from "../../../domain/repository/auth_repository";
 import { db } from "../../../../core/infra/database/drizzle/database";
-import { usersTable } from "../../../../core/infra/database/drizzle/schema";
+import {
+  usersTable,
+  propertiesTable,
+  addressesTable,
+  externalBookingSources,
+} from "../../../../core/infra/database/drizzle/schema";
 
 export class AuthPostgresRepository implements AuthRepository {
   async findUserById(id: string): Promise<User | null> {
@@ -40,5 +45,29 @@ export class AuthPostgresRepository implements AuthRepository {
     });
 
     return user ? User.reconstitute(user) : null;
+  }
+
+  async purgeUserData(userId: string): Promise<void> {
+    const properties = await db.query.propertiesTable.findMany({
+      where: eq(propertiesTable.user_id, userId),
+      columns: { id: true, address_id: true },
+    });
+
+    const propertyIds = properties.map(p => p.id);
+    const addressIds = properties.map(p => p.address_id);
+
+    if (propertyIds.length > 0) {
+      await db
+        .delete(externalBookingSources)
+        .where(inArray(externalBookingSources.property_id, propertyIds));
+    }
+
+    await db.delete(usersTable).where(eq(usersTable.id, userId));
+
+    if (addressIds.length > 0) {
+      await db
+        .delete(addressesTable)
+        .where(inArray(addressesTable.id, addressIds));
+    }
   }
 }
