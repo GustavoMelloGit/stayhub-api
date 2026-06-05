@@ -1,7 +1,8 @@
-import { and, count, eq, gte, isNull, lte } from "drizzle-orm";
+import { and, count, eq, gt, gte, inArray, isNull, lte } from "drizzle-orm";
 import { Stay } from "../../../domain/entity/stay";
 import type {
   AllFromPropertyFilters,
+  DashboardStatsResult,
   StayRepository,
   StayWithTenant,
 } from "../../../domain/repository/stay_repository";
@@ -118,6 +119,69 @@ export class StayPostgresRepository implements StayRepository {
         pagination.limit,
         total
       ),
+    };
+  }
+
+  async dashboardStats(
+    propertyIds: string[],
+    date: Date
+  ): Promise<DashboardStatsResult> {
+    const startOfDay = new Date(
+      Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+    );
+    const sevenDaysLater = new Date(startOfDay);
+    sevenDaysLater.setUTCDate(sevenDaysLater.getUTCDate() + 7);
+
+    const baseWhere = and(
+      inArray(staysTable.property_id, propertyIds),
+      isNull(staysTable.deleted_at)
+    );
+
+    const [activeResult, upcomingCheckInsResult, upcomingStays] =
+      await Promise.all([
+        db
+          .select({ count: count() })
+          .from(staysTable)
+          .where(
+            and(
+              baseWhere,
+              lte(staysTable.check_in, startOfDay),
+              gte(staysTable.check_out, startOfDay)
+            )
+          ),
+        db
+          .select({ count: count() })
+          .from(staysTable)
+          .where(
+            and(
+              baseWhere,
+              gt(staysTable.check_in, startOfDay),
+              lte(staysTable.check_in, sevenDaysLater)
+            )
+          ),
+        db.query.staysTable.findMany({
+          where: and(baseWhere, gt(staysTable.check_in, startOfDay)),
+          with: {
+            tenant: true,
+            property: true,
+          },
+          orderBy: (staysTable, { asc }) => [asc(staysTable.check_in)],
+          limit: 5,
+        }),
+      ]);
+
+    return {
+      active_stays: activeResult[0]?.count ? Number(activeResult[0].count) : 0,
+      upcoming_check_ins: upcomingCheckInsResult[0]?.count
+        ? Number(upcomingCheckInsResult[0].count)
+        : 0,
+      upcoming_stays: upcomingStays.map(stay => ({
+        id: stay.id,
+        property_id: stay.property_id,
+        property_name: stay.property.name,
+        check_in: stay.check_in,
+        tenant: { name: stay.tenant.name },
+      })),
     };
   }
 

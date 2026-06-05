@@ -109,6 +109,10 @@ const stayControllers: Route[] = [
     authenticated: true,
     controller: stayDi.makeUpdateStayController(),
   },
+  {
+    authenticated: true,
+    controller: stayDi.makeGetDashboardOverviewController(),
+  },
 ];
 
 const authControllers: Route[] = [

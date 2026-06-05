@@ -15,6 +15,18 @@ export type AllFromPropertyFilters = {
   to?: Date;
 };
 
+export type DashboardStatsResult = {
+  active_stays: number;
+  upcoming_check_ins: number;
+  upcoming_stays: Array<{
+    id: string;
+    property_id: string;
+    property_name: string;
+    check_in: Date;
+    tenant: { name: string };
+  }>;
+};
+
 export interface StayRepository {
   stayOfId(id: string): Promise<Stay | null>;
   saveStay(stay: Stay): Promise<void>;
@@ -25,4 +37,8 @@ export interface StayRepository {
     filters?: AllFromPropertyFilters
   ): Promise<PaginatedResult<StayWithTenant>>;
   tenantWithPhone(phone: string): Promise<Tenant | null>;
+  dashboardStats(
+    propertyIds: string[],
+    date: Date
+  ): Promise<DashboardStatsResult>;
 }

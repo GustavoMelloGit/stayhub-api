@@ -1,4 +1,15 @@
-import { and, eq, gte, lte, sum, count, desc } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  gt,
+  gte,
+  inArray,
+  isNull,
+  lte,
+  sum,
+} from "drizzle-orm";
 import {
   LedgerEntry,
   type LedgerEntryData,
@@ -40,6 +51,30 @@ export class LedgerEntryPostgresRepository implements LedgerEntryRepository {
       .select({ total: sum(ledgerEntriesTable.amount) })
       .from(ledgerEntriesTable)
       .where(eq(ledgerEntriesTable.property_id, propertyId));
+
+    const total = result[0]?.total;
+    return total ? Number(total) : 0;
+  }
+
+  async monthlyRevenueForProperties(
+    propertyIds: string[],
+    date: Date
+  ): Promise<number> {
+    const start = new Date(date.getFullYear(), date.getMonth(), 1);
+    const end = new Date(date.getFullYear(), date.getMonth() + 1, 1);
+
+    const result = await db
+      .select({ total: sum(ledgerEntriesTable.amount) })
+      .from(ledgerEntriesTable)
+      .where(
+        and(
+          inArray(ledgerEntriesTable.property_id, propertyIds),
+          gt(ledgerEntriesTable.amount, 0),
+          gte(ledgerEntriesTable.created_at, start),
+          lte(ledgerEntriesTable.created_at, end),
+          isNull(ledgerEntriesTable.deleted_at)
+        )
+      );
 
     const total = result[0]?.total;
     return total ? Number(total) : 0;
