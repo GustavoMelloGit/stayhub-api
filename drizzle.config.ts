@@ -8,4 +8,5 @@ export default defineConfig({
   dbCredentials: {
     url: env.DATABASE_URL,
   },
+  schemaFilter: [env.DB_SCHEMA],
 });
