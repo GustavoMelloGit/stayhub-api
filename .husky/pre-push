@@ -1,1 +1,6 @@
+if [ -f .env.test ]; then
+  bun run test
+else
+  echo "⚠️  .env.test not found — skipping tests"
+fi
 git diff HEAD --quiet && bun run build
