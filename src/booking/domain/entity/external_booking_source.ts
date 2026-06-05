@@ -9,7 +9,7 @@ export type ExternalBookingSourcePlatformName = "AIRBNB" | "BOOKING";
 export const externalBookingSourceSchema = baseEntitySchema.extend({
   property_id: z.uuidv4(),
   platform_name: z.enum(["AIRBNB", "BOOKING"]),
-  sync_url: z.url(),
+  sync_url: z.url().max(2048),
 });
 
 export type ExternalBookingSourceData = z.infer<

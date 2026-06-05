@@ -7,8 +7,8 @@ import { ValidationError } from "../../../core/application/error/validation_erro
 
 export const ledgerEntrySchema = baseEntitySchema.extend({
   amount: z.int(),
-  description: z.string().nullable(),
-  category: z.string(),
+  description: z.string().max(500).nullable(),
+  category: z.string().max(50),
   property_id: z.uuidv4(),
 });
 

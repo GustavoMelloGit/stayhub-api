@@ -15,21 +15,34 @@ import {
 } from "../../../core/infra/http/swagger/schema_helpers";
 
 const addressSchema = z.object({
-  street: z.string().min(1),
-  number: z.string().min(1),
-  neighborhood: z.string().min(1),
-  city: z.string().min(1),
-  state: z.string().min(1),
-  zip_code: z.string().min(1),
-  country: z.string().min(1),
-  complement: z.string().default(""),
+  street: z.string().min(1).max(100, "Street must be at most 100 characters"),
+  number: z.string().min(1).max(20, "Number must be at most 20 characters"),
+  neighborhood: z
+    .string()
+    .min(1)
+    .max(100, "Neighborhood must be at most 100 characters"),
+  city: z.string().min(1).max(100, "City must be at most 100 characters"),
+  state: z.string().min(1).max(100, "State must be at most 100 characters"),
+  zip_code: z.string().min(1).max(20, "Zip code must be at most 20 characters"),
+  country: z.string().min(1).max(100, "Country must be at most 100 characters"),
+  complement: z
+    .string()
+    .max(100, "Complement must be at most 100 characters")
+    .default(""),
 });
 
 const inputSchema = z.object({
   property_id: z.uuid(),
-  name: z.string().min(1, "Name is required").optional(),
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(100, "Name must be at most 100 characters")
+    .optional(),
   address: addressSchema.partial().optional(),
-  images: z.array(z.string()).min(1, "Images are required").optional(),
+  images: z
+    .array(z.string().max(2048, "Image URL must be at most 2048 characters"))
+    .min(1, "Images are required")
+    .optional(),
   capacity: z
     .number()
     .int()

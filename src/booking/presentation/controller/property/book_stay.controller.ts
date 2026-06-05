@@ -27,7 +27,10 @@ const inputSchema = z.object({
     .int()
     .min(0, "Price must be a non-negative integer representing cents"),
   tenant: z.object({
-    name: z.string().min(2, "Name is required"),
+    name: z
+      .string()
+      .min(2, "Name is required")
+      .max(100, "Name must be at most 100 characters"),
     phone: z.string().length(13),
     sex: z.enum(["MALE", "FEMALE", "OTHER"]),
   }),
