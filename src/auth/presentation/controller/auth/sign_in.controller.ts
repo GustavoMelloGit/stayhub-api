@@ -14,8 +14,8 @@ import {
 } from "../../../../core/infra/http/swagger/schema_helpers";
 
 const inputSchema = z.object({
-  email: z.email(),
-  password: z.string(),
+  email: z.email().max(255, "Email must be at most 255 characters"),
+  password: z.string().max(128, "Password must be at most 128 characters"),
 });
 
 const outputSchema = z.object({

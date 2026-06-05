@@ -5,9 +5,9 @@ import {
 import { z } from "zod";
 
 export const userSchema = baseEntitySchema.extend({
-  name: z.string().min(1),
-  email: z.string().email(),
-  password: z.string().min(8),
+  name: z.string().min(1).max(100),
+  email: z.string().email().max(255),
+  password: z.string().min(8).max(128),
 });
 
 export type UserData = z.infer<typeof userSchema>;

@@ -17,4 +17,8 @@ export interface LedgerEntryRepository {
     pagination: PaginationInput,
     dateFilter?: DateFilter
   ): Promise<PaginatedResult<LedgerEntry>>;
+  monthlyRevenueForProperties(
+    propertyIds: string[],
+    date: Date
+  ): Promise<number>;
 }

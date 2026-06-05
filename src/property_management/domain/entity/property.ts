@@ -8,19 +8,19 @@ import { Address } from "../value_object/address";
 import type { DeepPartial } from "../../../core/application/types/deep_partial";
 
 export const propertySchema = baseEntitySchema.extend({
-  name: z.string().min(1, "Name is required"),
+  name: z.string().min(1, "Name is required").max(100),
   user_id: z.uuidv4("User ID is required and must be a valid UUID"),
   address: z.object({
-    street: z.string().min(1, "Street is required"),
-    number: z.string().min(1, "Number is required"),
-    neighborhood: z.string().min(1, "Neighborhood is required"),
-    city: z.string().min(1, "City is required"),
-    state: z.string().min(1, "State is required"),
-    zip_code: z.string().min(1, "Zip code is required"),
-    country: z.string().min(1, "Country is required"),
-    complement: z.string().default(""),
+    street: z.string().min(1, "Street is required").max(100),
+    number: z.string().min(1, "Number is required").max(20),
+    neighborhood: z.string().min(1, "Neighborhood is required").max(100),
+    city: z.string().min(1, "City is required").max(100),
+    state: z.string().min(1, "State is required").max(100),
+    zip_code: z.string().min(1, "Zip code is required").max(20),
+    country: z.string().min(1, "Country is required").max(100),
+    complement: z.string().max(100).default(""),
   }),
-  images: z.array(z.string()).min(1, "Images are required"),
+  images: z.array(z.string().max(2048)).min(1, "Images are required"),
   capacity: z.number().int().positive("Capacity must be greater than 0"),
 });
 
