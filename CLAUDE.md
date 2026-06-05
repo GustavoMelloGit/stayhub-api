@@ -36,7 +36,15 @@ bun run db:migration  # Gera arquivos de migration
 bun run db:migrate    # Executa migrations pendentes
 ```
 
-Não há test runner configurado neste projeto.
+```bash
+# Testes
+bun run db:push:test  # Cria o schema `test` no banco e aplica o schema Drizzle (obrigatório antes do primeiro run)
+bun run test          # Executa todos os testes
+```
+
+Os testes ficam em `tests/<bounded context>/<test name>.test.ts`.
+
+> **Pré-requisito**: o arquivo `.env.test` na raiz do projeto deve conter a variável `DATABASE_URL` com as credenciais reais do banco local.
 
 ## Arquitetura
 
