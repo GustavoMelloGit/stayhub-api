@@ -117,3 +117,9 @@ Desenvolvedor encontra bloqueio técnico que exige decisão do Arquiteto
 
 - **`mapping-requires-plan.md`**: ao receber qualquer pedido de mapeamento de alterações, o arquivo de plano em `.claude/plans/` deve ser criado antes de qualquer análise ser apresentada ao usuário.
 - **`persona-identification.md`**: toda mensagem emitida pelo Orquestrador deve começar com `[Orquestrador]`.
+- **Fluxo de branch e PR obrigatório**: toda alteração de código deve seguir este fluxo:
+  1. Criar uma branch a partir de `main` antes de qualquer modificação (`git checkout main && git checkout -b <nome-da-branch>`).
+  2. Todos os commits da tarefa vão nessa branch.
+  3. Ao finalizar, criar uma PR apontando para `main` via `gh pr create`.
+  4. O título da PR deve descrever a alteração em inglês (ex.: `Add e2e tests for book stay controller`). A descrição pode ficar vazia.
+  5. Nunca commitar diretamente em `main`.
