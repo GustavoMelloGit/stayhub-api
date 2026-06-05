@@ -17,7 +17,7 @@
     "prepare": "husky",
     "test": "bun test --preload ./tests/setup.ts",
     "db:push": "drizzle-kit push",
-    "db:push:test": "NODE_ENV=test psql $DATABASE_URL -c 'CREATE SCHEMA IF NOT EXISTS test' && NODE_ENV=test drizzle-kit push",
+    "db:push:test": "bun --env-file=.env.test scripts/push_test_schema.ts",
     "db:migration": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate"
   },
