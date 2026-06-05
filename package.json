@@ -17,7 +17,7 @@
     "prepare": "husky",
     "test": "bun test --env-file=.env.test --preload ./tests/setup.ts",
     "db:push": "drizzle-kit push",
-    "db:push:test": "bun --env-file=.env.test scripts/push_test_schema.ts",
+    "db:push:test": "bun --env-file=.env.test x drizzle-kit push",
     "db:migration": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate"
   },
