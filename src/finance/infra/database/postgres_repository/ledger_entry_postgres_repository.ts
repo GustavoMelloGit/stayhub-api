@@ -1,4 +1,15 @@
-import { and, eq, gt, gte, inArray, lte, sum, count, desc } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  gt,
+  gte,
+  inArray,
+  isNull,
+  lte,
+  sum,
+} from "drizzle-orm";
 import {
   LedgerEntry,
   type LedgerEntryData,
@@ -60,7 +71,8 @@ export class LedgerEntryPostgresRepository implements LedgerEntryRepository {
           inArray(ledgerEntriesTable.property_id, propertyIds),
           gt(ledgerEntriesTable.amount, 0),
           gte(ledgerEntriesTable.created_at, start),
-          lte(ledgerEntriesTable.created_at, end)
+          lte(ledgerEntriesTable.created_at, end),
+          isNull(ledgerEntriesTable.deleted_at)
         )
       );
 
