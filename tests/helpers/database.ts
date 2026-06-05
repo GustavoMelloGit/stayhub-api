@@ -3,9 +3,10 @@ import { db } from "../../src/core/infra/database/drizzle/database";
 import { env } from "../../src/core/infra/config/environments";
 
 export async function truncate(tables: string[]): Promise<void> {
-  if (env.NODE_ENV !== "test" || env.DB_SCHEMA !== "test") {
+  const dbName = new URL(env.DATABASE_URL).pathname.slice(1);
+  if (env.NODE_ENV !== "test" || !dbName.includes("test")) {
     throw new Error(
-      "truncate() can only run when NODE_ENV=test and DB_SCHEMA=test"
+      "truncate() can only run against a test database (NODE_ENV=test and database name must contain 'test')"
     );
   }
 
