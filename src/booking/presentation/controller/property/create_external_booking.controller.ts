@@ -16,8 +16,8 @@ import {
 
 const inputSchema = z.object({
   platform_name: z.enum(["AIRBNB", "BOOKING"]),
-  sync_url: z.url(),
-  property_id: z.string(),
+  sync_url: z.url().max(2048, "Sync URL must be at most 2048 characters"),
+  property_id: z.string().uuid("Property ID must be a valid UUID"),
 });
 
 const outputSchema = z.object({
