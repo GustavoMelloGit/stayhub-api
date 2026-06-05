@@ -19,7 +19,10 @@ describe("POST /auth/sign-in", () => {
       method: "POST",
       body: JSON.stringify({ email: user.email, password: plainPassword }),
     });
-    const body = await res.json();
+    const body = (await res.json()) as {
+      token: string;
+      user: Record<string, unknown>;
+    };
 
     expect(res.status).toBe(200);
     expect(typeof body.token).toBe("string");
@@ -45,7 +48,7 @@ describe("POST /auth/sign-in", () => {
       method: "POST",
       body: JSON.stringify({ email: user.email, password: "wrong-password" }),
     });
-    const body = await res.json();
+    const body = (await res.json()) as Record<string, unknown>;
 
     expect(res.status).toBe(401);
     expect(body.token).toBeUndefined();
@@ -65,7 +68,10 @@ describe("POST /auth/sign-in", () => {
         password: "wrong-password",
       }),
     });
-    const bodyWrongPassword = await resWrongPassword.json();
+    const bodyWrongPassword = (await resWrongPassword.json()) as Record<
+      string,
+      unknown
+    >;
 
     const resUnknownEmail = await api("/auth/sign-in", {
       method: "POST",
@@ -74,7 +80,10 @@ describe("POST /auth/sign-in", () => {
         password: "any-password",
       }),
     });
-    const bodyUnknownEmail = await resUnknownEmail.json();
+    const bodyUnknownEmail = (await resUnknownEmail.json()) as Record<
+      string,
+      unknown
+    >;
 
     expect(resUnknownEmail.status).toBe(401);
     expect(bodyUnknownEmail.token).toBeUndefined();
