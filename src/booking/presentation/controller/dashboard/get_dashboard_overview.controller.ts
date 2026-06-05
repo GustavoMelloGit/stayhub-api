@@ -15,7 +15,7 @@ import {
 const inputSchema = z.object({
   date: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .date()
     .transform(s => new Date(`${s}T00:00:00.000Z`))
     .optional(),
 });
