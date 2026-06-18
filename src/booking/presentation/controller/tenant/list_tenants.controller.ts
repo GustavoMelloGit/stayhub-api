@@ -17,6 +17,7 @@ const outputSchema = z.array(
     id: z.string().uuid(),
     name: z.string(),
     phone: z.string(),
+    sex: z.enum(["MALE", "FEMALE", "OTHER"]),
   })
 );
 
@@ -29,6 +30,15 @@ export class ListTenantsController implements Controller {
     description:
       "Returns tenants who have stays in properties owned by the authenticated user.",
     tags: ["Tenants"],
+    parameters: [
+      {
+        name: "q",
+        in: "query",
+        required: false,
+        description: "Filter tenants by name (case-insensitive, partial match)",
+        schema: { type: "string" },
+      },
+    ],
     responses: {
       "200": responseFromZod("List of tenants", outputSchema),
       "401": errorResponse("Unauthorized"),
@@ -37,8 +47,11 @@ export class ListTenantsController implements Controller {
 
   constructor(private readonly useCase: ListTenantsUseCase) {}
 
-  async handle(_request: ControllerRequest, user: User) {
-    const tenants = await this.useCase.execute(undefined, user);
+  async handle(request: ControllerRequest, user: User) {
+    const tenants = await this.useCase.execute(
+      { query: request.query.q },
+      user
+    );
     return tenants;
   }
 }

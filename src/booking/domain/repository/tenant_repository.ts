@@ -6,6 +6,7 @@ export interface TenantRepository {
   save(tenant: Tenant): Promise<Tenant>;
   findAll(): Promise<Tenant[]>;
   findByOwnerProperties(
-    ownerId: string
-  ): Promise<{ id: string; name: string; phone: string }[]>;
+    ownerId: string,
+    query?: string
+  ): Promise<{ id: string; name: string; phone: string; sex: string }[]>;
 }
