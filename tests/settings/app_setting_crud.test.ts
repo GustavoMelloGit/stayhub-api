@@ -142,7 +142,7 @@ describe("POST /settings", () => {
     expect(res.status).toBe(401);
   });
 
-  it("500 — empty body causes internal error (boundedJsonValue with undefined)", async () => {
+  it("422 — empty body is rejected (boundedJsonValue with undefined returns validation error)", async () => {
     const token = await createAuthTokenForNewUser();
 
     const res = await api("/settings", {
@@ -151,9 +151,7 @@ describe("POST /settings", () => {
       body: JSON.stringify({}),
     });
 
-    // When value is absent (undefined), JSON.stringify(undefined) returns undefined,
-    // and accessing .length on undefined throws a TypeError that is not mapped to 422.
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(422);
   });
 
   it("422 — rejects invalid type", async () => {
@@ -424,7 +422,7 @@ describe("DELETE /settings/:id", () => {
     await truncate(TABLES);
   });
 
-  it("200 — soft deletes setting successfully", async () => {
+  it("204 — soft deletes setting successfully", async () => {
     const token = await createAuthTokenForNewUser();
 
     const createRes = await createSetting(token, {
@@ -440,7 +438,7 @@ describe("DELETE /settings/:id", () => {
       headers: { Authorization: "Bearer " + token },
     });
 
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(204);
   });
 
   it("401 — rejects request without token", async () => {
@@ -477,7 +475,7 @@ describe("DELETE /settings/:id", () => {
       method: "DELETE",
       headers: { Authorization: "Bearer " + token },
     });
-    expect(deleteRes.status).toBe(200);
+    expect(deleteRes.status).toBe(204);
 
     const getRes = await api(`/settings/${created.id}`, {
       headers: { Authorization: "Bearer " + token },

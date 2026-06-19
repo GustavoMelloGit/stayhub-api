@@ -29,6 +29,13 @@ function measureDepth(val: unknown, current = 0): number {
 }
 
 export const boundedJsonValue = z.unknown().superRefine((val, ctx) => {
+  if (val === undefined) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Value is required",
+    });
+    return;
+  }
   const json = JSON.stringify(val);
   if (json.length > 16384) {
     ctx.addIssue({

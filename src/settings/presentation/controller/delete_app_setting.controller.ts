@@ -49,6 +49,6 @@ export class DeleteAppSettingController implements Controller {
     const input = request.body as Input;
 
     await this.useCase.execute({ id: input.id });
-    return null;
+    return undefined;
   }
 }
