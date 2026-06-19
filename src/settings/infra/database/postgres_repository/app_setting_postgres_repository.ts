@@ -11,6 +11,7 @@ import type {
   PaginationInput,
 } from "../../../../core/application/dto/pagination";
 import { calculatePaginationMetadata } from "../../../../core/application/dto/pagination";
+import { ConflictError } from "../../../../core/application/error/conflict_error";
 
 export class AppSettingPostgresRepository implements AppSettingRepository {
   async save(setting: AppSetting): Promise<void> {
@@ -25,10 +26,21 @@ export class AppSettingPostgresRepository implements AppSettingRepository {
       deleted_at: setting.deleted_at,
     };
 
-    const result = await db.insert(appSettingsTable).values(data).returning();
+    try {
+      const result = await db.insert(appSettingsTable).values(data).returning();
 
-    if (!result[0]) {
-      throw new Error("Failed to save app setting");
+      if (!result[0]) {
+        throw new Error("Failed to save app setting");
+      }
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        "code" in error &&
+        (error as { code: string }).code === "23505"
+      ) {
+        throw new ConflictError("App setting key already exists");
+      }
+      throw error;
     }
   }
 
