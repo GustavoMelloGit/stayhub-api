@@ -67,6 +67,7 @@ export class CreateAppSettingController implements Controller {
     responses: {
       "200": responseFromZod("App setting created", outputSchema),
       "401": errorResponse("Unauthorized"),
+      "403": errorResponse("Forbidden — admin role required"),
       "409": errorResponse("App setting key already exists"),
       "422": validationErrorResponse(),
     },

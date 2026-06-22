@@ -57,6 +57,7 @@ export class UpdateAppSettingController implements Controller {
     responses: {
       "200": responseFromZod("App setting updated", outputSchema),
       "401": errorResponse("Unauthorized"),
+      "403": errorResponse("Forbidden — admin role required"),
       "404": errorResponse("App setting not found"),
       "422": validationErrorResponse(),
     },
