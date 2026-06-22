@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ConflictError } from "../../../application/error/conflict_error";
+import { ForbiddenError } from "../../../application/error/forbidden_error";
 import { IllegalStateError } from "../../../application/error/illegal_state_error";
 import { ResourceNotFoundError } from "../../../application/error/resource_not_found_error";
 import { UnauthorizedError } from "../../../application/error/unauthorized_error";
@@ -96,6 +97,7 @@ class ControllerRequestParser {
 
 const errorCodeMap: Record<string, number> = {
   [ConflictError.name]: 409,
+  [ForbiddenError.name]: 403,
   [ValidationError.name]: 422,
   [ResourceNotFoundError.name]: 404,
   [UnauthorizedError.name]: 401,
@@ -104,7 +106,8 @@ const errorCodeMap: Record<string, number> = {
 
 export function BunHttpControllerAdapter(
   controller: Controller,
-  authenticated: boolean
+  authenticated: boolean,
+  adminOnly: boolean = false
 ) {
   return async function (request: Request): Promise<Response> {
     // Handle CORS preflight requests
@@ -132,11 +135,17 @@ export function BunHttpControllerAdapter(
         controllerRequest.body = result.data as Record<string, unknown>;
       }
 
+      const requiresAuth = authenticated || adminOnly;
       let user: User | undefined;
-      if (authenticated) {
+      if (requiresAuth) {
         const authMiddleware = middlewareDi.makeAuthMiddleware();
         user = await authMiddleware.handle(controllerRequest);
       }
+
+      if (adminOnly && user?.role !== "admin") {
+        throw new ForbiddenError();
+      }
+
       const response = await controller.handle(controllerRequest, user);
 
       const serializedResponse = serializeDatesRecursively(response);
