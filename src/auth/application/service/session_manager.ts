@@ -1,36 +1,39 @@
 import jwt from "jsonwebtoken";
 import { UnauthorizedError } from "../../../core/application/error/unauthorized_error";
 import { env } from "../../../core/infra/config/environments";
+import type { UserRole } from "../../domain/entity/user";
 
 export interface ISessionManager {
-  createSession(userId: string): Promise<string>;
-  verifySession(token: string): Promise<{ userId: string }>;
+  createSession(userId: string, role: UserRole): Promise<string>;
+  verifySession(token: string): Promise<{ userId: string; role: UserRole }>;
 }
 
 export class SessionManager implements ISessionManager {
   constructor() {}
 
-  async createSession(userId: string): Promise<string> {
-    const token = this.#sign(userId);
+  async createSession(userId: string, role: UserRole): Promise<string> {
+    const token = this.#sign(userId, role);
 
     return token;
   }
 
-  async verifySession(token: string): Promise<{ userId: string }> {
-    const userId = this.#verify(token);
+  async verifySession(
+    token: string
+  ): Promise<{ userId: string; role: UserRole }> {
+    const payload = this.#verify(token);
 
-    if (!userId) {
+    if (!payload.userId) {
       throw new UnauthorizedError("Unauthorized");
     }
 
-    return { userId };
+    return payload;
   }
 
-  #sign(userId: string): string {
-    return jwt.sign({ userId }, env.JWT_SECRET, { expiresIn: "1d" });
+  #sign(userId: string, role: UserRole): string {
+    return jwt.sign({ userId, role }, env.JWT_SECRET, { expiresIn: "1d" });
   }
 
-  #verify(token: string): string {
+  #verify(token: string): { userId: string; role: UserRole } {
     try {
       const decoded = jwt.verify(token, env.JWT_SECRET);
 
@@ -38,7 +41,13 @@ export class SessionManager implements ISessionManager {
         throw new UnauthorizedError("Unauthorized");
       }
 
-      return decoded.userId as string;
+      const role: UserRole =
+        "role" in decoded &&
+        (decoded.role === "admin" || decoded.role === "user")
+          ? (decoded.role as UserRole)
+          : "user";
+
+      return { userId: decoded.userId as string, role };
     } catch {
       throw new UnauthorizedError("Unauthorized");
     }
