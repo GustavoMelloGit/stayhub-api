@@ -12,7 +12,7 @@ import { ListAppSettingsController } from "../../presentation/controller/list_ap
 import { UpdateAppSettingController } from "../../presentation/controller/update_app_setting.controller";
 import { DeleteAppSettingController } from "../../presentation/controller/delete_app_setting.controller";
 
-export class SettingsDi {
+export class BackofficeDi {
   #appSettingRepository: AppSettingRepository;
 
   constructor() {
