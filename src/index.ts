@@ -38,6 +38,7 @@ async function main() {
     { port: server.port, environment: env.NODE_ENV }
   );
   logger.info(`📖 API docs: ${baseUrl}/docs`);
+  logger.info(`📄 OpenAPI JSON: ${baseUrl}/docs/spec`);
 }
 
 main();
