@@ -34,13 +34,15 @@ export function bodyFromZod(
 
 export function responseFromZod(
   description: string,
-  schema: z.ZodTypeAny
+  schema: z.ZodTypeAny,
+  example?: Record<string, unknown>
 ): OpenApiResponse {
   return {
     description,
     content: {
       "application/json": {
         schema: toSchema(schema),
+        ...(example ? { example } : {}),
       },
     },
   };
