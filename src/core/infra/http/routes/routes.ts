@@ -27,6 +27,7 @@ const settingsDi = new SettingsDi();
 type Route = {
   controller: Controller;
   authenticated: boolean;
+  adminOnly?: boolean;
 };
 
 const healthController: Route = {
@@ -139,6 +140,7 @@ const authControllers: Route[] = [
 const settingsControllers: Route[] = [
   {
     authenticated: true,
+    adminOnly: true,
     controller: settingsDi.makeCreateAppSettingController(),
   },
   {
@@ -155,10 +157,12 @@ const settingsControllers: Route[] = [
   },
   {
     authenticated: true,
+    adminOnly: true,
     controller: settingsDi.makeUpdateAppSettingController(),
   },
   {
     authenticated: true,
+    adminOnly: true,
     controller: settingsDi.makeDeleteAppSettingController(),
   },
 ];
@@ -179,11 +183,15 @@ const routeMap = new Map<
   Partial<Record<HttpControllerMethod, (request: Request) => Promise<Response>>>
 >();
 
-controllers.forEach(({ authenticated, controller }) => {
+controllers.forEach(({ authenticated, adminOnly, controller }) => {
   const alreadyExists = routeMap.get(controller.path);
   if (!alreadyExists) {
     routeMap.set(controller.path, {
-      [controller.method]: BunHttpControllerAdapter(controller, authenticated),
+      [controller.method]: BunHttpControllerAdapter(
+        controller,
+        authenticated,
+        adminOnly
+      ),
       // Add OPTIONS handler for CORS preflight
       [HttpControllerMethod.OPTIONS]: async (request: Request) =>
         corsMiddleware.handlePreflightRequest(request),
@@ -191,7 +199,11 @@ controllers.forEach(({ authenticated, controller }) => {
   } else {
     routeMap.set(controller.path, {
       ...alreadyExists,
-      [controller.method]: BunHttpControllerAdapter(controller, authenticated),
+      [controller.method]: BunHttpControllerAdapter(
+        controller,
+        authenticated,
+        adminOnly
+      ),
       // Add OPTIONS handler for CORS preflight
       [HttpControllerMethod.OPTIONS]: async (request: Request) =>
         corsMiddleware.handlePreflightRequest(request),
