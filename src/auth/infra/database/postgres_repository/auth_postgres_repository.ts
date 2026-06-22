@@ -24,6 +24,7 @@ export class AuthPostgresRepository implements AuthRepository {
       name: input.name,
       email: input.email,
       password: input.password,
+      role: input.role,
       created_at: input.created_at,
       updated_at: input.updated_at,
       deleted_at: input.deleted_at,
