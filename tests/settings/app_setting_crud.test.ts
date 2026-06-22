@@ -134,6 +134,23 @@ describe("POST /settings", () => {
     expect(res.status).toBe(403);
   });
 
+  it("403 — token with forged admin role is rejected when user is 'user' in db", async () => {
+    const { user } = await createUserFixture({
+      name: "Forged Role User",
+      email: `forged-role-${crypto.randomUUID()}@stayhub.dev`,
+      password: "password123",
+    });
+    const forgedToken = await createAuthToken(user.id, "admin");
+
+    const res = await createSetting(forgedToken, {
+      key: "app.name",
+      value: "StayHub",
+      type: "string",
+    });
+
+    expect(res.status).toBe(403);
+  });
+
   it("409 — admin rejects duplicate key", async () => {
     const token = await createAuthTokenForAdmin();
 
