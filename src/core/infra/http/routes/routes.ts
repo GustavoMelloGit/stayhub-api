@@ -11,7 +11,7 @@ import { TenantDi } from "../../../../booking/infra/di/tenant_di";
 import { BunHttpControllerAdapter } from "../adapters/http_controller_adapter";
 import { FinanceDi } from "../../../../finance/infra/di/finance_di";
 import { PropertyManagementDi } from "../../../../property_management/infra/di/property_management_di";
-import { SettingsDi } from "../../../../settings/infra/di/settings_di";
+import { BackofficeDi } from "../../../../backoffice/infra/di/backoffice_di";
 import { OpenApiBuilder } from "../swagger/open_api_builder";
 import { swaggerUiHtml } from "../swagger/swagger_ui";
 
@@ -22,7 +22,7 @@ const stayDi = new StayDi();
 const corsMiddleware = new CorsMiddleware();
 const financeDi = new FinanceDi();
 const propertyManagementDi = new PropertyManagementDi();
-const settingsDi = new SettingsDi();
+const backofficeDi = new BackofficeDi();
 
 type Route = {
   controller: Controller;
@@ -137,33 +137,33 @@ const authControllers: Route[] = [
   },
 ];
 
-const settingsControllers: Route[] = [
+const backofficeControllers: Route[] = [
   {
     authenticated: true,
     adminOnly: true,
-    controller: settingsDi.makeCreateAppSettingController(),
+    controller: backofficeDi.makeCreateAppSettingController(),
   },
   {
     authenticated: true,
-    controller: settingsDi.makeListAppSettingsController(),
+    controller: backofficeDi.makeListAppSettingsController(),
   },
   {
     authenticated: true,
-    controller: settingsDi.makeGetAppSettingController(),
+    controller: backofficeDi.makeGetAppSettingController(),
   },
   {
     authenticated: true,
-    controller: settingsDi.makeGetAppSettingByKeyController(),
-  },
-  {
-    authenticated: true,
-    adminOnly: true,
-    controller: settingsDi.makeUpdateAppSettingController(),
+    controller: backofficeDi.makeGetAppSettingByKeyController(),
   },
   {
     authenticated: true,
     adminOnly: true,
-    controller: settingsDi.makeDeleteAppSettingController(),
+    controller: backofficeDi.makeUpdateAppSettingController(),
+  },
+  {
+    authenticated: true,
+    adminOnly: true,
+    controller: backofficeDi.makeDeleteAppSettingController(),
   },
 ];
 
@@ -174,7 +174,7 @@ const controllers = [
   ...stayControllers,
   ...financeControllers,
   ...propertyManagementControllers,
-  ...settingsControllers,
+  ...backofficeControllers,
   healthController,
 ];
 
