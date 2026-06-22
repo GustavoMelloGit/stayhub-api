@@ -11,6 +11,7 @@ import { TenantDi } from "../../../../booking/infra/di/tenant_di";
 import { BunHttpControllerAdapter } from "../adapters/http_controller_adapter";
 import { FinanceDi } from "../../../../finance/infra/di/finance_di";
 import { PropertyManagementDi } from "../../../../property_management/infra/di/property_management_di";
+import { SettingsDi } from "../../../../settings/infra/di/settings_di";
 import { OpenApiBuilder } from "../swagger/open_api_builder";
 import { swaggerUiHtml } from "../swagger/swagger_ui";
 
@@ -21,6 +22,7 @@ const stayDi = new StayDi();
 const corsMiddleware = new CorsMiddleware();
 const financeDi = new FinanceDi();
 const propertyManagementDi = new PropertyManagementDi();
+const settingsDi = new SettingsDi();
 
 type Route = {
   controller: Controller;
@@ -134,6 +136,33 @@ const authControllers: Route[] = [
   },
 ];
 
+const settingsControllers: Route[] = [
+  {
+    authenticated: true,
+    controller: settingsDi.makeCreateAppSettingController(),
+  },
+  {
+    authenticated: true,
+    controller: settingsDi.makeListAppSettingsController(),
+  },
+  {
+    authenticated: true,
+    controller: settingsDi.makeGetAppSettingController(),
+  },
+  {
+    authenticated: true,
+    controller: settingsDi.makeGetAppSettingByKeyController(),
+  },
+  {
+    authenticated: true,
+    controller: settingsDi.makeUpdateAppSettingController(),
+  },
+  {
+    authenticated: true,
+    controller: settingsDi.makeDeleteAppSettingController(),
+  },
+];
+
 const controllers = [
   ...tenantControllers,
   ...propertyControllers,
@@ -141,6 +170,7 @@ const controllers = [
   ...stayControllers,
   ...financeControllers,
   ...propertyManagementControllers,
+  ...settingsControllers,
   healthController,
 ];
 
