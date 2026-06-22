@@ -10,6 +10,7 @@ const envSchema = z.object({
   TUYA_DEVICE_ID: z.string().trim(),
   TUYA_CLIENT_ID: z.string().trim(),
   TUYA_CLIENT_SECRET: z.string().trim(),
+  API_BASE_URL: z.string().trim().optional(),
 });
 
 export const env = envSchema.parse(process.env);
