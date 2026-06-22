@@ -4,10 +4,13 @@ import {
 } from "../../../core/domain/entity/base_entity";
 import { z } from "zod";
 
+export type UserRole = "user" | "admin";
+
 export const userSchema = baseEntitySchema.extend({
   name: z.string().min(1).max(100),
   email: z.string().email().max(255),
   password: z.string().min(8).max(128),
+  role: z.enum(["user", "admin"]).default("user"),
 });
 
 export type UserData = z.infer<typeof userSchema>;
@@ -65,5 +68,9 @@ export class User {
 
   get deleted_at() {
     return this.#data.deleted_at;
+  }
+
+  get role(): UserRole {
+    return this.#data.role;
   }
 }
