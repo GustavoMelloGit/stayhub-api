@@ -4,10 +4,17 @@ export function swaggerUiHtml(
 ): string {
   const autoAuthScript = opts?.signInPath
     ? `
+        onComplete: () => {
+          const saved = localStorage.getItem('swagger_bearer_token');
+          if (saved) ui.preauthorizeApiKey('bearerAuth', saved);
+        },
         responseInterceptor: (response) => {
           if (response.url.endsWith('${opts.signInPath}') && response.status === 200) {
             const token = response.body?.token;
-            if (token) ui.preauthorizeApiKey('bearerAuth', token);
+            if (token) {
+              localStorage.setItem('swagger_bearer_token', token);
+              ui.preauthorizeApiKey('bearerAuth', token);
+            }
           }
           return response;
         },`
