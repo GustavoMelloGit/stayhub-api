@@ -4,13 +4,17 @@ import {
 } from "../../../core/domain/entity/base_entity";
 import { z } from "zod";
 
+export type UserRole = "user" | "admin";
+
 export const userSchema = baseEntitySchema.extend({
   name: z.string().min(1).max(100),
   email: z.string().email().max(255),
   password: z.string().min(8).max(128),
+  role: z.enum(["user", "admin"]).optional().default("user"),
 });
 
 export type UserData = z.infer<typeof userSchema>;
+type UserInputData = z.input<typeof userSchema>;
 
 /**
  * @kind Entity
@@ -26,13 +30,13 @@ export class User {
     return crypto.randomUUID();
   }
 
-  public static create(data: WithoutBaseEntity<UserData>): User {
+  public static create(data: WithoutBaseEntity<UserInputData>): User {
     return new User({
       ...data,
       id: this.nextId(),
       created_at: new Date(),
       updated_at: new Date(),
-    });
+    } as UserData);
   }
 
   public static reconstitute(data: UserData): User {
@@ -65,5 +69,9 @@ export class User {
 
   get deleted_at() {
     return this.#data.deleted_at;
+  }
+
+  get role(): UserRole {
+    return this.#data.role;
   }
 }

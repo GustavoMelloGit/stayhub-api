@@ -1,10 +1,13 @@
 import { describe, it, expect, beforeEach } from "bun:test";
 import { api } from "../helpers/server";
 import { truncate } from "../helpers/database";
-import { createUserFixture } from "../helpers/fixtures/user";
+import {
+  createUserFixture,
+  createAdminFixture,
+} from "../helpers/fixtures/user";
 import { createAuthToken } from "../helpers/fixtures/auth_token";
 
-const TABLES = ["app_settings"];
+const TABLES = ["app_settings", "users"];
 
 type AppSettingDto = {
   id: string;
@@ -19,10 +22,19 @@ type AppSettingDto = {
 async function createAuthTokenForNewUser(): Promise<string> {
   const { user } = await createUserFixture({
     name: "Settings User",
-    email: `settings-${crypto.randomUUID()}@stayhub.dev`,
+    email: `settings-user-${crypto.randomUUID()}@stayhub.dev`,
     password: "password123",
   });
-  return createAuthToken(user.id);
+  return createAuthToken(user.id, "user");
+}
+
+async function createAuthTokenForAdmin(): Promise<string> {
+  const { user } = await createAdminFixture({
+    name: "Settings Admin",
+    email: `settings-admin-${crypto.randomUUID()}@stayhub.dev`,
+    password: "password123",
+  });
+  return createAuthToken(user.id, "admin");
 }
 
 async function createSetting(
@@ -41,8 +53,8 @@ describe("POST /settings", () => {
     await truncate(TABLES);
   });
 
-  it("200 — creates setting with type: string", async () => {
-    const token = await createAuthTokenForNewUser();
+  it("200 — admin creates setting with type: string", async () => {
+    const token = await createAuthTokenForAdmin();
 
     const res = await createSetting(token, {
       key: "app.name",
@@ -61,8 +73,8 @@ describe("POST /settings", () => {
     expect(typeof body.updated_at).toBe("string");
   });
 
-  it("200 — creates setting with type: number", async () => {
-    const token = await createAuthTokenForNewUser();
+  it("200 — admin creates setting with type: number", async () => {
+    const token = await createAuthTokenForAdmin();
 
     const res = await createSetting(token, {
       key: "app.max_guests",
@@ -77,8 +89,8 @@ describe("POST /settings", () => {
     expect(body.type).toBe("number");
   });
 
-  it("200 — creates setting with type: boolean", async () => {
-    const token = await createAuthTokenForNewUser();
+  it("200 — admin creates setting with type: boolean", async () => {
+    const token = await createAuthTokenForAdmin();
 
     const res = await createSetting(token, {
       key: "feature.dark_mode",
@@ -93,8 +105,8 @@ describe("POST /settings", () => {
     expect(body.type).toBe("boolean");
   });
 
-  it("200 — creates setting with type: json (object)", async () => {
-    const token = await createAuthTokenForNewUser();
+  it("200 — admin creates setting with type: json (object)", async () => {
+    const token = await createAuthTokenForAdmin();
 
     const jsonValue = { theme: "dark", locale: "pt-BR" };
     const res = await createSetting(token, {
@@ -110,8 +122,37 @@ describe("POST /settings", () => {
     expect(body.value).toEqual(jsonValue);
   });
 
-  it("409 — rejects duplicate key", async () => {
+  it("403 — user role receives 403 on POST /settings", async () => {
     const token = await createAuthTokenForNewUser();
+
+    const res = await createSetting(token, {
+      key: "app.name",
+      value: "StayHub",
+      type: "string",
+    });
+
+    expect(res.status).toBe(403);
+  });
+
+  it("403 — token with forged admin role is rejected when user is 'user' in db", async () => {
+    const { user } = await createUserFixture({
+      name: "Forged Role User",
+      email: `forged-role-${crypto.randomUUID()}@stayhub.dev`,
+      password: "password123",
+    });
+    const forgedToken = await createAuthToken(user.id, "admin");
+
+    const res = await createSetting(forgedToken, {
+      key: "app.name",
+      value: "StayHub",
+      type: "string",
+    });
+
+    expect(res.status).toBe(403);
+  });
+
+  it("409 — admin rejects duplicate key", async () => {
+    const token = await createAuthTokenForAdmin();
 
     const firstRes = await createSetting(token, {
       key: "app.name",
@@ -143,7 +184,7 @@ describe("POST /settings", () => {
   });
 
   it("422 — empty body is rejected (boundedJsonValue with undefined returns validation error)", async () => {
-    const token = await createAuthTokenForNewUser();
+    const token = await createAuthTokenForAdmin();
 
     const res = await api("/settings", {
       method: "POST",
@@ -155,7 +196,7 @@ describe("POST /settings", () => {
   });
 
   it("422 — rejects invalid type", async () => {
-    const token = await createAuthTokenForNewUser();
+    const token = await createAuthTokenForAdmin();
 
     const res = await createSetting(token, {
       key: "app.name",
@@ -167,7 +208,7 @@ describe("POST /settings", () => {
   });
 
   it("422 — rejects value incompatible with type (number type, string value)", async () => {
-    const token = await createAuthTokenForNewUser();
+    const token = await createAuthTokenForAdmin();
 
     const res = await createSetting(token, {
       key: "app.max_guests",
@@ -179,7 +220,7 @@ describe("POST /settings", () => {
   });
 
   it("422 — rejects extra field in body (.strict())", async () => {
-    const token = await createAuthTokenForNewUser();
+    const token = await createAuthTokenForAdmin();
 
     const res = await createSetting(token, {
       key: "app.name",
@@ -192,7 +233,7 @@ describe("POST /settings", () => {
   });
 
   it("422 — rejects value exceeding 16KB", async () => {
-    const token = await createAuthTokenForNewUser();
+    const token = await createAuthTokenForAdmin();
 
     const bigValue = "a".repeat(16385);
     const res = await createSetting(token, {
@@ -210,10 +251,11 @@ describe("GET /settings/:id", () => {
     await truncate(TABLES);
   });
 
-  it("200 — returns setting by id", async () => {
-    const token = await createAuthTokenForNewUser();
+  it("200 — returns setting by id (user role)", async () => {
+    const adminToken = await createAuthTokenForAdmin();
+    const userToken = await createAuthTokenForNewUser();
 
-    const createRes = await createSetting(token, {
+    const createRes = await createSetting(adminToken, {
       key: "app.name",
       value: "StayHub",
       type: "string",
@@ -222,7 +264,7 @@ describe("GET /settings/:id", () => {
     expect(createRes.status).toBe(200);
 
     const res = await api(`/settings/${created.id}`, {
-      headers: { Authorization: "Bearer " + token },
+      headers: { Authorization: "Bearer " + userToken },
     });
     const body = (await res.json()) as AppSettingDto;
 
@@ -255,10 +297,11 @@ describe("GET /settings/key/:key", () => {
     await truncate(TABLES);
   });
 
-  it("200 — returns setting by key", async () => {
-    const token = await createAuthTokenForNewUser();
+  it("200 — returns setting by key (user role)", async () => {
+    const adminToken = await createAuthTokenForAdmin();
+    const userToken = await createAuthTokenForNewUser();
 
-    const createRes = await createSetting(token, {
+    const createRes = await createSetting(adminToken, {
       key: "feature.dark_mode",
       value: false,
       type: "boolean",
@@ -266,7 +309,7 @@ describe("GET /settings/key/:key", () => {
     expect(createRes.status).toBe(200);
 
     const res = await api("/settings/key/feature.dark_mode", {
-      headers: { Authorization: "Bearer " + token },
+      headers: { Authorization: "Bearer " + userToken },
     });
     const body = (await res.json()) as AppSettingDto;
 
@@ -298,22 +341,23 @@ describe("GET /settings", () => {
     await truncate(TABLES);
   });
 
-  it("200 — returns paginated list with metadata", async () => {
-    const token = await createAuthTokenForNewUser();
+  it("200 — returns paginated list with metadata (user role)", async () => {
+    const adminToken = await createAuthTokenForAdmin();
+    const userToken = await createAuthTokenForNewUser();
 
-    await createSetting(token, {
+    await createSetting(adminToken, {
       key: "app.name",
       value: "StayHub",
       type: "string",
     });
-    await createSetting(token, {
+    await createSetting(adminToken, {
       key: "app.version",
       value: "1.0.0",
       type: "string",
     });
 
     const res = await api("/settings", {
-      headers: { Authorization: "Bearer " + token },
+      headers: { Authorization: "Bearer " + userToken },
     });
     const body = (await res.json()) as {
       data: AppSettingDto[];
@@ -350,8 +394,8 @@ describe("PUT /settings/:id", () => {
     await truncate(TABLES);
   });
 
-  it("200 — updates value and description", async () => {
-    const token = await createAuthTokenForNewUser();
+  it("200 — admin updates value and description", async () => {
+    const token = await createAuthTokenForAdmin();
 
     const createRes = await createSetting(token, {
       key: "app.name",
@@ -375,8 +419,29 @@ describe("PUT /settings/:id", () => {
     expect(body.description).toBe("Updated name");
   });
 
+  it("403 — user role receives 403 on PUT /settings/:id", async () => {
+    const adminToken = await createAuthTokenForAdmin();
+    const userToken = await createAuthTokenForNewUser();
+
+    const createRes = await createSetting(adminToken, {
+      key: "app.name",
+      value: "OldName",
+      type: "string",
+    });
+    const created = (await createRes.json()) as AppSettingDto;
+    expect(createRes.status).toBe(200);
+
+    const res = await api(`/settings/${created.id}`, {
+      method: "PUT",
+      headers: { Authorization: "Bearer " + userToken },
+      body: JSON.stringify({ value: "NewName" }),
+    });
+
+    expect(res.status).toBe(403);
+  });
+
   it("422 — rejects attempt to change key (.strict())", async () => {
-    const token = await createAuthTokenForNewUser();
+    const token = await createAuthTokenForAdmin();
 
     const createRes = await createSetting(token, {
       key: "app.name",
@@ -404,8 +469,8 @@ describe("PUT /settings/:id", () => {
     expect(res.status).toBe(401);
   });
 
-  it("404 — returns 404 for non-existent id", async () => {
-    const token = await createAuthTokenForNewUser();
+  it("404 — admin gets 404 for non-existent id", async () => {
+    const token = await createAuthTokenForAdmin();
 
     const res = await api(`/settings/${crypto.randomUUID()}`, {
       method: "PUT",
@@ -422,8 +487,8 @@ describe("DELETE /settings/:id", () => {
     await truncate(TABLES);
   });
 
-  it("204 — soft deletes setting successfully", async () => {
-    const token = await createAuthTokenForNewUser();
+  it("204 — admin soft deletes setting successfully", async () => {
+    const token = await createAuthTokenForAdmin();
 
     const createRes = await createSetting(token, {
       key: "app.name",
@@ -441,6 +506,26 @@ describe("DELETE /settings/:id", () => {
     expect(res.status).toBe(204);
   });
 
+  it("403 — user role receives 403 on DELETE /settings/:id", async () => {
+    const adminToken = await createAuthTokenForAdmin();
+    const userToken = await createAuthTokenForNewUser();
+
+    const createRes = await createSetting(adminToken, {
+      key: "app.name",
+      value: "StayHub",
+      type: "string",
+    });
+    const created = (await createRes.json()) as AppSettingDto;
+    expect(createRes.status).toBe(200);
+
+    const res = await api(`/settings/${created.id}`, {
+      method: "DELETE",
+      headers: { Authorization: "Bearer " + userToken },
+    });
+
+    expect(res.status).toBe(403);
+  });
+
   it("401 — rejects request without token", async () => {
     const res = await api(`/settings/${crypto.randomUUID()}`, {
       method: "DELETE",
@@ -449,8 +534,8 @@ describe("DELETE /settings/:id", () => {
     expect(res.status).toBe(401);
   });
 
-  it("404 — returns 404 for non-existent id", async () => {
-    const token = await createAuthTokenForNewUser();
+  it("404 — admin gets 404 for non-existent id", async () => {
+    const token = await createAuthTokenForAdmin();
 
     const res = await api(`/settings/${crypto.randomUUID()}`, {
       method: "DELETE",
@@ -461,9 +546,10 @@ describe("DELETE /settings/:id", () => {
   });
 
   it("404 — deleted setting is not found (soft delete confirmed)", async () => {
-    const token = await createAuthTokenForNewUser();
+    const adminToken = await createAuthTokenForAdmin();
+    const userToken = await createAuthTokenForNewUser();
 
-    const createRes = await createSetting(token, {
+    const createRes = await createSetting(adminToken, {
       key: "app.name",
       value: "StayHub",
       type: "string",
@@ -473,12 +559,12 @@ describe("DELETE /settings/:id", () => {
 
     const deleteRes = await api(`/settings/${created.id}`, {
       method: "DELETE",
-      headers: { Authorization: "Bearer " + token },
+      headers: { Authorization: "Bearer " + adminToken },
     });
     expect(deleteRes.status).toBe(204);
 
     const getRes = await api(`/settings/${created.id}`, {
-      headers: { Authorization: "Bearer " + token },
+      headers: { Authorization: "Bearer " + userToken },
     });
 
     expect(getRes.status).toBe(404);

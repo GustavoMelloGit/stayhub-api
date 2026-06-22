@@ -11,7 +11,7 @@ import { TenantDi } from "../../../../booking/infra/di/tenant_di";
 import { BunHttpControllerAdapter } from "../adapters/http_controller_adapter";
 import { FinanceDi } from "../../../../finance/infra/di/finance_di";
 import { PropertyManagementDi } from "../../../../property_management/infra/di/property_management_di";
-import { SettingsDi } from "../../../../settings/infra/di/settings_di";
+import { BackofficeDi } from "../../../../backoffice/infra/di/backoffice_di";
 import { OpenApiBuilder } from "../swagger/open_api_builder";
 import { swaggerUiHtml } from "../swagger/swagger_ui";
 
@@ -22,11 +22,12 @@ const stayDi = new StayDi();
 const corsMiddleware = new CorsMiddleware();
 const financeDi = new FinanceDi();
 const propertyManagementDi = new PropertyManagementDi();
-const settingsDi = new SettingsDi();
+const backofficeDi = new BackofficeDi();
 
 type Route = {
   controller: Controller;
   authenticated: boolean;
+  adminOnly?: boolean;
 };
 
 const healthController: Route = {
@@ -136,30 +137,33 @@ const authControllers: Route[] = [
   },
 ];
 
-const settingsControllers: Route[] = [
+const backofficeControllers: Route[] = [
   {
     authenticated: true,
-    controller: settingsDi.makeCreateAppSettingController(),
+    adminOnly: true,
+    controller: backofficeDi.makeCreateAppSettingController(),
   },
   {
     authenticated: true,
-    controller: settingsDi.makeListAppSettingsController(),
+    controller: backofficeDi.makeListAppSettingsController(),
   },
   {
     authenticated: true,
-    controller: settingsDi.makeGetAppSettingController(),
+    controller: backofficeDi.makeGetAppSettingController(),
   },
   {
     authenticated: true,
-    controller: settingsDi.makeGetAppSettingByKeyController(),
+    controller: backofficeDi.makeGetAppSettingByKeyController(),
   },
   {
     authenticated: true,
-    controller: settingsDi.makeUpdateAppSettingController(),
+    adminOnly: true,
+    controller: backofficeDi.makeUpdateAppSettingController(),
   },
   {
     authenticated: true,
-    controller: settingsDi.makeDeleteAppSettingController(),
+    adminOnly: true,
+    controller: backofficeDi.makeDeleteAppSettingController(),
   },
 ];
 
@@ -170,7 +174,7 @@ const controllers = [
   ...stayControllers,
   ...financeControllers,
   ...propertyManagementControllers,
-  ...settingsControllers,
+  ...backofficeControllers,
   healthController,
 ];
 
@@ -179,11 +183,15 @@ const routeMap = new Map<
   Partial<Record<HttpControllerMethod, (request: Request) => Promise<Response>>>
 >();
 
-controllers.forEach(({ authenticated, controller }) => {
+controllers.forEach(({ authenticated, adminOnly, controller }) => {
   const alreadyExists = routeMap.get(controller.path);
   if (!alreadyExists) {
     routeMap.set(controller.path, {
-      [controller.method]: BunHttpControllerAdapter(controller, authenticated),
+      [controller.method]: BunHttpControllerAdapter(
+        controller,
+        authenticated,
+        adminOnly
+      ),
       // Add OPTIONS handler for CORS preflight
       [HttpControllerMethod.OPTIONS]: async (request: Request) =>
         corsMiddleware.handlePreflightRequest(request),
@@ -191,7 +199,11 @@ controllers.forEach(({ authenticated, controller }) => {
   } else {
     routeMap.set(controller.path, {
       ...alreadyExists,
-      [controller.method]: BunHttpControllerAdapter(controller, authenticated),
+      [controller.method]: BunHttpControllerAdapter(
+        controller,
+        authenticated,
+        adminOnly
+      ),
       // Add OPTIONS handler for CORS preflight
       [HttpControllerMethod.OPTIONS]: async (request: Request) =>
         corsMiddleware.handlePreflightRequest(request),

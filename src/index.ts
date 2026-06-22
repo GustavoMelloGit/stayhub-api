@@ -30,12 +30,15 @@ async function main() {
   });
 
   const isProduction = env.NODE_ENV === "production";
+  const baseUrl = env.API_BASE_URL ?? `http://localhost:${server.port}`;
   logger.info(
     isProduction
       ? `🚀 API running in production mode`
-      : `🚀 Listening on http://localhost:${server.port}`,
+      : `🚀 Listening on ${baseUrl}`,
     { port: server.port, environment: env.NODE_ENV }
   );
+  logger.info(`📖 API docs: ${baseUrl}/docs`);
+  logger.info(`📄 OpenAPI JSON: ${baseUrl}/docs/spec`);
 }
 
 main();

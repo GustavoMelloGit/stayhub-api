@@ -24,6 +24,7 @@ const outputSchema = z.object({
     id: z.string().uuid(),
     name: z.string(),
     email: z.string().email(),
+    role: z.enum(["user", "admin"]),
     created_at: z.string().datetime(),
     updated_at: z.string().datetime(),
   }),

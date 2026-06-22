@@ -39,6 +39,7 @@ export class DeleteAppSettingController implements Controller {
     responses: {
       "204": noContentResponse("App setting deleted"),
       "401": errorResponse("Unauthorized"),
+      "403": errorResponse("Forbidden — admin role required"),
       "404": errorResponse("App setting not found"),
     },
   };

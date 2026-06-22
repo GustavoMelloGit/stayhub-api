@@ -55,10 +55,19 @@ export class CreateAppSettingController implements Controller {
     summary: "Create app setting",
     description: "Creates a new application configuration entry.",
     tags: ["Settings"],
-    requestBody: bodyFromZod(inputSchema),
+    requestBody: bodyFromZod(inputSchema, {
+      example: {
+        key: "cohost_stay_message_template",
+        value: "Olá {cohost_name}, os dados da estadia são: {stay_details}",
+        type: "string",
+        description:
+          "Template da mensagem para o coanfitrião com dados da estadia",
+      },
+    }),
     responses: {
       "200": responseFromZod("App setting created", outputSchema),
       "401": errorResponse("Unauthorized"),
+      "403": errorResponse("Forbidden — admin role required"),
       "409": errorResponse("App setting key already exists"),
       "422": validationErrorResponse(),
     },

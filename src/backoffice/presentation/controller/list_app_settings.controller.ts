@@ -77,7 +77,27 @@ export class ListAppSettingsController implements Controller {
       },
     ],
     responses: {
-      "200": responseFromZod("Paginated app settings", outputSchema),
+      "200": responseFromZod("Paginated app settings", outputSchema, {
+        data: [
+          {
+            id: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            key: "cohost_stay_message_template",
+            value: "Olá {cohost_name}, os dados da estadia são: {stay_details}",
+            type: "string",
+            description: "Template da mensagem para o coanfitrião",
+            created_at: "2026-06-22T00:00:00.000Z",
+            updated_at: "2026-06-22T00:00:00.000Z",
+          },
+        ],
+        pagination: {
+          page: 1,
+          limit: 20,
+          total: 1,
+          total_pages: 1,
+          has_next: false,
+          has_previous: false,
+        },
+      }),
       "401": errorResponse("Unauthorized"),
     },
   };

@@ -15,6 +15,7 @@ type Output = {
     id: string;
     name: string;
     email: string;
+    role: string;
     created_at: Date;
     updated_at: Date;
   };
@@ -43,7 +44,7 @@ export class SignInUseCase implements UseCase<Input, Output> {
       throw new UnauthorizedError("Incorrect e-mail or password");
     }
 
-    const token = await this.sessionManager.createSession(user.id);
+    const token = await this.sessionManager.createSession(user.id, user.role);
 
     return {
       token,
@@ -51,6 +52,7 @@ export class SignInUseCase implements UseCase<Input, Output> {
         id: user.id,
         email: user.email,
         name: user.name,
+        role: user.role,
         created_at: user.created_at,
         updated_at: user.updated_at,
       },

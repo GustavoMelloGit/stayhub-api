@@ -17,6 +17,7 @@ type Output = {
     id: string;
     name: string;
     email: string;
+    role: string;
     created_at: Date;
     updated_at: Date;
   };
@@ -38,11 +39,18 @@ export class RegisterUserUseCase implements UseCase<Input, Output> {
 
     const hashedPassword = await this.hasher.hash(input.password);
 
-    const user = User.create({ ...input, password: hashedPassword });
+    const user = User.create({
+      name: input.name,
+      email: input.email,
+      password: hashedPassword,
+    });
 
     const savedUser = await this.userRepository.addUser(user);
 
-    const token = await this.sessionManager.createSession(savedUser.id);
+    const token = await this.sessionManager.createSession(
+      savedUser.id,
+      savedUser.role
+    );
 
     return {
       token,
@@ -50,6 +58,7 @@ export class RegisterUserUseCase implements UseCase<Input, Output> {
         id: savedUser.id,
         name: savedUser.name,
         email: savedUser.email,
+        role: savedUser.role,
         created_at: savedUser.created_at,
         updated_at: savedUser.updated_at,
       },
